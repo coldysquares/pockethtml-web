@@ -30,6 +30,8 @@ const filenameEl = document.querySelector('#filename');
 const saveStatus = document.querySelector('#saveStatus');
 const fileInput = document.querySelector('#fileInput');
 const modeButtons = [...document.querySelectorAll('.mode-button')];
+const focusButton = document.querySelector('#focusButton');
+const restoreControlsButton = document.querySelector('#restoreControlsButton');
 
 let filename = localStorage.getItem(STORAGE_NAME) || 'untitled.html';
 editor.value = localStorage.getItem(STORAGE_CODE) || starter;
@@ -60,8 +62,28 @@ function setMode(mode) {
   if (!isCode) renderPreview();
 }
 
+function enterFocusView() {
+  if (!codePane.hidden) setMode('preview');
+  document.body.classList.add('focus-preview');
+  restoreControlsButton.hidden = false;
+}
+
+function exitFocusView() {
+  document.body.classList.remove('focus-preview');
+  restoreControlsButton.hidden = true;
+}
+
 modeButtons.forEach(button => {
   button.addEventListener('click', () => setMode(button.dataset.mode));
+});
+
+focusButton.addEventListener('click', enterFocusView);
+restoreControlsButton.addEventListener('click', exitFocusView);
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && document.body.classList.contains('focus-preview')) {
+    exitFocusView();
+  }
 });
 
 document.querySelector('#refreshButton').addEventListener('click', () => {
