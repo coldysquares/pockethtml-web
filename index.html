@@ -22,7 +22,7 @@
       </div>
       <div class="topbar-actions">
         <div class="status" id="saveStatus" aria-live="polite">Saved locally</div>
-        <button id="focusButton" class="focus-button" type="button" aria-label="Hide PocketHTML controls and show the preview full screen">
+        <button id="focusButton" class="focus-button" type="button" aria-label="Hide PocketHTML controls and show the preview in focus mode">
           Full view
         </button>
       </div>
@@ -63,7 +63,7 @@
     </section>
 
     <section id="previewPane" class="pane preview-pane" hidden>
-      <iframe id="preview" title="HTML preview" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"></iframe>
+      <iframe id="preview" title="HTML preview" scrolling="yes" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"></iframe>
     </section>
 
     <footer>
@@ -71,9 +71,12 @@
     </footer>
   </main>
 
-  <button id="restoreControlsButton" class="restore-controls" type="button" hidden aria-label="Show PocketHTML controls">
-    Controls
-  </button>
+  <div id="focusBar" class="focus-bar" hidden>
+    <span class="focus-bar-label">PocketHTML · Preview</span>
+    <button id="restoreControlsButton" class="restore-controls" type="button" aria-label="Show PocketHTML controls">
+      Controls
+    </button>
+  </div>
 
   <script src="app.js"></script>
 </body>

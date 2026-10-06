@@ -1,4 +1,4 @@
-const CACHE = 'pockethtml-v2';
+const CACHE = 'pockethtml-v3';
 const ASSETS = [
   './',
   './index.html',

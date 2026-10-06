@@ -31,6 +31,7 @@ const saveStatus = document.querySelector('#saveStatus');
 const fileInput = document.querySelector('#fileInput');
 const modeButtons = [...document.querySelectorAll('.mode-button')];
 const focusButton = document.querySelector('#focusButton');
+const focusBar = document.querySelector('#focusBar');
 const restoreControlsButton = document.querySelector('#restoreControlsButton');
 
 let filename = localStorage.getItem(STORAGE_NAME) || 'untitled.html';
@@ -65,12 +66,12 @@ function setMode(mode) {
 function enterFocusView() {
   if (!codePane.hidden) setMode('preview');
   document.body.classList.add('focus-preview');
-  restoreControlsButton.hidden = false;
+  focusBar.hidden = false;
 }
 
 function exitFocusView() {
   document.body.classList.remove('focus-preview');
-  restoreControlsButton.hidden = true;
+  focusBar.hidden = true;
 }
 
 modeButtons.forEach(button => {
