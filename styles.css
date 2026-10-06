@@ -39,6 +39,11 @@ button { -webkit-tap-highlight-color: transparent; }
   justify-content: space-between;
   gap: 16px;
 }
+.topbar-actions {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
 .eyebrow {
   color: var(--muted);
   font-size: 11px;
@@ -56,6 +61,18 @@ h1 {
   white-space: nowrap;
   padding-bottom: 5px;
 }
+.focus-button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+.focus-button:active { transform: scale(.97); }
 
 .mode-switch {
   display: grid;
@@ -169,7 +186,72 @@ h1 {
 [hidden] { display: none !important; }
 footer { color: var(--muted); font-size: 11px; text-align: center; }
 
+.restore-controls {
+  position: fixed;
+  z-index: 1000;
+  top: calc(8px + var(--safe-top));
+  right: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 999px;
+  background: rgba(13,15,18,.82);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .01em;
+  box-shadow: 0 4px 20px rgba(0,0,0,.28);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+body.focus-preview {
+  height: 100dvh;
+  overflow: hidden;
+}
+body.focus-preview .app-shell {
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  padding: 0;
+  gap: 0;
+  display: block;
+}
+body.focus-preview .topbar,
+body.focus-preview .mode-switch,
+body.focus-preview .toolbar,
+body.focus-preview .code-pane,
+body.focus-preview footer {
+  display: none !important;
+}
+body.focus-preview .preview-pane {
+  display: block !important;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  border: 0;
+  border-radius: 0;
+}
+body.focus-preview #preview {
+  display: block;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+}
+
+@media (max-width: 520px) {
+  .topbar { gap: 10px; }
+  .topbar-actions {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .status { padding-bottom: 0; }
+  .focus-button { min-height: 30px; padding: 0 9px; }
+}
+
 @media (min-width: 780px) {
   .app-shell { padding-left: 24px; padding-right: 24px; }
   #editor, #preview { min-height: 66dvh; }
+  body.focus-preview #preview { min-height: 100dvh; }
 }
