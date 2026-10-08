@@ -1,5 +1,6 @@
 const STORAGE_CODE = 'pockethtml.code.v1';
 const STORAGE_NAME = 'pockethtml.filename.v1';
+const STORAGE_SOURCE = 'pockethtml.sourceUrl.v1';
 
 const starter = `<!doctype html>
 <html lang="en">
@@ -29,18 +30,22 @@ const previewPane = document.querySelector('#previewPane');
 const filenameEl = document.querySelector('#filename');
 const saveStatus = document.querySelector('#saveStatus');
 const fileInput = document.querySelector('#fileInput');
+const importUrlButton = document.querySelector('#importUrlButton');
 const modeButtons = [...document.querySelectorAll('.mode-button')];
 const focusButton = document.querySelector('#focusButton');
 const focusBar = document.querySelector('#focusBar');
 const restoreControlsButton = document.querySelector('#restoreControlsButton');
 
 let filename = localStorage.getItem(STORAGE_NAME) || 'untitled.html';
+let sourceUrl = localStorage.getItem(STORAGE_SOURCE) || '';
 editor.value = localStorage.getItem(STORAGE_CODE) || starter;
 filenameEl.textContent = filename;
 
 function saveLocal() {
   localStorage.setItem(STORAGE_CODE, editor.value);
   localStorage.setItem(STORAGE_NAME, filename);
+  if (sourceUrl) localStorage.setItem(STORAGE_SOURCE, sourceUrl);
+  else localStorage.removeItem(STORAGE_SOURCE);
   saveStatus.textContent = 'Saved locally';
 }
 
@@ -51,8 +56,28 @@ editor.addEventListener('input', () => {
   saveTimer = setTimeout(saveLocal, 180);
 });
 
+function escapeAttribute(value) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('<', '&lt;');
+}
+
+function buildPreviewHtml() {
+  if (!sourceUrl || /<base\b/i.test(editor.value)) return editor.value;
+
+  const baseTag = `<base href="${escapeAttribute(sourceUrl)}">`;
+  const headMatch = editor.value.match(/<head\b[^>]*>/i);
+
+  if (headMatch) {
+    return editor.value.replace(headMatch[0], `${headMatch[0]}\n  ${baseTag}`);
+  }
+
+  return `${baseTag}\n${editor.value}`;
+}
+
 function renderPreview() {
-  preview.srcdoc = editor.value;
+  preview.srcdoc = buildPreviewHtml();
 }
 
 function setMode(mode) {
@@ -74,12 +99,62 @@ function exitFocusView() {
   focusBar.hidden = true;
 }
 
+function filenameFromUrl(value) {
+  try {
+    const url = new URL(value);
+    const lastPart = decodeURIComponent(url.pathname.split('/').filter(Boolean).pop() || 'index.html')
+      .replace(/[^a-z0-9._-]+/gi, '-')
+      .replace(/^-+|-+$/g, '');
+    const safeName = lastPart || 'index.html';
+    return /\.html?$/i.test(safeName) ? safeName : `${safeName}.html`;
+  } catch {
+    return 'imported.html';
+  }
+}
+
+async function importFromUrl() {
+  let value = prompt('Paste a public page URL:');
+  if (!value) return;
+
+  value = value.trim();
+  if (!/^https?:\/\//i.test(value)) value = `https://${value}`;
+
+  importUrlButton.disabled = true;
+  saveStatus.textContent = 'Fetching…';
+
+  try {
+    const response = await fetch('/api/fetch-source', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: value })
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
+    if (typeof data.html !== 'string') throw new Error('No HTML was returned.');
+
+    editor.value = data.html;
+    sourceUrl = data.finalUrl || value;
+    filename = filenameFromUrl(sourceUrl);
+    filenameEl.textContent = filename;
+    saveLocal();
+    setMode('code');
+    editor.focus();
+  } catch (error) {
+    saveStatus.textContent = 'Import failed';
+    alert(`Could not import that page: ${error.message}`);
+  } finally {
+    importUrlButton.disabled = false;
+  }
+}
+
 modeButtons.forEach(button => {
   button.addEventListener('click', () => setMode(button.dataset.mode));
 });
 
 focusButton.addEventListener('click', enterFocusView);
 restoreControlsButton.addEventListener('click', exitFocusView);
+importUrlButton.addEventListener('click', importFromUrl);
 
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && document.body.classList.contains('focus-preview')) {
@@ -96,6 +171,7 @@ document.querySelector('#newButton').addEventListener('click', () => {
   if (!confirm('Start a new file? Your current work is already saved in this browser.')) return;
   editor.value = starter;
   filename = 'untitled.html';
+  sourceUrl = '';
   filenameEl.textContent = filename;
   saveLocal();
   setMode('code');
@@ -108,6 +184,7 @@ fileInput.addEventListener('change', async event => {
   try {
     editor.value = await file.text();
     filename = file.name || 'untitled.html';
+    sourceUrl = '';
     filenameEl.textContent = filename;
     saveLocal();
     setMode('code');
