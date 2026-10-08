@@ -36,6 +36,9 @@ const focusButton = document.querySelector('#focusButton');
 const focusBar = document.querySelector('#focusBar');
 const restoreControlsButton = document.querySelector('#restoreControlsButton');
 
+const LOCAL_PREVIEW_SANDBOX = 'allow-scripts allow-forms allow-modals allow-popups allow-same-origin';
+const IMPORTED_PREVIEW_SANDBOX = 'allow-scripts allow-forms allow-modals allow-popups';
+
 let filename = localStorage.getItem(STORAGE_NAME) || 'untitled.html';
 let sourceUrl = localStorage.getItem(STORAGE_SOURCE) || '';
 editor.value = localStorage.getItem(STORAGE_CODE) || starter;
@@ -77,6 +80,7 @@ function buildPreviewHtml() {
 }
 
 function renderPreview() {
+  preview.setAttribute('sandbox', sourceUrl ? IMPORTED_PREVIEW_SANDBOX : LOCAL_PREVIEW_SANDBOX);
   preview.srcdoc = buildPreviewHtml();
 }
 
