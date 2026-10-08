@@ -30,7 +30,7 @@ button { -webkit-tap-highlight-color: transparent; }
   margin: 0 auto;
   padding: calc(18px + var(--safe-top)) 16px calc(18px + var(--safe-bottom));
   display: grid;
-  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
   gap: 12px;
 }
 
@@ -74,6 +74,32 @@ h1 {
   white-space: nowrap;
 }
 .focus-button:active { transform: scale(.97); }
+
+.pocket-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  background: #111318;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.pocket-switch-link {
+  min-height: 34px;
+  border-radius: 9px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.pocket-switch-link.active {
+  background: var(--panel-2);
+  color: var(--accent);
+}
 
 .mode-switch {
   display: grid;
@@ -240,6 +266,7 @@ body.focus-preview .app-shell {
   display: block;
 }
 body.focus-preview .topbar,
+body.focus-preview .pocket-switch,
 body.focus-preview .mode-switch,
 body.focus-preview .toolbar,
 body.focus-preview .code-pane,
