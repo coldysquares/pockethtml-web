@@ -39,10 +39,24 @@ const restoreControlsButton = document.querySelector('#restoreControlsButton');
 const LOCAL_PREVIEW_SANDBOX = 'allow-scripts allow-forms allow-modals allow-popups allow-same-origin';
 const IMPORTED_PREVIEW_SANDBOX = 'allow-scripts allow-forms allow-modals allow-popups';
 
+const STORAGE_DOC = 'pockethtml.docId.v1';
+const library = window.PocketLibrary || null;
+
 let filename = localStorage.getItem(STORAGE_NAME) || 'untitled.html';
 let sourceUrl = localStorage.getItem(STORAGE_SOURCE) || '';
+let docId = localStorage.getItem(STORAGE_DOC) || '';
 editor.value = localStorage.getItem(STORAGE_CODE) || starter;
 filenameEl.textContent = filename;
+
+function persistDoc() {
+  if (!library) return Promise.resolve();
+  if (!docId) {
+    docId = library.newId();
+    localStorage.setItem(STORAGE_DOC, docId);
+  }
+  return library.put({ id: docId, name: filename, code: editor.value, sourceUrl })
+    .catch(() => { saveStatus.textContent = 'Saved (library unavailable)'; });
+}
 
 function saveLocal() {
   localStorage.setItem(STORAGE_CODE, editor.value);
@@ -50,6 +64,36 @@ function saveLocal() {
   if (sourceUrl) localStorage.setItem(STORAGE_SOURCE, sourceUrl);
   else localStorage.removeItem(STORAGE_SOURCE);
   saveStatus.textContent = 'Saved locally';
+  return persistDoc();
+}
+
+// Start a fresh library entry (Open, Import URL, New). Earlier files stay in the Library.
+function startDoc({ name, code, source = '' }) {
+  docId = library ? library.newId() : '';
+  if (docId) localStorage.setItem(STORAGE_DOC, docId);
+  else localStorage.removeItem(STORAGE_DOC);
+  editor.value = code;
+  filename = name || 'untitled.html';
+  sourceUrl = source;
+  filenameEl.textContent = filename;
+  return saveLocal();
+}
+
+// Switch the editor to an existing library entry.
+function loadDoc(doc) {
+  docId = doc.id;
+  localStorage.setItem(STORAGE_DOC, docId);
+  editor.value = doc.code;
+  filename = doc.name || 'untitled.html';
+  sourceUrl = doc.sourceUrl || '';
+  filenameEl.textContent = filename;
+  return saveLocal();
+}
+
+// Opening the same file twice reuses its entry instead of duplicating it.
+async function openAsDoc(name, code, source = '') {
+  const same = library ? await library.findSame(name, code).catch(() => null) : null;
+  return same ? loadDoc(same) : startDoc({ name, code, source });
 }
 
 let saveTimer;
@@ -79,9 +123,17 @@ function buildPreviewHtml() {
   return `${baseTag}\n${editor.value}`;
 }
 
-function renderPreview() {
-  preview.setAttribute('sandbox', sourceUrl ? IMPORTED_PREVIEW_SANDBOX : LOCAL_PREVIEW_SANDBOX);
-  preview.srcdoc = buildPreviewHtml();
+let lastRendered = null;
+
+// Only reload the preview when the code actually changed, so a tool that is
+// mid-task (converting, recording) is not wiped by switching tabs. Refresh forces it.
+function renderPreview(force = false) {
+  const html = buildPreviewHtml();
+  const sandbox = sourceUrl ? IMPORTED_PREVIEW_SANDBOX : LOCAL_PREVIEW_SANDBOX;
+  if (!force && html === lastRendered && preview.getAttribute('sandbox') === sandbox) return;
+  preview.setAttribute('sandbox', sandbox);
+  preview.srcdoc = html;
+  lastRendered = html;
 }
 
 function setMode(mode) {
@@ -137,11 +189,8 @@ async function importFromUrl() {
     if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
     if (typeof data.html !== 'string') throw new Error('No HTML was returned.');
 
-    editor.value = data.html;
-    sourceUrl = data.finalUrl || value;
-    filename = filenameFromUrl(sourceUrl);
-    filenameEl.textContent = filename;
-    saveLocal();
+    const finalUrl = data.finalUrl || value;
+    await openAsDoc(filenameFromUrl(finalUrl), data.html, finalUrl);
     setMode('code');
     editor.focus();
   } catch (error) {
@@ -167,17 +216,13 @@ document.addEventListener('keydown', event => {
 });
 
 document.querySelector('#refreshButton').addEventListener('click', () => {
-  renderPreview();
+  renderPreview(true);
   setMode('preview');
 });
 
-document.querySelector('#newButton').addEventListener('click', () => {
-  if (!confirm('Start a new file? Your current work is already saved in this browser.')) return;
-  editor.value = starter;
-  filename = 'untitled.html';
-  sourceUrl = '';
-  filenameEl.textContent = filename;
-  saveLocal();
+document.querySelector('#newButton').addEventListener('click', async () => {
+  if (!library && !confirm('Start a new file? Your current work will be replaced.')) return;
+  await startDoc({ name: 'untitled.html', code: starter });
   setMode('code');
   editor.focus();
 });
@@ -186,11 +231,7 @@ fileInput.addEventListener('change', async event => {
   const [file] = event.target.files;
   if (!file) return;
   try {
-    editor.value = await file.text();
-    filename = file.name || 'untitled.html';
-    sourceUrl = '';
-    filenameEl.textContent = filename;
-    saveLocal();
+    await openAsDoc(file.name || 'untitled.html', await file.text());
     setMode('code');
   } catch (error) {
     alert(`Could not open that file: ${error.message}`);
@@ -230,7 +271,122 @@ editor.addEventListener('keydown', event => {
   editor.dispatchEvent(new Event('input', { bubbles: true }));
 });
 
-renderPreview();
+// ---- Library sheet ----
+const librarySheet = document.querySelector('#librarySheet');
+const libraryList = document.querySelector('#libraryList');
+
+function formatSize(bytes) {
+  return bytes < 1024 ? `${bytes} B` : bytes < 1048576 ? `${Math.round(bytes / 1024)} KB` : `${(bytes / 1048576).toFixed(1)} MB`;
+}
+
+function formatWhen(ms) {
+  const d = new Date(ms);
+  const sameDay = d.toDateString() === new Date().toDateString();
+  return sameDay
+    ? d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+    : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+async function renderLibrary() {
+  libraryList.textContent = '';
+  let docs = [];
+  try { docs = library ? await library.list() : []; } catch { docs = []; }
+  if (!docs.length) {
+    const empty = document.createElement('p');
+    empty.className = 'library-empty';
+    empty.textContent = 'Nothing saved yet. Files you open, import or start here will show up in this list.';
+    libraryList.appendChild(empty);
+    return;
+  }
+  docs.forEach(doc => {
+    const item = document.createElement('div');
+    item.className = 'library-item' + (doc.id === docId ? ' current' : '');
+
+    const open = document.createElement('button');
+    open.type = 'button';
+    open.className = 'library-open';
+    const name = document.createElement('span');
+    name.className = 'library-name';
+    name.textContent = doc.title || doc.name;
+    const meta = document.createElement('span');
+    meta.className = 'library-meta';
+    meta.textContent = `${doc.title && doc.title !== doc.name ? doc.name + ' · ' : ''}${formatSize(doc.size)} · ${formatWhen(doc.updated)}${doc.id === docId ? ' · open now' : ''}`;
+    open.append(name, meta);
+    open.addEventListener('click', async () => {
+      await loadDoc(doc);
+      closeLibrary();
+      setMode('preview');
+    });
+
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'library-delete';
+    del.textContent = 'Delete';
+    del.setAttribute('aria-label', `Delete ${doc.name}`);
+    del.addEventListener('click', async () => {
+      if (!confirm(`Delete “${doc.title || doc.name}” from this phone’s library?`)) return;
+      await library.remove(doc.id);
+      if (doc.id === docId) {
+        docId = '';
+        localStorage.removeItem(STORAGE_DOC);
+      }
+      renderLibrary();
+    });
+
+    item.append(open, del);
+    libraryList.appendChild(item);
+  });
+}
+
+function openLibrary() {
+  librarySheet.hidden = false;
+  document.body.classList.add('sheet-open');
+  renderLibrary();
+}
+
+function closeLibrary() {
+  librarySheet.hidden = true;
+  document.body.classList.remove('sheet-open');
+}
+
+document.querySelector('#libraryButton').addEventListener('click', openLibrary);
+document.querySelector('#libraryClose').addEventListener('click', closeLibrary);
+librarySheet.addEventListener('click', event => {
+  if (event.target === librarySheet) closeLibrary();
+});
+
+// ---- Startup: ?doc=<id> opens a saved file, ?src=/tools/... loads a hosted tool's source ----
+async function boot() {
+  const params = new URLSearchParams(location.search);
+  const wantDoc = params.get('doc');
+  const wantSrc = params.get('src');
+  try {
+    if (wantDoc && library) {
+      const doc = await library.get(wantDoc);
+      if (doc) {
+        await loadDoc(doc);
+        setMode('preview');
+      }
+    } else if (wantSrc) {
+      const url = new URL(wantSrc, location.href);
+      if (url.origin !== location.origin) throw new Error('Only tools hosted here can be opened this way.');
+      const response = await fetch(url.href, { cache: 'no-cache' });
+      if (!response.ok) throw new Error(`Could not load ${url.pathname} (${response.status})`);
+      const name = url.pathname.split('/').filter(Boolean).slice(-2).join('-').replace(/-index\.html$/, '.html') || 'tool.html';
+      await openAsDoc(name, await response.text());
+      setMode('code');
+    } else if (library && !docId && editor.value !== starter) {
+      // First run with the library: keep whatever was already being edited.
+      await persistDoc();
+    }
+  } catch (error) {
+    alert(error.message);
+  }
+  if (wantDoc || wantSrc) history.replaceState(null, '', location.pathname);
+  renderPreview();
+}
+
+boot();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {

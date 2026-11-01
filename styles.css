@@ -77,7 +77,8 @@ h1 {
 
 .pocket-switch {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
   padding: 3px;
   background: #111318;
   border: 1px solid var(--line);
@@ -315,4 +316,78 @@ body.focus-preview #preview {
   .app-shell { padding-left: 24px; padding-right: 24px; }
   #editor, #preview { min-height: 66dvh; }
   body.focus-preview #preview { min-height: 0; }
+}
+
+/* ---- Library sheet ---- */
+body.sheet-open { overflow: hidden; }
+.sheet {
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheet[hidden] { display: none !important; }
+.sheet-panel {
+  width: min(100%, 640px);
+  max-height: 86dvh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 16px 16px calc(16px + var(--safe-bottom));
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+}
+.sheet-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.sheet-head h2 { margin: 3px 0 0; font-size: 24px; letter-spacing: -.03em; }
+.library-list { overflow-y: auto; display: grid; gap: 8px; align-content: start; }
+.library-empty { color: var(--muted); font-size: 14px; margin: 8px 0; }
+.library-item {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel-2);
+  overflow: hidden;
+}
+.library-item.current { border-color: var(--accent); }
+.library-open {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  padding: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+.library-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.library-meta { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.library-delete {
+  padding: 0 14px;
+  border: 0;
+  border-left: 1px solid var(--line);
+  background: transparent;
+  color: #ff8f80;
+  font-size: 13px;
+  font-weight: 700;
+}
+.library-tools-link {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  padding: 6px;
 }

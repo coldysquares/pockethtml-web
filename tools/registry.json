@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "updated": "2026-11-01",
+  "statuses": ["live", "building", "idea"],
+  "tools": [
+    {
+      "id": "wav-to-mp3",
+      "name": "WAV → MP3",
+      "description": "Convert WAV recordings to MP3 on the phone. Nothing is uploaded.",
+      "kind": "hosted",
+      "path": "wav-to-mp3/",
+      "version": "1.0.0",
+      "status": "live",
+      "tags": ["audio"],
+      "added": "2026-11-01",
+      "updated": "2026-11-01"
+    },
+    {
+      "id": "pockethtml",
+      "name": "PocketHTML",
+      "description": "Phone HTML editor and previewer, with a library of saved files.",
+      "kind": "app",
+      "url": "../",
+      "repo": "https://github.com/coldysquares/pockethtml-web",
+      "status": "live",
+      "tags": ["workbench"]
+    },
+    {
+      "id": "pocketpdf",
+      "name": "PocketPDF",
+      "description": "PDF companion to PocketHTML.",
+      "kind": "app",
+      "url": "https://pocketpdf.vercel.app/",
+      "status": "live",
+      "tags": ["workbench"]
+    },
+    {
+      "id": "tabbycat",
+      "name": "Tabbycat",
+      "description": "Guitar songbook. Songs live in the browser that saved them.",
+      "kind": "app",
+      "url": "https://tabbycat-one.vercel.app",
+      "repo": "https://github.com/coldysquares/tabbycat",
+      "status": "live",
+      "tags": ["music"]
+    },
+    {
+      "id": "slopscore-lab",
+      "name": "Slopscore Lab",
+      "description": "Generative remixing.",
+      "kind": "app",
+      "url": "https://slopscore-lab.vercel.app",
+      "repo": "https://github.com/coldysquares/slopscore-lab",
+      "status": "live",
+      "tags": ["music"]
+    },
+    {
+      "id": "ted-lab",
+      "name": "TED LAB 1974",
+      "description": "Sound experiments.",
+      "kind": "app",
+      "url": "https://guvs.vercel.app/ted-lab/",
+      "repo": "https://github.com/coldysquares/guvs",
+      "status": "live",
+      "tags": ["music"]
+    },
+    {
+      "id": "wiki-constellation",
+      "name": "Wiki Constellation",
+      "description": "Research exploration.",
+      "kind": "app",
+      "url": "https://guvs.vercel.app/wiki-constellation/",
+      "repo": "https://github.com/coldysquares/guvs",
+      "status": "live",
+      "tags": ["research"]
+    },
+    {
+      "id": "pocket-mp3",
+      "name": "PocketMP3",
+      "description": "Local-first audio app with on-device transcription. Song transcription upgrade in progress.",
+      "kind": "app",
+      "url": null,
+      "repo": "https://github.com/coldysquares/pocket-mp3",
+      "status": "building",
+      "tags": ["audio"]
+    }
+  ]
+}
