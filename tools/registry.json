@@ -1,7 +1,11 @@
 {
   "schema_version": 1,
-  "updated": "2026-11-01",
-  "statuses": ["live", "building", "idea"],
+  "updated": "2026-11-03",
+  "statuses": [
+    "live",
+    "building",
+    "idea"
+  ],
   "tools": [
     {
       "id": "wav-to-mp3",
@@ -11,9 +15,23 @@
       "path": "wav-to-mp3/",
       "version": "1.0.0",
       "status": "live",
-      "tags": ["audio"],
+      "tags": [
+        "audio"
+      ],
       "added": "2026-11-01",
       "updated": "2026-11-01"
+    },
+    {
+      "id": "last-call",
+      "name": "Last Call",
+      "description": "A dive bar of five AI patrons. Pour drinks and watch their confidence stay at 100% while their judgment falls apart, then see what the 1.2-mile drive home really costs.",
+      "kind": "hosted",
+      "path": "last-call/",
+      "version": "1.0.0",
+      "status": "live",
+      "tags": [],
+      "added": "2026-11-03",
+      "updated": "2026-11-03"
     },
     {
       "id": "pockethtml",
@@ -23,7 +41,9 @@
       "url": "../",
       "repo": "https://github.com/coldysquares/pockethtml-web",
       "status": "live",
-      "tags": ["workbench"]
+      "tags": [
+        "workbench"
+      ]
     },
     {
       "id": "pocketpdf",
@@ -32,7 +52,9 @@
       "kind": "app",
       "url": "https://pocketpdf.vercel.app/",
       "status": "live",
-      "tags": ["workbench"]
+      "tags": [
+        "workbench"
+      ]
     },
     {
       "id": "tabbycat",
@@ -42,7 +64,9 @@
       "url": "https://tabbycat-one.vercel.app",
       "repo": "https://github.com/coldysquares/tabbycat",
       "status": "live",
-      "tags": ["music"]
+      "tags": [
+        "music"
+      ]
     },
     {
       "id": "slopscore-lab",
@@ -52,7 +76,9 @@
       "url": "https://slopscore-lab.vercel.app",
       "repo": "https://github.com/coldysquares/slopscore-lab",
       "status": "live",
-      "tags": ["music"]
+      "tags": [
+        "music"
+      ]
     },
     {
       "id": "ted-lab",
@@ -62,7 +88,9 @@
       "url": "https://guvs.vercel.app/ted-lab/",
       "repo": "https://github.com/coldysquares/guvs",
       "status": "live",
-      "tags": ["music"]
+      "tags": [
+        "music"
+      ]
     },
     {
       "id": "wiki-constellation",
@@ -72,7 +100,9 @@
       "url": "https://guvs.vercel.app/wiki-constellation/",
       "repo": "https://github.com/coldysquares/guvs",
       "status": "live",
-      "tags": ["research"]
+      "tags": [
+        "research"
+      ]
     },
     {
       "id": "pocket-mp3",
@@ -82,7 +112,9 @@
       "url": null,
       "repo": "https://github.com/coldysquares/pocket-mp3",
       "status": "building",
-      "tags": ["audio"]
+      "tags": [
+        "audio"
+      ]
     }
   ]
 }
