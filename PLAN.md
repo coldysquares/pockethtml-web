@@ -16,6 +16,8 @@ Working plan for making Nick's apps one place he can open from his phone, with p
 - 2026-11-07: PocketMP3 audio picker lists audio types instead of `audio/*`; its service worker was cache first with a fixed name, so deploys never reached the phone. Now network first with a 3 s timeout (pocket-mp3 PR).
 - 2026-11-07: Registry `"offline": true` marks apps checked to open offline (PocketHTML, PocketPDF, PocketMP3). Home shows them with a green dot.
 
+- 2026-11-07: Night Cruiser (merged from Nick's six versions) and Tape Deck added as hosted tools. Both share one offline audio library (IndexedDB `pocket-audio`), so music added in one plays in the other with no signal. Home has an Upload HTML tile that saves .html files to the Library.
+
 ## Offline survey (2026-11-07, from the live pages)
 - Have a service worker: PocketPDF, PocketMP3, Aether Alchemist, Systems & Chaos Lab, Rhinoceros. Only PocketPDF and PocketMP3 are marked offline so far; the other three need a check.
 - No service worker (need signal): Pitchback, Tabbycat, Local Songbook, Slopscore Lab, TED LAB, Wollohy Playground, Wollohy archive, Clip Studio, Local Tools, Wiki Constellation, Astrograph, GUVs, Saperli Popette, STATERoom, NickOS, Packet Now, Task Keeper.

@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#04060b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Night Cruiser</title>
+<style>
+:root{--accent:#f43f5e;--glow:rgba(244,63,94,.16);--bg:#04060b;--panel:#0c121e;--line:#222d40;--muted:#8794a8;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:#f3f6fa;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif}
+body{min-height:100dvh;background:radial-gradient(ellipse at 50% -20%,var(--glow),transparent 60%),var(--bg);transition:background .5s}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.mono{font-family:var(--mono)}
+.app{max-width:640px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top)) 12px calc(22px + env(safe-area-inset-bottom));display:grid;gap:10px}
+.panel{background:linear-gradient(145deg,#111a29,#090e17);border:1px solid var(--line);border-radius:20px;padding:14px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.back{font:700 11px var(--mono);letter-spacing:.1em;color:var(--muted);text-decoration:none}
+.brand{font:900 11px var(--mono);letter-spacing:.3em;color:var(--accent)}
+.clock{font:800 clamp(28px,8vw,40px)/1 var(--mono);letter-spacing:-1px;margin-top:4px}
+.sub{font:11px var(--mono);color:var(--muted);margin-top:5px;letter-spacing:.05em}
+.speed{border:1px solid var(--line);background:#070b13;border-radius:16px;padding:8px 12px;min-width:86px;text-align:center}
+.speed b{display:block;font:800 26px var(--mono);color:var(--accent)}
+.speed small{font:9px var(--mono);color:var(--muted);letter-spacing:.1em}
+.label{font:800 10px var(--mono);letter-spacing:.2em;color:var(--muted);margin:2px 2px 8px}
+.stations{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.st{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:11px 2px;min-width:0;text-align:center}
+.st .e{display:block;font-size:19px}.st b{display:block;font:800 10px var(--mono);margin-top:6px;letter-spacing:.06em}.st small{display:block;font:9px var(--mono);color:var(--muted);margin-top:3px}
+.st.on{border:2px solid var(--accent);background:var(--glow);box-shadow:0 0 18px var(--glow)}
+.now{text-align:center}
+.viz{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:54px;margin:6px 0 10px}
+.viz i{display:block;width:5px;border-radius:3px;background:var(--accent);opacity:.85;height:4px;transition:height .08s}
+.title{font:900 18px var(--mono);letter-spacing:.04em}
+.desc{font-size:12px;color:var(--muted);margin-top:5px}
+.pill{display:inline-block;font:10px var(--mono);border:1px solid var(--line);border-radius:8px;padding:4px 8px;margin-top:9px;color:#cbd5e1}
+.transport{display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px}
+.transport button{height:70px;border:1px solid var(--line);border-radius:18px;background:var(--panel);font:800 12px var(--mono)}
+.transport .main{background:var(--accent);border:0;color:#090d15;font-size:15px;box-shadow:0 6px 24px var(--glow)}
+.grid2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.tog{border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:12px 6px;text-align:center;font:800 10px var(--mono);letter-spacing:.06em}
+.tog .e{display:block;font-size:19px;margin-bottom:5px}.tog small{display:block;color:var(--muted);margin-top:4px;font-weight:400}
+.tog.on{border-color:var(--accent);background:var(--glow)}
+.slider{margin:6px 0 12px}.slider .row{font:800 10px var(--mono);letter-spacing:.1em}.slider output{color:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--accent);margin:8px 0 0}
+.tracks{list-style:none;margin:8px 0 0;padding:0;max-height:220px;overflow:auto;border-top:1px solid var(--line)}
+.tracks li{display:flex;justify-content:space-between;gap:8px;padding:10px 4px;border-bottom:1px solid #161e2c;font:12px var(--mono)}
+.tracks li.on{color:var(--accent)}
+.tracks li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tracks li button{border:0;background:none;color:var(--muted);font:11px var(--mono);padding:0 4px}
+.btn{border:1px solid var(--line);background:#101827;border-radius:12px;padding:10px 12px;font:800 11px var(--mono);letter-spacing:.06em}
+.btn.on{border-color:var(--accent);background:var(--glow)}
+.note{font:10px/1.6 var(--mono);color:#5d6b80;text-align:center;letter-spacing:.05em;padding:4px 8px}
+.heard{font:11px var(--mono);color:var(--muted);margin-top:6px;min-height:15px}
+@media(max-width:370px){.panel{padding:12px}.st b{font-size:9px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body data-station="0">
+<main class="app">
+
+<header class="panel row">
+  <div>
+    <a class="back" href="../../">← POCKET</a>
+    <div class="brand" style="margin-top:8px">NIGHT CRUISER</div>
+    <div class="clock" id="clock">--:--</div>
+    <div class="sub" id="stationLine">NIGHTRIDE 84 · 88.9</div>
+  </div>
+  <button class="speed" id="gps" aria-label="Turn GPS speed on or off"><b id="speed">--</b><small id="gpsState">GPS OFF</small></button>
+</header>
+
+<section>
+  <div class="label">STATIONS</div>
+  <div class="stations" id="stations"></div>
+</section>
+
+<section class="panel now">
+  <div class="viz" id="viz"></div>
+  <div class="title" id="title">NIGHTRIDE 84</div>
+  <div class="desc" id="desc">Cinematic synthwave, retro drums, melodic hooks.</div>
+  <span class="pill" id="status">READY · WORKS OFFLINE</span>
+</section>
+
+<footer class="transport">
+  <button id="prev">◀<br>PREV</button>
+  <button class="main" id="play">▶ PLAY</button>
+  <button id="next">NEXT<br>▶</button>
+</footer>
+
+<section class="grid2">
+  <button class="tog" id="rainBtn"><span class="e">🌧️</span>RAIN<small id="rainState">off</small></button>
+  <button class="tog" id="driveBtn"><span class="e">🔥</span>DRIVE<small id="driveState">off</small></button>
+  <button class="tog" id="delayBtn"><span class="e">〰️</span>ECHO<small id="delayState">off</small></button>
+</section>
+
+<section class="panel">
+  <div class="slider"><div class="row"><label for="energy">ENERGY</label><output id="energyOut">65%</output></div><input id="energy" type="range" min="0" max="100" value="65"></div>
+  <div class="slider"><div class="row"><label for="variation">MELODY VARIATION</label><output id="variationOut">60%</output></div><input id="variation" type="range" min="0" max="100" value="60"></div>
+  <div class="slider"><div class="row"><label for="space">SPACE / EFFECTS</label><output id="spaceOut">45%</output></div><input id="space" type="range" min="0" max="100" value="45"></div>
+  <div class="slider" style="margin-bottom:0"><div class="row"><label for="volume">VOLUME</label><output id="volumeOut">70%</output></div><input id="volume" type="range" min="0" max="100" value="70"></div>
+</section>
+
+<section class="panel">
+  <div class="row">
+    <div><div class="label" style="margin:0">MY MUSIC</div><div class="sub" id="libLine">Saved on this phone, plays offline</div></div>
+    <div class="row" style="gap:6px">
+      <button class="btn" id="addMusic">+ ADD</button>
+    </div>
+  </div>
+  <input id="fileInput" type="file" multiple hidden accept=".mp3,.m4a,.wav,.aac,.aif,.aiff,.flac,.ogg,.opus,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/x-wav,audio/aac,audio/flac,audio/ogg">
+  <ul class="tracks" id="tracks"></ul>
+</section>
+
+<section class="panel">
+  <div class="row">
+    <div><div class="label" style="margin:0">VOICE</div><div class="heard" id="heard">Say: next, punk, chill, rain, pause, time, trivia</div></div>
+    <button class="btn" id="voiceBtn">🎙 OFF</button>
+  </div>
+  <div class="row" style="margin-top:10px;gap:7px">
+    <button class="btn" id="statusBtn" style="flex:1">🗣 TIME + STATION</button>
+    <button class="btn" id="triviaBtn" style="flex:1">🧠 TRIVIA</button>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <label for="sleep" class="label" style="margin:0">SLEEP TIMER</label>
+    <select id="sleep" class="btn"><option value="0">OFF</option><option value="15">15 MIN</option><option value="30">30 MIN</option><option value="60">60 MIN</option></select>
+  </div>
+</section>
+
+<div class="note">SET IT UP BEFORE YOU DRIVE · EYES ON THE ROAD<br>GENERATED ON YOUR PHONE · NO SIGNAL NEEDED (EXCEPT LIVE)</div>
+</main>
+
+<audio id="player" playsinline preload="none"></audio>
+<audio id="live" playsinline preload="none"></audio>
+
+<script>
+// Shared offline audio library for Pocket tools (Night Cruiser, Tape Deck).
+// Tracks are stored as blobs in IndexedDB on this origin, so every Pocket tool
+// can play them with no signal. Inlined into each tool so tools stay single-file.
+const PocketAudio = (() => {
+  const DB = 'pocket-audio', STORE = 'tracks';
+  let dbp = null;
+  const EXT = /\.(mp3|wav|wave|flac|ogg|oga|m4a|aac|opus|aif|aiff|caf|webm)$/i;
+  function open() {
+    if (dbp) return dbp;
+    dbp = new Promise((resolve, reject) => {
+      if (!('indexedDB' in window)) return reject(new Error('no indexedDB'));
+      const req = indexedDB.open(DB, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore(STORE, { keyPath: 'id' });
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    return dbp;
+  }
+  function tx(mode, fn) {
+    return open().then(db => new Promise((resolve, reject) => {
+      const t = db.transaction(STORE, mode);
+      const r = fn(t.objectStore(STORE));
+      t.oncomplete = () => resolve(r && 'result' in r ? r.result : r);
+      t.onerror = () => reject(t.error);
+    }));
+  }
+  const isAudio = f => !f.name.startsWith('.') && (/^audio\//.test(f.type) || EXT.test(f.name));
+  return {
+    isAudio,
+    list: () => tx('readonly', s => s.getAll()).then(a => (a || []).sort((x, y) => x.added - y.added)),
+    add(files) {
+      const now = Date.now();
+      const items = Array.from(files).filter(isAudio).map((f, i) => {
+        const parts = (f.webkitRelativePath || '').split('/');
+        return {
+          id: now.toString(36) + i + Math.random().toString(36).slice(2, 6),
+          name: f.name.replace(EXT, ''),
+          folder: parts.length > 1 ? parts[parts.length - 2] : 'Loose',
+          type: f.type || 'audio/mpeg',
+          size: f.size,
+          added: now + i,
+          blob: new Blob([f], { type: f.type || 'audio/mpeg' })
+        };
+      });
+      return tx('readwrite', s => items.forEach(it => s.put(it))).then(() => items);
+    },
+    remove: id => tx('readwrite', s => s.delete(id)),
+    clear: () => tx('readwrite', s => s.clear())
+  };
+})();
+
+</script>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+
+const STATIONS = [
+  {id:'synth', name:'NIGHTRIDE 84', freq:'88.9', e:'🌆', short:'SYNTH', color:'#f43f5e',
+   desc:'Cinematic synthwave, retro drums, melodic hooks.', bpm:104, root:110,
+   scale:[0,2,3,5,7,8,10], prog:[0,5,3,4], lead:'sawtooth', cutoff:5200,
+   bass:[0,0,7,0,3,0,7,10], kick:[0,8], snare:[4,12], hat:2, mel:.72},
+  {id:'lofi', name:'MIDNIGHT TAPE', freq:'92.3', e:'🌙', short:'LO-FI', color:'#10b981',
+   desc:'Dusty drums, warm chords, sleepy late-night melodies.', bpm:80, root:130.81,
+   scale:[0,2,3,5,7,9,10], prog:[0,3,5,4], lead:'triangle', cutoff:2600,
+   bass:[0,7,0,3,0,7,5,3], kick:[0,10], snare:[4,12], hat:4, mel:.5, swing:.12},
+  {id:'cyber', name:'NEON UNDERGROUND', freq:'96.7', e:'⚡', short:'CYBER', color:'#f59e0b',
+   desc:'Dark bass, industrial percussion, hard electronic drive.', bpm:124, root:82.41,
+   scale:[0,1,3,5,7,8,10], prog:[0,0,5,3], lead:'square', cutoff:6500,
+   bass:[0,0,0,7,0,3,0,10], kick:[0,4,8,12], snare:[4,12], hat:2, mel:.7},
+  {id:'space', name:'STARLIGHT', freq:'101.5', e:'🪐', short:'SPACE', color:'#38bdf8',
+   desc:'Wide slow pads and floating melodies. No drums.', bpm:64, root:98,
+   scale:[0,2,4,7,9], prog:[0,4,5,3], lead:'sine', cutoff:1900,
+   bass:[0,0,0,0,7,0,0,0], kick:[], snare:[], hat:0, mel:.4, pad:true},
+  {id:'energy', name:'VOLTAGE', freq:'104.2', e:'🔋', short:'ENERGY', color:'#a855f7',
+   desc:'Four-on-the-floor drums, bright hooks, uplifting bass.', bpm:128, root:110,
+   scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'square', cutoff:7000,
+   bass:[0,0,7,0,0,5,7,10], kick:[0,4,8,12], snare:[4,12], hat:2, mel:.8},
+  {id:'punk', name:'PUNK AFTER DARK', freq:'107.9', e:'🎸', short:'PUNK', color:'#fb923c',
+   desc:'Fast drums, fuzzed guitar-ish synths, rebellious riffs.', bpm:156, root:82.41,
+   scale:[0,3,5,7,10], prog:[0,3,4,3], lead:'sawtooth', cutoff:6000, fuzz:true,
+   bass:[0,0,0,0,3,3,5,5], kick:[0,6,8], snare:[4,12], hat:2, mel:.85},
+  {id:'mine', name:'MY MUSIC', freq:'LOCAL', e:'💾', short:'MINE', color:'#c4f042',
+   desc:'Your saved tracks, played from this phone.', local:true},
+  {id:'live', name:'SOMAFM DEF CON', freq:'LIVE', e:'📡', short:'LIVE', color:'#e879f9',
+   desc:'Internet radio. Needs signal.', stream:'https://ice1.somafm.com/defcon-128-mp3'}
+];
+
+const S = {
+  i:0, playing:false, ctx:null, master:null, bus:null, filter:null, comp:null,
+  delay:null, delayFb:null, delayWet:null, verb:null, verbWet:null, fuzz:null, fuzzWet:null,
+  rainGain:null, mediaSrc:null, analyser:null,
+  rain:false, drive:false, echo:false,
+  energy:.65, variation:.6, space:.45, volume:.7,
+  step:0, nextTime:0, timer:null, lastDeg:2,
+  tracks:[], ti:0, url:null,
+  voice:false, rec:null, gps:null, speed:null, sleep:null, wake:null, qi:0, score:0, trivia:false
+};
+const player = $('player');
+const live = $('live');
+
+/* ---------- UI ---------- */
+$('stations').innerHTML = STATIONS.map((s,i) =>
+  `<button class="st" data-i="${i}"><span class="e">${s.e}</span><b>${s.short}</b><small>${s.freq}</small></button>`).join('');
+$('viz').innerHTML = '<i></i>'.repeat(24);
+const bars = [...$('viz').children];
+
+function clock(){ $('clock').textContent = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
+clock(); setInterval(clock, 5000);
+
+function station(){ return STATIONS[S.i]; }
+function setStatus(t){ $('status').textContent = t; }
+function paint(){
+  const s = station();
+  document.documentElement.style.setProperty('--accent', s.color);
+  document.documentElement.style.setProperty('--glow', s.color + '29');
+  document.querySelectorAll('.st').forEach((b,i) => b.classList.toggle('on', i===S.i));
+  $('title').textContent = s.local && S.tracks[S.ti] ? S.tracks[S.ti].name : s.name;
+  $('desc').textContent = s.local && !S.tracks.length ? 'Tap + ADD below to save music to this phone.' : s.desc;
+  $('stationLine').textContent = s.name + ' · ' + s.freq;
+  $('play').textContent = S.playing ? 'Ⅱ PAUSE' : '▶ PLAY';
+  if (!S.playing) setStatus(s.stream ? 'LIVE · NEEDS SIGNAL' : 'READY · WORKS OFFLINE');
+  renderTracks();
+  media();
+}
+
+/* ---------- Audio graph ---------- */
+function impulse(ctx, sec, decay){
+  const len = ctx.sampleRate*sec, b = ctx.createBuffer(2, len, ctx.sampleRate);
+  for (let c=0;c<2;c++){ const d=b.getChannelData(c); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay); }
+  return b;
+}
+function curve(k){
+  const n=2048, c=new Float32Array(n);
+  for(let i=0;i<n;i++){ const x=i*2/n-1; c[i]=(1+k)*x/(1+k*Math.abs(x)); }
+  return c;
+}
+function initAudio(){
+  if (S.ctx) { if (S.ctx.state==='suspended') S.ctx.resume(); return true; }
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) { setStatus('NO WEB AUDIO HERE'); return false; }
+  const ctx = S.ctx = new AC();
+  S.master = ctx.createGain(); S.master.gain.value = S.volume;
+  S.comp = ctx.createDynamicsCompressor(); S.comp.threshold.value=-18; S.comp.ratio.value=3.5; S.comp.attack.value=.01; S.comp.release.value=.2;
+  S.analyser = ctx.createAnalyser(); S.analyser.fftSize = 64;
+  S.master.connect(S.comp); S.comp.connect(S.analyser); S.analyser.connect(ctx.destination);
+  // Synth bus: voices -> bus -> filter -> master, with sends.
+  S.bus = ctx.createGain();
+  S.filter = ctx.createBiquadFilter(); S.filter.type='lowpass'; S.filter.frequency.value=6000;
+  S.bus.connect(S.filter); S.filter.connect(S.master);
+  S.fuzz = ctx.createWaveShaper(); S.fuzz.curve = curve(30); S.fuzz.oversample='4x';
+  S.fuzzWet = ctx.createGain(); S.fuzzWet.gain.value = 0;
+  S.filter.connect(S.fuzz); S.fuzz.connect(S.fuzzWet); S.fuzzWet.connect(S.master);
+  S.delay = ctx.createDelay(2); S.delayFb = ctx.createGain(); S.delayWet = ctx.createGain(); S.delayWet.gain.value=0;
+  const dlp = ctx.createBiquadFilter(); dlp.type='lowpass'; dlp.frequency.value=2600;
+  S.filter.connect(S.delay); S.delay.connect(dlp); dlp.connect(S.delayFb); S.delayFb.connect(S.delay); dlp.connect(S.delayWet); S.delayWet.connect(S.master);
+  S.verb = ctx.createConvolver(); S.verb.buffer = impulse(ctx, 2.6, 2.4); S.verbWet = ctx.createGain();
+  S.filter.connect(S.verb); S.verb.connect(S.verbWet); S.verbWet.connect(S.master);
+  // Rain goes through the master so the volume slider controls it.
+  const len = ctx.sampleRate*3, rb = ctx.createBuffer(1, len, ctx.sampleRate), rd = rb.getChannelData(0);
+  let b0=0,b1=0; for(let i=0;i<len;i++){ const w=Math.random()*2-1; b0=.99*b0+w*.06; b1=.6*b1+w*.4; rd[i]=(b0+b1*.5+(Math.random()<.0008?Math.random()*2-1:0))*.5; }
+  const rs = ctx.createBufferSource(); rs.buffer=rb; rs.loop=true;
+  const rf = ctx.createBiquadFilter(); rf.type='bandpass'; rf.frequency.value=1400; rf.Q.value=.4;
+  S.rainGain = ctx.createGain(); S.rainGain.gain.value=0;
+  rs.connect(rf); rf.connect(S.rainGain); S.rainGain.connect(S.master); rs.start();
+  // Local files and the live stream also run through the master.
+  try { S.mediaSrc = ctx.createMediaElementSource(player); S.mediaSrc.connect(S.master); } catch(e) {}
+  fx(); viz();
+  return true;
+}
+function fx(){
+  if (!S.ctx) return;
+  const t = S.ctx.currentTime, s = station();
+  S.master.gain.setTargetAtTime(S.playing || S.rain ? S.volume : 0, t, .08);
+  S.verbWet.gain.setTargetAtTime(S.space*(s.pad?.7:.4), t, .2);
+  S.delayWet.gain.setTargetAtTime(S.echo ? .12+S.space*.3 : 0, t, .2);
+  S.delayFb.gain.setTargetAtTime(.15+S.space*.35, t, .2);
+  S.delay.delayTime.setTargetAtTime(s.bpm ? (60/s.bpm)*.75 : .3, t, .2);
+  S.fuzzWet.gain.setTargetAtTime(S.drive || s.fuzz ? .55 : 0, t, .1);
+  S.rainGain.gain.setTargetAtTime(S.rain ? .2 : 0, t, .4);
+  if (!S.playing) S.filter.frequency.setTargetAtTime(6000, t, .2);
+  if (!S.mediaSrc) player.volume = S.volume;
+  live.volume = S.volume;
+}
+
+/* ---------- Voices ---------- */
+const hz = (root, semi) => root*Math.pow(2, semi/12);
+function voice(freq, t, dur, vol, type, opt={}){
+  const c=S.ctx, o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,t); if (opt.detune) o.detune.value=opt.detune;
+  const a = opt.attack || .012;
+  g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(vol,t+a); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g); g.connect(S.bus); o.start(t); o.stop(t+dur+.05);
+}
+function noise(t, dur, vol, hp){
+  const c=S.ctx, b=c.createBuffer(1, Math.max(1,c.sampleRate*dur), c.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+  const s=c.createBufferSource(); s.buffer=b; const f=c.createBiquadFilter(); f.type='highpass'; f.frequency.value=hp;
+  const g=c.createGain(); g.gain.value=vol; s.connect(f); f.connect(g); g.connect(S.bus); s.start(t);
+}
+function kick(t,v){ const c=S.ctx,o=c.createOscillator(),g=c.createGain(); o.frequency.setValueAtTime(130,t); o.frequency.exponentialRampToValueAtTime(42,t+.14); g.gain.setValueAtTime(.9*v,t); g.gain.exponentialRampToValueAtTime(.001,t+.3); o.connect(g); g.connect(S.bus); o.start(t); o.stop(t+.32); }
+const snare = (t,v) => { noise(t,.16,.35*v,1300); voice(190,t,.09,.12*v,'triangle'); };
+const hat = (t,v) => noise(t,.04,.14*v,7500);
+
+function chord(s, deg, t, barDur){
+  const sc=s.scale, notes=[0,2,4].map(k=>sc[(deg+k)%sc.length]+(deg+k>=sc.length?12:0));
+  const dur = s.pad ? barDur*1.6 : barDur*.95;
+  notes.forEach((n,i)=>voice(hz(s.root,n+12), t, dur, (s.pad?.05:.032)*(.7+S.energy*.5), s.pad?'sine':'triangle', {attack:s.pad?1.2:.08, detune:i===2?6:-3}));
+}
+function lead(s, beat, t){
+  const sc=s.scale, v=S.variation;
+  let deg = S.lastDeg + [-2,-1,-1,0,1,1,2][Math.floor(Math.random()*7)];
+  if (Math.random() < .25*(1-v)) deg = [0,2,4][Math.floor(Math.random()*3)];
+  if (Math.random() < .15*v) deg += Math.random()<.5 ? -3 : 3;
+  deg = Math.max(0, Math.min(sc.length*2-1, deg));
+  if (beat===0 || beat===8) deg = [0,2,4,sc.length][Math.floor(Math.random()*4)];
+  S.lastDeg = deg;
+  const semi = sc[deg%sc.length] + 12*Math.floor(deg/sc.length);
+  const dur = s.pad ? 1.8 : s.id==='lofi' ? .5 : s.id==='punk' ? .16 : .3;
+  voice(hz(s.root*2, semi), t, dur, .05+S.energy*.05, s.lead, {detune:s.fuzz?9:4, attack:s.pad?.4:.012});
+}
+
+/* ---------- Lookahead scheduler (steady timing on phones) ---------- */
+function stepAt(t){
+  const s=station(), st=S.step%64, beat=st%16, bar=Math.floor(st/16), e=S.energy;
+  const barDur = 60/s.bpm*4;
+  if (beat===0) {
+    chord(s, s.prog[bar%s.prog.length], t, barDur);
+    S.filter.frequency.setTargetAtTime(s.cutoff*(.55+e*.6)*(1+Math.sin(S.step/40)*.15*S.space), t, .5);
+  }
+  if (e > .08) {
+    if (s.kick.includes(beat)) kick(t, .6+e*.4);
+    if (s.snare.includes(beat)) snare(t, .5+e*.5);
+    if (s.hat && beat%s.hat===0 && Math.random() < .55+e*.45) hat(t, beat%4===0 ? 1 : .6);
+    if (e>.75 && beat===15 && s.snare.length) snare(t, .4);
+  } else if (s.kick.length && beat===0) kick(t, .35);
+  if (beat%2===0 && Math.random() < .7+e*.3) {
+    const n = s.bass[(beat/2)%s.bass.length];
+    const chordRoot = s.scale[s.prog[bar%s.prog.length]%s.scale.length];
+    voice(hz(s.root/2, chordRoot+n), t, s.pad?1.2:.28, .16+e*.12, s.fuzz?'sawtooth':'triangle', {attack:.008});
+  }
+  const p = s.pad ? (beat%4===0 ? s.mel : 0) : s.mel*(.55+e*.5)*(.85+S.variation*.3);
+  if (Math.random() < p && (s.pad || beat%2===0 || Math.random()<e*.5)) lead(s, beat, t);
+  S.step++;
+}
+function scheduler(){
+  if (!S.playing || !S.ctx) return;
+  const s = station(); if (!s.bpm) return;
+  while (S.nextTime < S.ctx.currentTime + .12) {
+    const swing = s.swing && S.step%2 ? s.swing*(60/s.bpm/4) : 0;
+    stepAt(S.nextTime + swing);
+    S.nextTime += 60/s.bpm/4;
+  }
+}
+
+/* ---------- Playback ---------- */
+async function play(){
+  if (!initAudio()) return;
+  try { await S.ctx.resume(); } catch(e) {}
+  const s = station();
+  S.playing = true;
+  clearInterval(S.timer);
+  if (s.local) {
+    if (!S.tracks.length) { S.playing=false; paint(); setStatus('ADD MUSIC FIRST'); return; }
+    live.pause(); loadTrack(S.ti); await player.play().catch(()=>setStatus('TAP PLAY AGAIN'));
+    setStatus('PLAYING FROM THIS PHONE');
+  } else if (s.stream) {
+    player.pause(); live.src = s.stream; live.volume = S.volume; setStatus('CONNECTING…');
+    await live.play().then(()=>setStatus('LIVE')).catch(()=>{ setStatus('NO SIGNAL FOR LIVE'); });
+  } else {
+    player.pause(); live.pause();
+    S.step = 0; S.nextTime = S.ctx.currentTime + .06;
+    S.timer = setInterval(scheduler, 25);
+    setStatus('GENERATING ON YOUR PHONE');
+  }
+  fx(); paint(); wake();
+}
+function pause(){
+  S.playing = false; clearInterval(S.timer); player.pause(); live.pause(); fx(); paint();
+}
+function pick(i){
+  const was = S.playing;
+  if (was) pause();
+  S.i = (i+STATIONS.length)%STATIONS.length; S.step = 0; S.lastDeg = 2;
+  paint();
+  if (was) play();
+}
+$('stations').addEventListener('click', e => { const b=e.target.closest('.st'); if (b) { pick(+b.dataset.i); if (!S.playing) play(); } });
+$('play').onclick = () => S.playing ? pause() : play();
+$('next').onclick = () => station().local && S.tracks.length ? nextTrack(1) : pick(S.i+1);
+$('prev').onclick = () => station().local && S.tracks.length ? nextTrack(-1) : pick(S.i-1);
+
+/* ---------- Toggles and sliders ---------- */
+function toggle(key, btn, label){
+  initAudio(); S[key] = !S[key];
+  $(btn).classList.toggle('on', S[key]); $(label).textContent = S[key] ? 'on' : 'off'; fx();
+}
+$('rainBtn').onclick = () => toggle('rain','rainBtn','rainState');
+$('driveBtn').onclick = () => toggle('drive','driveBtn','driveState');
+$('delayBtn').onclick = () => toggle('echo','delayBtn','delayState');
+['energy','variation','space','volume'].forEach(id => {
+  const el=$(id), out=$(id+'Out');
+  const saved = localStorage.getItem('nc.'+id); if (saved!==null) el.value = saved;
+  const set = () => { S[id] = el.value/100; out.textContent = el.value+'%'; try{localStorage.setItem('nc.'+id, el.value);}catch(e){} fx(); };
+  el.addEventListener('input', set); set();
+});
+
+/* ---------- My music (shared offline library) ---------- */
+function renderTracks(){
+  const ul=$('tracks');
+  $('libLine').textContent = S.tracks.length ? S.tracks.length+' saved on this phone · plays offline' : 'Saved on this phone, plays offline';
+  ul.innerHTML = S.tracks.map((t,i)=>`<li class="${station().local&&i===S.ti?'on':''}" data-i="${i}"><span>${String(i+1).padStart(2,'0')} ${t.name.replace(/</g,'&lt;')}</span><button data-del="${t.id}" aria-label="Remove">✕</button></li>`).join('');
+}
+async function loadLibrary(){
+  try { S.tracks = await PocketAudio.list(); } catch(e) { S.tracks = []; }
+  renderTracks();
+}
+function loadTrack(i){
+  const t = S.tracks[i]; if (!t) return;
+  if (S.url) URL.revokeObjectURL(S.url);
+  S.url = URL.createObjectURL(t.blob); player.src = S.url;
+}
+function nextTrack(d){
+  S.ti = (S.ti+d+S.tracks.length)%S.tracks.length;
+  if (S.playing) { loadTrack(S.ti); player.play().catch(()=>{}); }
+  paint();
+}
+player.addEventListener('ended', () => { if (station().local && S.tracks.length) nextTrack(1); });
+$('addMusic').onclick = () => $('fileInput').click();
+$('fileInput').addEventListener('change', async e => {
+  const files=e.target.files; if (!files.length) return;
+  setStatus('SAVING TO THIS PHONE…');
+  try { await PocketAudio.add(files); } catch(err) { setStatus('COULD NOT SAVE: '+(err.message||'storage full')); }
+  e.target.value=''; await loadLibrary();
+  const mine = STATIONS.findIndex(s=>s.local);
+  if (S.i !== mine) pick(mine); else paint();
+  setStatus(S.tracks.length+' TRACKS SAVED');
+});
+$('tracks').addEventListener('click', async e => {
+  const del = e.target.closest('[data-del]');
+  if (del) { await PocketAudio.remove(del.dataset.del); await loadLibrary(); S.ti=Math.min(S.ti,Math.max(0,S.tracks.length-1)); paint(); return; }
+  const li = e.target.closest('li'); if (!li) return;
+  S.ti = +li.dataset.i;
+  const mine = STATIONS.findIndex(s=>s.local);
+  if (S.i!==mine) { pick(mine); }
+  if (S.playing) { loadTrack(S.ti); player.play().catch(()=>{}); paint(); } else play();
+});
+
+/* ---------- Visualizer ---------- */
+function viz(){
+  const data = new Uint8Array(S.analyser ? S.analyser.frequencyBinCount : 32);
+  const loop = () => {
+    if (S.analyser) S.analyser.getByteFrequencyData(data);
+    bars.forEach((b,i)=>{ b.style.height = (4 + (data[i]||0)/255*50) + 'px'; });
+    requestAnimationFrame(loop);
+  };
+  loop();
+}
+
+/* ---------- Voice, status, trivia ---------- */
+function say(text, done){
+  if (!('speechSynthesis' in window)) { done&&done(); return; }
+  speechSynthesis.cancel();
+  if (S.ctx) S.master.gain.setTargetAtTime(S.volume*.35, S.ctx.currentTime, .1);
+  const u = new SpeechSynthesisUtterance(text); u.rate=1; u.pitch=.95;
+  u.onend = u.onerror = () => { fx(); done&&done(); };
+  speechSynthesis.speak(u);
+}
+function statusLine(){
+  const sp = S.speed==null ? '' : ' You are going about '+Math.round(S.speed)+' miles per hour.';
+  const msg = "It's "+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+'. You are listening to '+$('title').textContent+'.'+sp;
+  $('heard').textContent = msg; say(msg);
+}
+$('statusBtn').onclick = statusLine;
+const QUIZ = [
+  ['Which planet spins clockwise?', ['Mars','Venus','Jupiter','Saturn'], 1],
+  ['What year did the Sony Walkman launch?', ['1975','1979','1985','1990'], 1],
+  ['Which interstate runs from Seattle to Boston?', ['I-80','I-90','I-10','I-95'], 1],
+  ['What is the capital of Australia?', ['Sydney','Melbourne','Canberra','Perth'], 2],
+  ['How many keys does a standard piano have?', ['76','82','88','96'], 2],
+  ['Which state has the most miles of Interstate 10?', ['Texas','Arizona','California','Louisiana'], 0],
+  ['What instrument did Jimi Hendrix play?', ['Drums','Bass','Guitar','Keys'], 2],
+  ['Saguaro cactus grows naturally in which desert?', ['Mojave','Sonoran','Chihuahuan','Great Basin'], 1]
+];
+function ask(){
+  const [q,a] = QUIZ[S.qi%QUIZ.length]; S.trivia = true;
+  const opts = a.map((x,i)=>'ABCD'[i]+', '+x).join('. ');
+  $('heard').textContent = q;
+  say(q+' '+opts+'. Say a letter or an answer.', () => { if (S.rec && !S.voice) voiceOn(true); });
+  if (!S.rec) setTimeout(()=>{ if (S.trivia) reveal(); }, 9000);
+}
+function reveal(){ const [,a,c]=QUIZ[S.qi%QUIZ.length]; S.trivia=false; S.qi++; say('The answer is '+a[c]+'.'); $('heard').textContent='Answer: '+a[c]; }
+function answer(t){
+  const [,a,c] = QUIZ[S.qi%QUIZ.length];
+  const k = a.findIndex((x,i)=>t===('abcd'[i])||t.includes(x.toLowerCase())||t.includes('option '+'abcd'[i])||t==='ay'&&i===0||t==='bee'&&i===1||t==='see'&&i===2||t==='dee'&&i===3);
+  if (k<0) return false;
+  S.trivia=false; S.qi++;
+  if (k===c) { S.score+=100; say('Correct. '+S.score+' points.'); $('heard').textContent='Correct · '+S.score+' pts'; }
+  else { say('Nope. It was '+a[c]+'.'); $('heard').textContent='Answer: '+a[c]; }
+  return true;
+}
+$('triviaBtn').onclick = ask;
+function command(raw){
+  const t = raw.toLowerCase().trim();
+  $('heard').textContent = 'Heard: '+raw;
+  if (S.trivia && answer(t)) return;
+  const find = id => STATIONS.findIndex(s=>s.id===id);
+  if (/trivia|quiz|question/.test(t)) ask();
+  else if (/\bnext|skip\b/.test(t)) $('next').click();
+  else if (/previous|go back/.test(t)) $('prev').click();
+  else if (/punk/.test(t)) pick(find('punk'));
+  else if (/chill|lo.?fi|tape/.test(t)) pick(find('lofi'));
+  else if (/cyber|techno|dark/.test(t)) pick(find('cyber'));
+  else if (/space|ambient|stars?/.test(t)) pick(find('space'));
+  else if (/energy|voltage|upbeat/.test(t)) pick(find('energy'));
+  else if (/synth/.test(t)) pick(find('synth'));
+  else if (/my music|my songs|local/.test(t)) pick(find('mine'));
+  else if (/live|internet/.test(t)) pick(find('live'));
+  else if (/pause|stop/.test(t)) pause();
+  else if (/play|start|resume/.test(t)) play();
+  else if (/rain/.test(t)) $('rainBtn').click();
+  else if (/echo|delay/.test(t)) $('delayBtn').click();
+  else if (/drive|fuzz|distortion/.test(t)) $('driveBtn').click();
+  else if (/louder|volume up/.test(t)) { $('volume').value=Math.min(100,+$('volume').value+10); $('volume').dispatchEvent(new Event('input')); }
+  else if (/quieter|softer|volume down/.test(t)) { $('volume').value=Math.max(0,+$('volume').value-10); $('volume').dispatchEvent(new Event('input')); }
+  else if (/time|status|speed|where/.test(t)) statusLine();
+}
+function voiceOn(on){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { $('heard').textContent = 'Voice commands are not supported in this browser.'; return; }
+  S.voice = on;
+  if (on) {
+    if (!S.rec) {
+      S.rec = new SR(); S.rec.lang='en-US'; S.rec.continuous=true; S.rec.interimResults=false;
+      S.rec.onresult = e => { const r=e.results[e.results.length-1]; if (r.isFinal) command(r[0].transcript); };
+      S.rec.onerror = e => { if (e.error==='not-allowed') { S.voice=false; voiceUI(); } };
+      S.rec.onend = () => { if (S.voice) setTimeout(()=>{ try{S.rec.start();}catch(e){} }, 500); };
+    }
+    try { S.rec.start(); } catch(e) {}
+  } else if (S.rec) { try { S.rec.abort(); } catch(e) {} }
+  voiceUI();
+}
+function voiceUI(){ $('voiceBtn').textContent = S.voice ? '🎙 ON' : '🎙 OFF'; $('voiceBtn').classList.toggle('on', S.voice); }
+$('voiceBtn').onclick = () => voiceOn(!S.voice);
+
+/* ---------- GPS speed, sleep, wake lock, lock screen ---------- */
+$('gps').onclick = () => {
+  if (S.gps!==null) { navigator.geolocation.clearWatch(S.gps); S.gps=null; S.speed=null; $('speed').textContent='--'; $('gpsState').textContent='GPS OFF'; return; }
+  if (!navigator.geolocation) { $('gpsState').textContent='NO GPS'; return; }
+  $('gpsState').textContent='SEARCHING';
+  S.gps = navigator.geolocation.watchPosition(p => {
+    const v = p.coords.speed;
+    if (v!=null && isFinite(v)) { S.speed=v*2.23694; $('speed').textContent=Math.round(S.speed); $('gpsState').textContent='MPH'; }
+    else $('gpsState').textContent='NO FIX';
+  }, () => { $('gpsState').textContent='GPS ERROR'; S.gps=null; }, {enableHighAccuracy:true, maximumAge:3000, timeout:15000});
+};
+$('sleep').onchange = e => {
+  clearTimeout(S.sleep); const m=+e.target.value; if (!m) return;
+  S.sleep = setTimeout(() => { pause(); $('sleep').value='0'; setStatus('SLEEP TIMER · PAUSED'); }, m*60000);
+};
+async function wake(){ try { if ('wakeLock' in navigator && !S.wake) { S.wake = await navigator.wakeLock.request('screen'); S.wake.addEventListener('release', ()=>S.wake=null); } } catch(e) {} }
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState==='visible' && S.playing) { if (S.ctx && S.ctx.state!=='running') S.ctx.resume(); wake(); }
+});
+function media(){
+  if (!('mediaSession' in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({ title: $('title').textContent, artist: 'Night Cruiser', album: station().name });
+    navigator.mediaSession.setActionHandler('play', play);
+    navigator.mediaSession.setActionHandler('pause', pause);
+    navigator.mediaSession.setActionHandler('nexttrack', () => $('next').click());
+    navigator.mediaSession.setActionHandler('previoustrack', () => $('prev').click());
+  } catch(e) {}
+}
+window.addEventListener('pagehide', () => { clearInterval(S.timer); if (S.gps!==null) navigator.geolocation.clearWatch(S.gps); if (S.rec) { S.voice=false; try{S.rec.abort();}catch(e){} } });
+
+loadLibrary().then(paint);
+paint();
+})();
+</script>
+</body>
+</html>
