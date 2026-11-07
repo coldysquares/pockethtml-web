@@ -38,7 +38,7 @@ audio{width:100%;margin-top:10px;height:36px}
 </head>
 <body>
 <main>
-  <a id="back" class="back" href="../../" hidden>← Pocket</a>
+  <a id="back" class="back" href="../../" hidden>← Pocket</a> <a id="reload" class="back" href="#" hidden onclick="location.reload();return false" aria-label="Refresh">↻ Refresh</a>
   <h1>WAV → MP3</h1>
   <p class="sub">Converts on this device. Nothing is uploaded.</p>
 
@@ -562,7 +562,7 @@ function handle(files){
   });
 }
 
-if(/\/tools\//.test(location.pathname))$('back').hidden=false;
+if(/\/tools\//.test(location.pathname)){$('back').hidden=false;$('reload').hidden=false;}
 $('file').addEventListener('change',function(){handle(this.files);this.value=''});
 var drop=$('drop');
 ['dragenter','dragover'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.add('on')})});
