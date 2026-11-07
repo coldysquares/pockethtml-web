@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#030409">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Night Cruiser</title>
+<title>NIGHT CRUISER</title>
 <style>
 :root{--a:#ff3d6e;--g:rgba(255,61,110,.18);--bg:#030409;--p:#0b0f19;--l:#1d2638;--m:#7f8ba1;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -64,6 +64,21 @@ select.btn{appearance:none}
 .tracks li button{color:var(--m);font-size:12px;padding:4px 6px}
 .empty{font-size:12px;color:var(--m);font-family:-apple-system,system-ui,sans-serif;line-height:1.5}
 .foot{text-align:center;font-size:9px;letter-spacing:.22em;color:#46526a;padding:4px}
+.fine{text-align:center;font-size:10px;line-height:1.5;color:#46526a;padding:0 8px;font-family:-apple-system,system-ui,sans-serif}
+.topr{display:flex;gap:6px;align-items:center}
+.brand{text-align:center;padding:2px 0 0}
+.brand h1{margin:0;font-size:clamp(26px,8.5vw,40px);font-weight:900;letter-spacing:.16em;line-height:1;color:#fff;text-shadow:0 0 22px var(--g),0 0 2px var(--a)}
+.brand .sub{margin-top:6px;font-size:10px;letter-spacing:.24em;color:var(--m)}
+.brand .sub b{color:var(--a);font-weight:800}
+.lock{border:1px solid var(--a);border-radius:16px;padding:10px 14px;font-size:11px;line-height:1.5;color:#fff;background:var(--g);font-family:-apple-system,system-ui,sans-serif}
+.lock[hidden]{display:none}
+.ticks{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.14em;color:var(--m);margin-top:4px}
+.note{font-size:11px;color:var(--m);line-height:1.5;font-family:-apple-system,system-ui,sans-serif}
+.sub2{font-size:10px;letter-spacing:.16em;color:var(--m)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.seg button{border:1px solid var(--l);border-radius:14px;padding:12px 4px;font-size:10px;letter-spacing:.1em;font-weight:800;background:#0e1422}
+.seg button.on,.btn.on{border-color:var(--a);background:var(--g);color:#fff}
+button:disabled,input:disabled,select:disabled{opacity:.38;cursor:not-allowed}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -73,18 +88,26 @@ select.btn{appearance:none}
 <div class="top">
   <a href="../../">← POCKET</a>
   <span class="clock" id="clock">--:--</span>
-  <button class="chip" id="gps">GPS --</button>
+  <span class="topr"><button class="chip" id="refresh" aria-label="Refresh">↻</button><button class="chip" id="gps" data-lock>GPS --</button></span>
 </div>
+
+<header class="brand">
+  <h1>NIGHT CRUISER</h1>
+  <div class="sub">GENERATIVE RADIO · <b id="engine">ENGINE STANDBY</b></div>
+</header>
 
 <section class="dial">
   <canvas id="scope" width="560" height="150" aria-hidden="true"></canvas>
   <div class="info">
-    <div class="freq" id="freq">88.9 FM</div>
+    <div class="freq"><span id="freq">88.9 FM</span> · <span id="title">CINEMATIC SYNTHWAVE</span></div>
     <div class="name" id="name">NIGHTRIDE 84</div>
     <div class="desc" id="desc"></div>
-    <div class="meta"><span id="section">READY</span><span><b id="bpm">104</b> BPM</span><span id="status">OFFLINE OK</span></div>
+    <div class="meta"><span id="section">READY</span><span><b id="bpm">104</b> BPM</span><span id="mood">CINEMATIC</span></div>
+    <div class="meta"><span id="status">OFFLINE OK</span><span id="profileMeta">HIGHWAY</span></div>
   </div>
 </section>
+
+<div class="lock" id="lockNotice" hidden>Driving detected: configuration controls are restricted. Audio playback controls remain available.</div>
 
 <div class="transport">
   <button id="prev" aria-label="Previous">◀◀</button>
@@ -95,43 +118,75 @@ select.btn{appearance:none}
 <div class="strip" id="strip" role="list"></div>
 
 <div class="quick">
-  <button class="q" id="qRain"><span class="e">🌧️</span>RAIN</button>
-  <button class="q" id="qEcho"><span class="e">〰️</span>ECHO</button>
-  <button class="q" id="qFuzz"><span class="e">🔥</span>FUZZ</button>
-  <button class="q" id="qVoice"><span class="e">🎙️</span>VOICE</button>
+  <button class="q" id="qRain" data-lock><span class="e">🌧️</span>RAIN</button>
+  <button class="q" id="qEcho" data-lock><span class="e">〰️</span>DELAY</button>
+  <button class="q" id="qFuzz" data-lock><span class="e">🔥</span>DRIVE</button>
+  <button class="q" id="qVoice" data-lock><span class="e">🎙️</span>VOICE</button>
 </div>
 
-<details id="tune">
-  <summary><span>TUNE THE SOUND</span><span>▾</span></summary>
+<details id="engineBox">
+  <summary><span>MUSIC ENGINE</span><span>▾</span></summary>
   <div class="inner">
-    <div class="sl"><label for="energy">ENERGY <output id="energyOut"></output></label><input id="energy" type="range" min="0" max="100" value="60"></div>
-    <div class="sl"><label for="variation">MELODY MOVEMENT <output id="variationOut"></output></label><input id="variation" type="range" min="0" max="100" value="55"></div>
-    <div class="sl"><label for="space">SPACE <output id="spaceOut"></output></label><input id="space" type="range" min="0" max="100" value="45"></div>
-    <div class="sl"><label for="tape">TAPE GRIT <output id="tapeOut"></output></label><input id="tape" type="range" min="0" max="100" value="35"></div>
-    <div class="sl"><label for="volume">VOLUME <output id="volumeOut"></output></label><input id="volume" type="range" min="0" max="100" value="75"></div>
-    <div class="row"><span style="font-size:10px;letter-spacing:.16em;color:var(--m)">SLEEP TIMER</span>
-      <select id="sleep" class="btn"><option value="0">OFF</option><option value="15">15 MIN</option><option value="30">30 MIN</option><option value="60">60 MIN</option></select></div>
+    <div class="sl"><label for="energy">ENERGY / INTENSITY <output id="energyOut"></output></label><input id="energy" type="range" min="0" max="100" value="60" data-lock>
+      <div class="ticks"><span>CALM</span><span>BALANCED</span><span>ENERGIZED</span></div>
+      <div class="note" id="energyDesc"></div></div>
+    <div class="sl"><label for="variation">MELODIC VARIATION <output id="variationOut"></output></label><input id="variation" type="range" min="0" max="100" value="55" data-lock></div>
+    <div class="sub2">LISTENING PROFILE</div>
+    <div class="seg" id="profiles">
+      <button data-profile="highway" data-lock>🛣️ HIGHWAY</button>
+      <button data-profile="city" data-lock>🌆 CITY</button>
+      <button data-profile="parked" data-lock>🌌 PARKED</button>
+    </div>
+    <div class="note" id="profileDesc"></div>
+    <div class="row"><span class="sub2">LONG DRIVE MODE</span><button class="btn" id="longDrive" data-lock>OFF</button></div>
+    <div class="note">Favors steady arrangements, smooth transitions and consistent loudness. It does not prevent fatigue or replace rest breaks.</div>
+  </div>
+</details>
+
+<details id="fxBox">
+  <summary><span>EVOLVING SOUND DESIGN</span><span>▾</span></summary>
+  <div class="inner">
+    <div class="sl"><label for="effects">EFFECTS / ATMOSPHERE <output id="effectsOut"></output></label><input id="effects" type="range" min="0" max="100" value="50" data-lock></div>
+    <div class="sl"><label for="reverb">REVERB <output id="reverbOut"></output></label><input id="reverb" type="range" min="0" max="100" value="45" data-lock></div>
+    <div class="sl"><label for="delay">DELAY <output id="delayOut"></output></label><input id="delay" type="range" min="0" max="100" value="25" data-lock></div>
+    <div class="sl"><label for="filter">FILTER <output id="filterOut"></output></label><input id="filter" type="range" min="0" max="100" value="65" data-lock></div>
+    <div class="sl"><label for="stereo">STEREO <output id="stereoOut"></output></label><input id="stereo" type="range" min="0" max="100" value="50" data-lock></div>
+    <div class="sl"><label for="tape">TAPE GRIT <output id="tapeOut"></output></label><input id="tape" type="range" min="0" max="100" value="35" data-lock></div>
+    <div class="note">Effects evolve gradually with the composition. Controls set their overall intensity.</div>
+  </div>
+</details>
+
+<details id="mixBox">
+  <summary><span>VOLUME · RAIN · SLEEP</span><span>▾</span></summary>
+  <div class="inner">
+    <div class="sl"><label for="volume">MASTER VOLUME <output id="volumeOut"></output></label><input id="volume" type="range" min="0" max="100" value="75"></div>
+    <div class="sl"><label for="rainLevel">RAIN LEVEL <output id="rainLevelOut"></output></label><input id="rainLevel" type="range" min="0" max="100" value="45"></div>
+    <div class="row"><span class="sub2">SLEEP TIMER</span>
+      <select id="sleep" class="btn"><option value="0">OFF</option><option value="15">15 MIN</option><option value="30">30 MIN</option><option value="60">60 MIN</option><option value="90">90 MIN</option></select></div>
   </div>
 </details>
 
 <details id="musicBox">
   <summary><span>MY MUSIC · <span id="trackCount">0</span></span><span>▾</span></summary>
   <div class="inner">
-    <div class="row"><span class="empty">Saved on this phone. Plays with no signal, here and in Tape Deck.</span><button class="btn" id="addMusic">+ ADD</button></div>
+    <div class="row"><span class="empty">Saved on this phone. Plays with no signal, here and in Tape Deck.</span><button class="btn" id="addMusic" data-lock>+ ADD</button></div>
     <input id="fileInput" type="file" multiple hidden accept=".mp3,.m4a,.wav,.aac,.aif,.aiff,.flac,.ogg,.opus,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/x-wav,audio/aac,audio/flac,audio/ogg">
     <ul class="tracks" id="tracks"></ul>
   </div>
 </details>
 
-<details>
-  <summary><span>CO-PILOT</span><span>▾</span></summary>
+<details id="pilotBox">
+  <summary><span>VOICE CO-PILOT</span><span>▾</span></summary>
   <div class="inner">
-    <div class="heard" id="heard">Voice: say next, punk, chill, space, rain, louder, pause, time, trivia.</div>
-    <div class="row"><button class="btn wide" id="statusBtn">🗣 TIME + STATION</button><button class="btn wide" id="triviaBtn">🧠 TRIVIA</button></div>
+    <div class="heard" id="heard">Your midnight soundtrack is ready.</div>
+    <div class="note">Try saying: next, previous, synth, chill, cyber, golden hour, space, energy, punk, my music, live radio, play, pause, rain, delay, drive, louder, quieter, time, trivia.</div>
+    <div class="row"><button class="btn wide" id="statusBtn">🗣 CO-PILOT BRIEFING</button><button class="btn wide" id="triviaBtn">🧠 ROAD TRIVIA</button></div>
+    <div class="note" id="score">TRIVIA SCORE · 0</div>
   </div>
 </details>
 
 <div class="foot">SET UP BEFORE YOU DRIVE · EYES ON THE ROAD</div>
+<div class="fine">Designed as a low-distraction audio companion, not an ADHD treatment or driving-performance aid. Set up before driving. Never interact with the screen while driving. Music cannot prevent fatigue. Take breaks and never drive when drowsy.</div>
 </main>
 
 <audio id="player" playsinline preload="none"></audio>
@@ -199,36 +254,48 @@ const pickOne = a => a[Math.floor(Math.random() * a.length)];
 
 /* ================= STATIONS ================= */
 const STATIONS = [
-  { id:'synth', name:'NIGHTRIDE 84', freq:'88.9', e:'🌆', short:'SYNTH', c:'#ff3d6e',
-    desc:'Supersaw leads, gated snares, pulsing bass. Headlights and long straight roads.',
+  { id:'synth', name:'NIGHTRIDE 84', freq:'88.9', e:'🌆', short:'SYNTH', c:'#ff3d6e', title:'CINEMATIC SYNTHWAVE', mood:'CINEMATIC',
+    desc:'Cinematic synthwave, retro drums and melodic hooks.',
     bpm:100, root:43.65, scale:[0,2,3,5,7,8,10], prog:[0,5,3,6], lead:'supersaw', bassStyle:'pulse', drums:'synth', arp:true, pad:true, duck:.45 },
-  { id:'lofi', name:'MIDNIGHT TAPE', freq:'92.3', e:'🌙', short:'LO-FI', c:'#2fd18b',
-    desc:'Warm Rhodes-ish keys, dusty swung drums, vinyl crackle, tape wobble.',
+  { id:'lofi', name:'MIDNIGHT TAPE', freq:'92.3', e:'🌙', short:'LO-FI', c:'#2fd18b', title:'JAZZY LO-FI CHILL', mood:'RELAXED',
+    desc:'Dusty drums, warm chords and jazzy late-night melodies.',
     bpm:78, root:55, scale:[0,2,3,5,7,9,10], prog:[1,4,0,5], lead:'keys', bassStyle:'round', drums:'lofi', swing:.18, crackle:true, wobble:1, seventh:true },
-  { id:'cyber', name:'NEON UNDERGROUND', freq:'96.7', e:'⚡', short:'CYBER', c:'#ffb020',
-    desc:'Acid bassline, four-to-the-floor, dark minor stabs.',
+  { id:'cyber', name:'AUTOBAHN', freq:'96.7', e:'⚡', short:'CYBER', c:'#ffb020', title:'DARK CYBER TECHNO', mood:'DARK ENERGY',
+    desc:'Industrial percussion, dark bass and aggressive electronic rhythms.',
     bpm:124, root:41.2, scale:[0,1,3,5,7,8,10], prog:[0,0,5,6], lead:'square', bassStyle:'acid', drums:'four', duck:.5 },
-  { id:'space', name:'STARLIGHT', freq:'101.5', e:'🪐', short:'SPACE', c:'#46c3ff',
-    desc:'Slow wide pads, glassy bells, no drums. Desert at night.',
+  { id:'golden', name:'GOLDEN HOUR', freq:'99.5', e:'🌅', short:'DAYDREAM', c:'#ffc857', title:'WARM MELODIC SOUNDSCAPE', mood:'DAYDREAM',
+    desc:'Warm analog tones, memorable motifs and relaxed harmonic movement.',
+    bpm:88, root:73.42, scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'warm', bassStyle:'round', drums:'soft', pad:true },
+  { id:'space', name:'STARLIGHT', freq:'101.5', e:'🪐', short:'SPACE', c:'#46c3ff', title:'DEEP SPACE AMBIENT', mood:'ATMOSPHERIC',
+    desc:'Wide evolving pads, floating melodies and cinematic space.',
     bpm:60, root:49, scale:[0,2,4,7,9], prog:[0,3,4,2], lead:'bell', bassStyle:'drone', drums:'none', pad:true, bigVerb:true },
-  { id:'energy', name:'VOLTAGE', freq:'104.2', e:'🔋', short:'ENERGY', c:'#b46bff',
-    desc:'Bright major hooks, claps, rolling arps. Wakes the car up.',
+  { id:'energy', name:'VOLTAGE', freq:'104.2', e:'🔋', short:'ENERGY', c:'#b46bff', title:'ENERGY BEATS', mood:'HIGH ENERGY',
+    desc:'Driving electronic drums, uplifting bass and energetic synth hooks.',
     bpm:126, root:49, scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'supersaw', bassStyle:'offbeat', drums:'four', arp:true, clap:true, duck:.5 },
-  { id:'punk', name:'PUNK AFTER DARK', freq:'107.9', e:'🎸', short:'PUNK', c:'#ff7a2f',
-    desc:'Power-chord fuzz, fast drums, shouting-into-the-wind riffs.',
+  { id:'punk', name:'PUNK AFTER DARK', freq:'107.9', e:'🎸', short:'PUNK', c:'#ff7a2f', title:'PUNK DRIVE', mood:'REBELLIOUS',
+    desc:'Distorted guitar-like synths, fast drums and rebellious melodies.',
     bpm:168, root:41.2, scale:[0,3,5,7,10], prog:[0,3,5,4], lead:'fuzz', bassStyle:'eighths', drums:'punk', power:true },
-  { id:'mine', name:'MY MUSIC', freq:'LOCAL', e:'💾', short:'MINE', c:'#c4f042', desc:'Your saved tracks, played from this phone.', local:true },
-  { id:'live', name:'SOMAFM DEF CON', freq:'LIVE', e:'📡', short:'LIVE', c:'#ef6cff', desc:'Internet radio. Needs signal.', stream:'https://ice1.somafm.com/defcon-128-mp3' }
+  { id:'mine', name:'MY MUSIC', freq:'LOCAL', e:'💾', short:'MINE', c:'#c4f042', title:'YOUR SAVED TRACKS', mood:'LOCAL', desc:'Your saved tracks, played from this phone.', local:true },
+  { id:'live', name:'SOMAFM DEF CON', freq:'LIVE', e:'📡', short:'LIVE', c:'#ef6cff', title:'LIVE CLOUD RADIO', mood:'LIVE', desc:'Internet radio. Needs signal.', stream:'https://ice1.somafm.com/defcon-128-mp3' }
 ];
 const SECTIONS = ['INTRO','CRUISE','PEAK','CRUISE','DRIFT','CRUISE','PEAK','CRUISE'];
+// Long drive mode: steady arrangement, no peaks.
+const SECTIONS_LONG = ['INTRO','CRUISE','CRUISE','DRIFT','CRUISE','CRUISE','CRUISE','DRIFT'];
+const PROFILES = {
+  highway:{ name:'HIGHWAY', desc:'Stable rhythms, smooth phrases and restrained musical changes.', density:.85, variation:.55, complexity:.65 },
+  city:{ name:'CITY', desc:'Simplified arrangements and fewer simultaneous musical layers.', density:.62, variation:.35, complexity:.40 },
+  parked:{ name:'PARKED', desc:'Full melodic freedom, richer harmony and more elaborate effects.', density:1, variation:1, complexity:1 }
+};
 
 const S = {
   i:0, playing:false, ctx:null,
-  energy:.6, variation:.55, space:.45, tape:.35, volume:.75,
+  energy:.6, variation:.55, effects:.5, reverb:.45, delay:.25, filter:.65, stereo:.5, tape:.35, volume:.75, rainLevel:.45,
+  profile:'highway', longDrive:false, moving:false,
   rain:false, echo:false, fuzz:false,
-  step:0, next:0, timer:null, motif:null, section:'INTRO', lastSection:-1,
+  step:0, next:0, timer:null, evolve:null, motif:null, section:'INTRO', lastSection:-1,
   tracks:[], ti:0, url:null, voice:false, rec:null, gps:null, speed:null, sleep:null, wake:null, qi:0, score:0, trivia:false
 };
+const P = () => PROFILES[S.profile] || PROFILES.highway;
 const N = {}; // audio nodes
 const player = $('player'), live = $('live');
 const st = () => STATIONS[S.i];
@@ -254,7 +321,9 @@ function init(){
   // Music bus: duck (sidechain) -> tone -> tape saturation -> master
   N.music = c.createGain(); N.duck = c.createGain(); N.tone = c.createBiquadFilter(); N.tone.type='lowpass'; N.tone.frequency.value=16000; N.tone.Q.value=.3;
   N.sat = c.createWaveShaper(); N.sat.curve = shaper(1.6); N.sat.oversample='2x';
-  N.music.connect(N.duck); N.duck.connect(N.tone); N.tone.connect(N.sat); N.sat.connect(N.master);
+  // FILTER slider: a user lowpass after the arrangement's own tone filter, drifting slowly (evolving sound design)
+  N.filter = c.createBiquadFilter(); N.filter.type='lowpass'; N.filter.Q.value=.5; N.filter.frequency.value=8000;
+  N.music.connect(N.duck); N.duck.connect(N.tone); N.tone.connect(N.filter); N.filter.connect(N.sat); N.sat.connect(N.master);
   // Drum bus: not ducked, light saturation
   N.drums = c.createGain(); N.drums.gain.value=.9; N.drums.connect(N.master);
   // Sends
@@ -286,15 +355,19 @@ function apply(){
   if (!N.ctx) return;
   const t = N.ctx.currentTime, s = st();
   const on = S.playing || S.rain;
+  const fx = .4 + 1.2*S.effects; // EFFECTS / ATMOSPHERE scales reverb and delay together
   N.master.gain.setTargetAtTime(on ? S.volume*.9 : 0, t, .12);
-  N.verbOut.gain.setTargetAtTime((s.bigVerb?.6:.32)*S.space + .04, t, .3);
-  N.dlyOut.gain.setTargetAtTime(S.echo ? .18 + S.space*.25 : .04*S.space, t, .3);
-  N.dlyFb.gain.setTargetAtTime(S.echo ? .38 + S.space*.2 : .2, t, .3);
+  N.verbOut.gain.setTargetAtTime((s.bigVerb?.6:.32)*S.reverb*fx + .03, t, .3);
+  N.dlyOut.gain.setTargetAtTime(S.echo ? .18 + S.delay*.3 : S.delay*.14*fx, t, .3);
+  N.dlyFb.gain.setTargetAtTime(S.echo ? .38 + S.delay*.2 : .12 + S.delay*.22, t, .3);
   N.dly.delayTime.setTargetAtTime(s.bpm ? (60/s.bpm)*.75 : .33, t, .3);
+  N.filter.frequency.setTargetAtTime(500 + S.filter*11500, t, .6);
+  // Long drive mode: firmer glue compression for consistent loudness
+  N.glue.threshold.setTargetAtTime(S.longDrive ? -24 : -16, t, .5); N.glue.ratio.setTargetAtTime(S.longDrive ? 4 : 2.5, t, .5);
   N.fzOut.gain.setTargetAtTime(S.fuzz ? .35 : 0, t, .1);
   N.sat.curve = shaper(1.2 + S.tape*3);
   N.lfoAmt.gain.setTargetAtTime((s.wobble ? 9 : 2.5) * S.tape * (S.playing?1:0), t, .5);
-  N.rain.gain.setTargetAtTime(S.rain ? .16 : 0, t, .5);
+  N.rain.gain.setTargetAtTime(S.rain ? S.rainLevel*.35 : 0, t, .3);
   N.vinyl.gain.setTargetAtTime(S.playing && (s.crackle || S.tape>.6) ? .12*S.tape+.03 : 0, t, .3);
   live.volume = S.volume;
 }
@@ -307,7 +380,8 @@ function hzOf(s, deg, oct){ // scale degree (can exceed length) -> Hz
 }
 function out(node, pan, verb, dly){
   const c=N.ctx, p=c.createStereoPanner ? c.createStereoPanner() : null;
-  if (p) { p.pan.value = pan||0; node.connect(p); p.connect(N.music); } else node.connect(N.music);
+  // STEREO slider sets how wide voices sit in the field (0 = mono, 100 = wide)
+  if (p) { p.pan.value = Math.max(-1, Math.min(1, (pan||0) * (.15 + S.stereo*1.7))); node.connect(p); p.connect(N.music); } else node.connect(N.music);
   if (verb) { const g=c.createGain(); g.gain.value=verb; node.connect(g); g.connect(N.verbIn); }
   if (dly) { const g=c.createGain(); g.gain.value=dly; node.connect(g); g.connect(N.dlyIn); }
 }
@@ -349,7 +423,12 @@ function fuzzLead(f, t, len, vel, pan){
   osc('sawtooth',f,t,t+len+.3,-8).connect(ws); osc('sawtooth',f*1.5,t,t+len+.3,8).connect(ws);
   ws.connect(lp); lp.connect(g); env(g,t,.003,.05*vel,.1,.7,.08,len); out(g,pan,.15,0);
 }
-const LEADS = { supersaw, keys, bell, square, fuzz:fuzzLead };
+function warm(f, t, len, vel, pan){ // GOLDEN HOUR: soft triangle lead with an octave sine, warm lowpass
+  const c=N.ctx, g=c.createGain(), lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1400+1400*S.energy;
+  osc('triangle',f,t,t+len+.8).connect(lp); const o2=osc('sine',f*2,t,t+len+.8,4); const og=c.createGain(); og.gain.value=.3; o2.connect(og); og.connect(lp);
+  lp.connect(g); env(g,t,.02,.08*vel,.5,.55,.45,len); out(g,pan,.4,.22);
+}
+const LEADS = { supersaw, keys, bell, square, fuzz:fuzzLead, warm };
 function pad(freqs, t, len){
   const c=N.ctx, lp=c.createBiquadFilter(), g=c.createGain(); lp.type='lowpass'; lp.Q.value=.7;
   lp.frequency.setValueAtTime(500,t); lp.frequency.linearRampToValueAtTime(900+1600*S.energy, t+len*.5); lp.frequency.linearRampToValueAtTime(600, t+len);
@@ -401,11 +480,13 @@ function newMotif(s){
   return notes;
 }
 function mutate(m){
-  const v = S.variation; return m.map(n => n===null ? (Math.random()<v*.08 ? pickOne([2,4,7]) : null) : (Math.random()<v*.3 ? Math.max(0,Math.min(11,n+pickOne([-2,-1,1,2]))) : n));
+  // MELODIC VARIATION slider, shaped by the listening profile; long drive keeps phrases steadier
+  const v = S.variation * (.6 + .8*P().variation) * (S.longDrive ? .5 : 1); return m.map(n => n===null ? (Math.random()<v*.08 ? pickOne([2,4,7]) : null) : (Math.random()<v*.3 ? Math.max(0,Math.min(11,n+pickOne([-2,-1,1,2]))) : n));
 }
 function stepAt(t){
   const s = st(), step = S.step, b16 = step % 16, bar = Math.floor(step/16), barInPhrase = bar % 8;
-  const secIdx = Math.floor(bar/8) % SECTIONS.length, sec = S.energy < .2 ? 'DRIFT' : SECTIONS[secIdx];
+  const SEQ = S.longDrive ? SECTIONS_LONG : SECTIONS, prof = P();
+  const secIdx = Math.floor(bar/8) % SEQ.length, sec = S.energy < .2 ? 'DRIFT' : SEQ[secIdx];
   if (secIdx !== S.lastSection || !S.motif) { S.lastSection = secIdx; S.section = sec; S.motif = newMotif(s); $('section').textContent = sec; }
   if (b16===0 && barInPhrase%2===0 && barInPhrase) S.motif = mutate(S.motif);
   const chordDeg = s.prog[bar % s.prog.length], barDur = 60/s.bpm*4;
@@ -423,14 +504,18 @@ function stepAt(t){
   // Drums
   const sw = s.swing && step%2 ? s.swing*(60/s.bpm/4) : 0, T = t + sw;
   if (s.drums !== 'none' && !(drift && sec==='DRIFT')) {
-    const k = { synth:[0,8], lofi:[0,7,10], four:[0,4,8,12], punk:[0,6,8,14] }[s.drums] || [];
-    const sn = { synth:[4,12], lofi:[4,12], four:[4,12], punk:[4,12] }[s.drums] || [];
-    if (k.includes(b16) && (full || b16===0)) kick(T, vel());
-    if (sn.includes(b16) && full) { s.clap ? (clap(T, vel()), snare(T,.5)) : snare(T, vel(), s.drums==='lofi'); }
-    if (full || sec==='INTRO') {
+    const k = { synth:[0,8], lofi:[0,7,10], four:[0,4,8,12], punk:[0,6,8,14], soft:[0,8] }[s.drums] || [];
+    const sn = { synth:[4,12], lofi:[4,12], four:[4,12], punk:[4,12], soft:[4,12] }[s.drums] || [];
+    const soft = s.drums==='lofi' || s.drums==='soft';
+    if (k.includes(b16) && (full || b16===0)) kick(T, vel()*(s.drums==='soft'?.7:1));
+    if (sn.includes(b16) && full) { s.clap ? (clap(T, vel()), snare(T,.5)) : snare(T, vel(), soft); }
+    // Listening profile density: fewer in-between hats on CITY, all of them on PARKED
+    const dense = b16%4===0 || Math.random() < prof.density;
+    if ((full || sec==='INTRO') && dense) {
       if (s.drums==='four') { if (b16%4===2) hat(T, vel(), true); else if (b16%2===0 && S.energy>.4) hat(T, .6); }
       else if (s.drums==='punk') { if (b16%2===0) hat(T, vel()); }
       else if (s.drums==='lofi') { if (b16%2===0 && Math.random()<.85) hat(T, b16%4===0 ? .8 : .5); }
+      else if (s.drums==='soft') { if (b16%4===2) hat(T, .4); }
       else if (b16%2===0) hat(T, b16%4===2 ? .9 : .55);
       if (peak && b16===15) snare(T, .45, true);
       if (b16===14 && barInPhrase===7) { snare(T,.5); snare(T+60/s.bpm/8,.6); }
@@ -448,17 +533,22 @@ function stepAt(t){
     else if (s.bassStyle==='round' && (b16===0 || b16===7 || b16===10)) bass(bf*(b16===10?1.5:1), t+sw, st16*4, .9, 'round');
     else if (s.bassStyle==='drone' && b16===0) bass(bf, t, barDur*1.1, .8, 'drone');
   }
-  // Arp on peaks
-  if (s.arp && (peak || (full && S.energy>.7)) && b16%2===1) {
+  // Arp on peaks (left out on CITY, which keeps fewer layers)
+  if (s.arp && prof.complexity >= .5 && (peak || (full && S.energy>.7)) && b16%2===1) {
     const tones = chordTones(s, chordDeg, 3); const d = tones[(b16>>1)%3] + 7;
     square(hzOf(s, d, 2), t, .12, .6, ((b16>>1)%2?.4:-.4));
+  }
+  // Counter-melody: a quiet answering voice, more often on PARKED, rarer on CITY
+  if (full && b16%8===4 && s.lead!=='fuzz' && Math.random() < .45*prof.complexity) {
+    const cm = chordTones(s, chordDeg, 3)[2] + 4;
+    (s.lead==='bell' ? bell : keys)(hzOf(s, cm, 2), t+human(), s.lead==='bell' ? 1.2 : .35, .45, rnd(-.6,.6));
   }
   // Melody (motif)
   const mn = S.motif[step % 32];
   const play = mn !== null && (full || (drift && Math.random()<.5) || s.lead==='bell');
   if (play) {
     let deg = mn; if (b16%4===0) { const ct = chordTones(s, chordDeg, 3).map(x=>x%s.scale.length); const dm=((deg%s.scale.length)+s.scale.length)%s.scale.length; if (!ct.includes(dm)) deg += 1; }
-    const len = s.lead==='bell' ? 1.6 : s.lead==='keys' ? .45 : s.lead==='fuzz' ? .13 : (60/s.bpm/4)*rnd(1.2,2.4);
+    const len = s.lead==='bell' ? 1.6 : s.lead==='keys' ? .45 : s.lead==='warm' ? .55 : s.lead==='fuzz' ? .13 : (60/s.bpm/4)*rnd(1.2,2.4);
     LEADS[s.lead](hzOf(s, deg, s.lead==='bell'?3:2), t+human()+sw, len, vel()*(peak?1:.85), rnd(-.25,.25));
   }
   S.step++;
@@ -485,9 +575,18 @@ async function play(){
     S.step = 0; S.lastSection = -1; S.motif = null; S.next = N.ctx.currentTime + .08;
     S.timer = setInterval(scheduler, 25); $('status').textContent='MADE LIVE';
   }
+  clearInterval(S.evolve); S.evolve = setInterval(evolve, 1500);
   apply(); paint(); wake();
 }
-function pause(){ S.playing=false; clearInterval(S.timer); player.pause(); live.pause(); $('section').textContent='PAUSED'; apply(); paint(); }
+function pause(){ S.playing=false; clearInterval(S.timer); clearInterval(S.evolve); player.pause(); live.pause(); $('section').textContent='PAUSED'; apply(); paint(); }
+// Evolving sound design: slow filter and delay-time drift, small reverb changes (held steady in long drive mode)
+function evolve(){
+  if (!S.playing || !N.ctx) return;
+  const t = N.ctx.currentTime, s = st(), v = P().variation * (S.longDrive ? .3 : 1) * (.4 + S.effects);
+  N.filter.frequency.setTargetAtTime(Math.max(250, 500 + S.filter*11500 + Math.sin(Date.now()/12000)*350*v), t, 2);
+  const dt = s.bpm ? (60/s.bpm)*.75 : .33; N.dly.delayTime.setTargetAtTime(dt*(1 + Math.sin(Date.now()/18000)*.06*v), t, 3);
+  if (!S.longDrive && Math.random() < .18*v) { const fx=.4+1.2*S.effects; N.verbOut.gain.setTargetAtTime(((s.bigVerb?.6:.32)*S.reverb*fx+.03)*(.9+Math.random()*.15), t, 4); }
+}
 function tune(i){ const was=S.playing; if (was) pause(); S.i=(i+STATIONS.length)%STATIONS.length; paint(); if (was) play(); }
 
 /* ================= UI ================= */
@@ -499,26 +598,47 @@ function paint(){
   const on = document.querySelector('.st.on'); if (on && on.scrollIntoView) on.scrollIntoView({block:'nearest', inline:'nearest', behavior:'smooth'});
   const tr = s.local && S.tracks[S.ti];
   $('freq').textContent = s.freq + (s.bpm ? ' FM' : '');
+  $('title').textContent = s.title || '';
   $('name').textContent = tr ? tr.name : s.name;
   $('desc').textContent = s.local && !S.tracks.length ? 'Open MY MUSIC below and tap + ADD to save songs to this phone.' : s.desc;
   $('bpm').textContent = s.bpm || '--';
+  $('mood').textContent = s.mood || '';
+  $('engine').textContent = S.playing ? 'SOUND ENGINE LIVE' : 'ENGINE STANDBY';
+  $('profileMeta').textContent = P().name + (S.longDrive ? ' · LONG DRIVE' : '');
   $('play').textContent = S.playing ? 'Ⅱ PAUSE' : '▶ PLAY';
   if (!S.playing) { $('status').textContent = s.stream ? 'NEEDS SIGNAL' : 'OFFLINE OK'; $('section').textContent = 'READY'; }
   renderTracks(); media();
 }
-$('strip').addEventListener('click', e=>{ const b=e.target.closest('.st'); if (!b) return; tune(+b.dataset.i); if (!S.playing) play(); });
-$('play').onclick = () => S.playing ? pause() : play();
-$('next').onclick = () => st().local && S.tracks.length ? skip(1) : tune(S.i+1);
-$('prev').onclick = () => st().local && S.tracks.length ? skip(-1) : tune(S.i-1);
-function flip(key, id){ init(); S[key]=!S[key]; $(id).classList.toggle('on',S[key]); apply(); }
+function haptic(){ try { if (navigator.vibrate) navigator.vibrate(25); } catch(e){} }
+$('strip').addEventListener('click', e=>{ const b=e.target.closest('.st'); if (!b || b.disabled) return; haptic(); tune(+b.dataset.i); if (!S.playing) play(); });
+$('play').onclick = () => { haptic(); S.playing ? pause() : play(); };
+$('next').onclick = () => { haptic(); st().local && S.tracks.length ? skip(1) : tune(S.i+1); };
+$('prev').onclick = () => { haptic(); st().local && S.tracks.length ? skip(-1) : tune(S.i-1); };
+$('refresh').onclick = () => location.reload();
+function flip(key, id){ init(); haptic(); S[key]=!S[key]; $(id).classList.toggle('on',S[key]); apply(); }
 $('qRain').onclick = () => flip('rain','qRain');
 $('qEcho').onclick = () => flip('echo','qEcho');
 $('qFuzz').onclick = () => flip('fuzz','qFuzz');
-['energy','variation','space','tape','volume'].forEach(id=>{
-  const el=$(id), o=$(id+'Out'); try { const v=localStorage.getItem('nc2.'+id); if (v!==null) el.value=v; } catch(e){}
-  const set=()=>{ S[id]=el.value/100; o.textContent=el.value+'%'; try{localStorage.setItem('nc2.'+id,el.value);}catch(e){} apply(); };
+const store = (k, v) => { try { localStorage.setItem('nc2.'+k, v); } catch(e){} };
+const load = k => { try { return localStorage.getItem('nc2.'+k); } catch(e){ return null; } };
+if (load('reverb')===null && load('space')!==null) store('reverb', load('space')); // the old SPACE slider becomes REVERB
+function energyDesc(){ const v=+$('energy').value; $('energyDesc').textContent = v<25 ? 'Sparse pads, gentle bass and minimal rhythmic activity.' : v<65 ? 'Warm bass, evolving melodies and restrained rhythmic variation.' : 'More rhythmic activity, brighter textures and greater melodic movement.'; }
+['energy','variation','effects','reverb','delay','filter','stereo','tape','volume','rainLevel'].forEach(id=>{
+  const el=$(id), o=$(id+'Out'); const v=load(id); if (v!==null) el.value=v;
+  const set=()=>{ S[id]=el.value/100; o.textContent=el.value+'%'; store(id, el.value); if (id==='energy') energyDesc(); apply(); };
   el.addEventListener('input', set); set();
 });
+function setProfile(p){ if (!PROFILES[p]) return; S.profile=p; store('profile', p);
+  document.querySelectorAll('[data-profile]').forEach(b=>b.classList.toggle('on', b.dataset.profile===p));
+  $('profileDesc').textContent = PROFILES[p].desc; paint(); }
+$('profiles').addEventListener('click', e=>{ const b=e.target.closest('[data-profile]'); if (!b || b.disabled) return; haptic(); setProfile(b.dataset.profile); });
+function setLongDrive(on){
+  S.longDrive=on; store('longDrive', on?'1':'0'); $('longDrive').textContent = on ? 'ON' : 'OFF'; $('longDrive').classList.toggle('on', on);
+  if (on) { setProfile('highway'); if (+$('energy').value > 50) { $('energy').value = 50; $('energy').dispatchEvent(new Event('input')); } }
+  apply(); paint();
+}
+$('longDrive').onclick = () => { haptic(); setLongDrive(!S.longDrive); };
+setProfile(load('profile') || 'highway'); setLongDrive(load('longDrive')==='1');
 function clock(){ $('clock').textContent = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
 clock(); setInterval(clock, 5000);
 
@@ -564,27 +684,42 @@ function say(text, done){
   speechSynthesis.cancel(); if (N.ctx) N.master.gain.setTargetAtTime(S.volume*.3, N.ctx.currentTime, .1);
   const u=new SpeechSynthesisUtterance(text); u.rate=1; u.pitch=.95; u.onend=u.onerror=()=>{ apply(); done&&done(); }; speechSynthesis.speak(u);
 }
-function report(){ const sp=S.speed==null?'':' About '+Math.round(S.speed)+' miles per hour.'; const m="It's "+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+'. '+$('name').textContent+'.'+sp; $('heard').textContent=m; say(m); }
+function report(){
+  const s=st(), tr=s.local && S.tracks[S.ti];
+  const speed = S.speed==null ? 'GPS speed unavailable' : 'Cruising at '+Math.round(S.speed)+' miles per hour';
+  const m="It's "+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+'. '+speed+". You're tuned to "+(tr ? tr.name+' on '+s.name : s.name)+'. Enjoy the night ride.';
+  $('heard').textContent=m; say(m);
+}
 $('statusBtn').onclick = report;
-const QUIZ=[['Which planet spins clockwise?',['Mars','Venus','Jupiter','Saturn'],1],['What year did the Sony Walkman launch?',['1975','1979','1985','1990'],1],['Which interstate runs from Seattle to Boston?',['I-80','I-90','I-10','I-95'],1],['Capital of Australia?',['Sydney','Melbourne','Canberra','Perth'],2],['Keys on a standard piano?',['76','82','88','96'],2],['Which state has the most miles of I-10?',['Texas','Arizona','California','Louisiana'],0],['The saguaro grows wild in which desert?',['Mojave','Sonoran','Chihuahuan','Great Basin'],1],['A theremin is played by…',['Bowing','Not touching it','Blowing','Plucking'],1]];
-function ask(){ const [q,a]=QUIZ[S.qi%QUIZ.length]; S.trivia=true; $('heard').textContent=q; say(q+' '+a.map((x,i)=>'ABCD'[i]+', '+x).join('. ')+'.', ()=>{ if (!S.voice) setTimeout(()=>{ if (S.trivia) reveal(); }, 8000); }); }
-function reveal(){ const [,a,c]=QUIZ[S.qi%QUIZ.length]; S.trivia=false; S.qi++; $('heard').textContent='Answer: '+a[c]; say('The answer is '+a[c]+'.'); }
-function answer(t){ const [,a,c]=QUIZ[S.qi%QUIZ.length]; const L=['a|ay','b|bee','c|see','d|dee']; const k=a.findIndex((x,i)=>new RegExp('^('+L[i]+')$').test(t)||t.includes(x.toLowerCase())); if (k<0) return false; S.trivia=false; S.qi++; if (k===c){S.score+=100;say('Correct. '+S.score+' points.');} else say('Nope. '+a[c]+'.'); $('heard').textContent=k===c?'Correct · '+S.score:'Answer: '+a[c]; return true; }
+// Every question from every Night Cruiser version, duplicates removed
+const QUIZ=[['Which planet spins clockwise?',['Mars','Venus','Jupiter','Saturn'],1],['What year did the Sony Walkman launch?',['1975','1979','1985','1990'],1],['Which interstate runs from Seattle to Boston?',['I-80','I-90','I-10','I-95'],1],['Capital of Australia?',['Sydney','Melbourne','Canberra','Perth'],2],['Keys on a standard piano?',['76','82','88','96'],2],['How many gigawatts does the DeLorean need?',['1.21','2.5','8.8','10'],0],['Where does historic Route 66 end in California?',['San Diego','Santa Monica','Malibu','San Francisco'],1],['Which iconic portable cassette player launched in 1979?',['Discman','Walkman','Boombox','SoundBurger'],1],['Which state has the most miles of I-10?',['Texas','Arizona','California','Louisiana'],0],['The saguaro grows wild in which desert?',['Mojave','Sonoran','Chihuahuan','Great Basin'],1],['A theremin is played by…',['Bowing','Not touching it','Blowing','Plucking'],1]];
+function ask(){
+  const [q,a]=QUIZ[S.qi%QUIZ.length]; S.trivia=true; $('heard').textContent='TRIVIA QUESTION · '+q+' '+a.map((x,i)=>'ABCD'[i]+': '+x).join('. ');
+  say(q+' Is it '+a.map((x,i)=>'ABCD'[i]+', '+x).join(', ')+'?', ()=>{
+    // Listen for the answer (turns voice on, like the cockpit version). No voice support: reveal after 8 seconds.
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if (SR && !S.voice) voice(true);
+    setTimeout(()=>{ if (S.trivia) reveal(); }, SR ? 15000 : 8000);
+  });
+}
+function reveal(){ const [,a,c]=QUIZ[S.qi%QUIZ.length]; S.trivia=false; S.qi++; $('heard').textContent='ANSWER: '+a[c]; say('The answer is '+a[c]+'.'); }
+function answer(t){ const [,a,c]=QUIZ[S.qi%QUIZ.length]; const L=['a|ay|option a','b|bee|option b','c|see|option c','d|dee|option d']; const k=a.findIndex((x,i)=>new RegExp('^('+L[i]+')$').test(t)||t.includes(x.toLowerCase())); if (k<0) return false; S.trivia=false; S.qi++; if (k===c){S.score+=100;say('Correct! The answer is '+a[c]+'. Your score is '+S.score+' points.');} else say('Nice try. The answer is '+a[c]+'.'); $('heard').textContent=k===c?'CORRECT · '+S.score+' POINTS':'ANSWER: '+a[c]; $('score').textContent='TRIVIA SCORE · '+S.score; return true; }
 $('triviaBtn').onclick = ask;
 function cmd(raw){
   const t=raw.toLowerCase().trim(); $('heard').textContent='Heard: '+raw; if (S.trivia && answer(t)) return;
   const f=id=>STATIONS.findIndex(s=>s.id===id);
   const vol=d=>{ $('volume').value=Math.max(0,Math.min(100,+$('volume').value+d)); $('volume').dispatchEvent(new Event('input')); };
-  if (/trivia|quiz/.test(t)) ask(); else if (/\b(next|skip)\b/.test(t)) $('next').click(); else if (/previous|go back/.test(t)) $('prev').click();
-  else if (/punk/.test(t)) tune(f('punk')); else if (/chill|lo.?fi|tape/.test(t)) tune(f('lofi')); else if (/cyber|techno|acid/.test(t)) tune(f('cyber'));
-  else if (/space|ambient|star/.test(t)) tune(f('space')); else if (/energy|voltage|upbeat/.test(t)) tune(f('energy')); else if (/synth/.test(t)) tune(f('synth'));
-  else if (/my music|my songs/.test(t)) tune(f('mine')); else if (/live|internet/.test(t)) tune(f('live'));
+  const nrg=d=>{ if (S.moving) return; $('energy').value=Math.max(0,Math.min(100,+$('energy').value+d)); $('energy').dispatchEvent(new Event('input')); };
+  if (/trivia|quiz|question/.test(t)) ask(); else if (/\b(next|skip)\b/.test(t)) $('next').click(); else if (/previous|\bback\b/.test(t)) $('prev').click();
+  else if (/more energy|harder|energize/.test(t)) nrg(20); else if (/less energy|calm|mellow/.test(t)) nrg(-20);
+  else if (/louder|volume up|turn it up/.test(t)) vol(10); else if (/quieter|softer|volume down|turn it down/.test(t)) vol(-10);
+  else if (/punk/.test(t)) tune(f('punk')); else if (/chill|lo.?fi|tape/.test(t)) tune(f('lofi')); else if (/cyber|techno|acid|autobahn/.test(t)) tune(f('cyber'));
+  else if (/golden|daydream|sunset/.test(t)) tune(f('golden'));
+  else if (/space|ambient|star/.test(t)) tune(f('space')); else if (/energy|voltage|upbeat|\bbeats?\b/.test(t)) tune(f('energy')); else if (/synth|nightride/.test(t)) tune(f('synth'));
+  else if (/my music|my songs/.test(t)) tune(f('mine')); else if (/live|radio|internet/.test(t)) tune(f('live'));
   else if (/pause|stop/.test(t)) pause(); else if (/play|start|resume/.test(t)) play();
-  else if (/rain/.test(t)) $('qRain').click(); else if (/echo|delay/.test(t)) $('qEcho').click(); else if (/fuzz|distort/.test(t)) $('qFuzz').click();
-  else if (/louder|volume up/.test(t)) vol(10); else if (/quieter|softer|volume down/.test(t)) vol(-10);
-  else if (/more energy|harder/.test(t)) { $('energy').value=Math.min(100,+$('energy').value+20); $('energy').dispatchEvent(new Event('input')); }
-  else if (/calm|less energy|mellow/.test(t)) { $('energy').value=Math.max(0,+$('energy').value-20); $('energy').dispatchEvent(new Event('input')); }
-  else if (/time|status|speed/.test(t)) report();
+  else if (/rain/.test(t)) flip('rain','qRain'); else if (/echo|delay/.test(t)) flip('echo','qEcho'); else if (/fuzz|distort|\bdrive\b/.test(t)) flip('fuzz','qFuzz');
+  else if (/time|status|speed|briefing|co.?pilot/.test(t)) report();
 }
 function voice(on){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if (!SR) { $('heard').textContent='Voice commands are not supported in this browser.'; return; }
@@ -597,16 +732,25 @@ function voice(on){
   else if (S.rec) { try{S.rec.abort();}catch(e){} }
   $('qVoice').classList.toggle('on', S.voice);
 }
-$('qVoice').onclick = () => voice(!S.voice);
+$('qVoice').onclick = () => { haptic(); voice(!S.voice); };
 
 /* ================= GPS, SLEEP, WAKE, LOCK SCREEN ================= */
+// Driving lock: above 5 mph the setup controls lock. Playback, volume, rain level and voice commands keep working.
+function updateLock(){
+  $('lockNotice').hidden = !S.moving;
+  document.querySelectorAll('[data-lock], .st').forEach(el=>{ el.disabled = S.moving; });
+}
 $('gps').onclick = () => {
-  if (S.gps!==null) { navigator.geolocation.clearWatch(S.gps); S.gps=null; S.speed=null; $('gps').textContent='GPS --'; $('gps').classList.remove('on'); return; }
+  if (S.gps!==null) { navigator.geolocation.clearWatch(S.gps); S.gps=null; S.speed=null; S.moving=false; updateLock(); $('gps').textContent='GPS --'; $('gps').classList.remove('on'); return; }
   if (!navigator.geolocation) return; $('gps').textContent='GPS …'; $('gps').classList.add('on');
-  S.gps=navigator.geolocation.watchPosition(p=>{ const v=p.coords.speed; if (v!=null&&isFinite(v)){ S.speed=v*2.23694; $('gps').textContent=Math.round(S.speed)+' MPH'; } },
-    ()=>{ $('gps').textContent='GPS --'; $('gps').classList.remove('on'); S.gps=null; }, {enableHighAccuracy:true,maximumAge:3000,timeout:15000});
+  S.gps=navigator.geolocation.watchPosition(p=>{ const v=p.coords.speed; if (v!=null&&isFinite(v)){ S.speed=v*2.23694; $('gps').textContent=Math.round(S.speed)+' MPH'; S.moving=S.speed>5; updateLock(); } },
+    ()=>{ $('gps').textContent='GPS --'; $('gps').classList.remove('on'); S.gps=null; S.speed=null; S.moving=false; updateLock(); }, {enableHighAccuracy:true,maximumAge:3000,timeout:15000});
 };
-$('sleep').onchange = e => { clearTimeout(S.sleep); const m=+e.target.value; if (m) S.sleep=setTimeout(()=>{ pause(); $('sleep').value='0'; }, m*60000); };
+// Sleep timer: fades out, then pauses
+$('sleep').onchange = e => { clearTimeout(S.sleep); const m=+e.target.value; if (m) S.sleep=setTimeout(()=>{
+  if (N.ctx) N.master.gain.setTargetAtTime(0, N.ctx.currentTime, .9);
+  setTimeout(()=>{ pause(); $('status').textContent='SLEEP TIMER'; $('sleep').value='0'; }, 2500);
+}, m*60000); };
 async function wake(){ try { if ('wakeLock' in navigator && !S.wake) { S.wake=await navigator.wakeLock.request('screen'); S.wake.addEventListener('release',()=>S.wake=null); } } catch(e){} }
 document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState==='visible' && S.playing) { if (N.ctx && N.ctx.state!=='running') N.ctx.resume(); wake(); } });
 function media(){

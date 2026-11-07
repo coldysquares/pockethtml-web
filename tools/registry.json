@@ -40,10 +40,10 @@
     {
       "id": "night-cruiser",
       "name": "Night Cruiser",
-      "description": "Generative driving radio made on your phone: 6 stations that build from intro to peak, rain, echo, fuzz, your saved music, voice and trivia. Works offline.",
+      "description": "Generative driving radio: 7 made-on-phone stations plus your music and live radio, listening profiles, long drive mode, rain, delay, drive, voice co-pilot with trivia, sleep timer, driving lock. Works offline.",
       "kind": "hosted",
       "path": "night-cruiser/",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "status": "live",
       "tags": [
         "audio"
@@ -58,7 +58,7 @@
       "description": "Cassette-style player for your own audio. Tracks save to this phone and play offline, shared with Night Cruiser.",
       "kind": "hosted",
       "path": "tape-deck/",
-      "version": "1.0.0",
+      "version": "1.4.0",
       "status": "live",
       "tags": [
         "audio"

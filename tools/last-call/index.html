@@ -199,6 +199,8 @@
       <p>Tap a patron to pour +1 drink // Use @Name in chat to intervene before Last Call</p>
     </div>
     <div class="status-row">
+      <a class="badge" id="pocket-back" href="../../" hidden style="color:var(--amber);text-decoration:none">← POCKET</a>
+      <a class="badge" id="pocket-reload" href="#" hidden onclick="location.reload();return false" style="color:var(--amber);text-decoration:none">↻</a>
       <div class="badge" id="ollama-status" style="color:var(--safe);">Fallback: Ready</div>
       <div class="badge" id="clock-display" style="color:var(--amber);">10:15 PM</div>
     </div>
@@ -778,5 +780,6 @@ renderTelemetry();
 renderTranscriptUI();
 setInterval(drawBar, 120);
 </script>
+<script>if(/\/tools\//.test(location.pathname)){document.getElementById("pocket-back").hidden=false;document.getElementById("pocket-reload").hidden=false;}</script>
 </body>
 </html>
