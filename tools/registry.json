@@ -48,7 +48,8 @@
       "tags": [
         "workbench"
       ],
-      "repo": "https://github.com/coldysquares/pockethtml-web"
+      "repo": "https://github.com/coldysquares/pockethtml-web",
+      "offline": true
     },
     {
       "id": "pocketpdf",
@@ -60,7 +61,8 @@
       "status": "live",
       "tags": [
         "workbench"
-      ]
+      ],
+      "offline": true
     },
     {
       "id": "pocket-mp3",
@@ -73,7 +75,8 @@
       "tags": [
         "audio"
       ],
-      "repo": "https://github.com/coldysquares/pocket-mp3"
+      "repo": "https://github.com/coldysquares/pocket-mp3",
+      "offline": true
     },
     {
       "id": "pitchback",

@@ -105,7 +105,7 @@
       return a;
     }
     function hrefOf(t) { return t.kind === 'hosted' ? 'tools/' + t.path : t.url; }
-    function offline(t) { return t.kind === 'hosted' || t.id === 'pockethtml'; }
+    function offline(t) { return t.kind === 'hosted' || t.offline === true; }
     function size(b) { return b < 1048576 ? Math.max(1, Math.round(b / 1024)) + ' KB' : (b / 1048576).toFixed(1) + ' MB'; }
     function when(ms) { return new Date(ms).toLocaleDateString([], { month: 'short', day: 'numeric' }); }
     function monogram(text) {
