@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-11-03",
+  "updated": "2026-11-07",
   "statuses": [
     "live",
     "building",
@@ -19,7 +19,8 @@
         "audio"
       ],
       "added": "2026-11-01",
-      "updated": "2026-11-01"
+      "updated": "2026-11-01",
+      "icon": "🎚"
     },
     {
       "id": "last-call",
@@ -29,25 +30,30 @@
       "path": "last-call/",
       "version": "1.0.0",
       "status": "live",
-      "tags": [],
+      "tags": [
+        "toys"
+      ],
       "added": "2026-11-03",
-      "updated": "2026-11-03"
+      "updated": "2026-11-03",
+      "icon": "🍺"
     },
     {
       "id": "pockethtml",
       "name": "PocketHTML",
+      "icon": "⌨️",
       "description": "Phone HTML editor and previewer, with a library of saved files.",
       "kind": "app",
-      "url": "../",
-      "repo": "https://github.com/coldysquares/pockethtml-web",
+      "url": "edit/",
       "status": "live",
       "tags": [
         "workbench"
-      ]
+      ],
+      "repo": "https://github.com/coldysquares/pockethtml-web"
     },
     {
       "id": "pocketpdf",
       "name": "PocketPDF",
+      "icon": "📄",
       "description": "PDF companion to PocketHTML.",
       "kind": "app",
       "url": "https://pocketpdf.vercel.app/",
@@ -57,12 +63,51 @@
       ]
     },
     {
+      "id": "pocket-mp3",
+      "name": "PocketMP3",
+      "icon": "🎙",
+      "description": "Local-first audio app with on-device transcription. Song transcription upgrade in progress.",
+      "kind": "app",
+      "url": "https://pocket-mp3.vercel.app/",
+      "status": "building",
+      "tags": [
+        "audio"
+      ],
+      "repo": "https://github.com/coldysquares/pocket-mp3"
+    },
+    {
+      "id": "pitchback",
+      "name": "Pitchback",
+      "icon": "🎤",
+      "description": "Sing it back.",
+      "kind": "app",
+      "url": "https://pitchback-lab.vercel.app/",
+      "status": "live",
+      "tags": [
+        "audio"
+      ],
+      "repo": "https://github.com/coldysquares/pitchback-app"
+    },
+    {
       "id": "tabbycat",
       "name": "Tabbycat",
+      "icon": "🎸",
       "description": "Guitar songbook. Songs live in the browser that saved them.",
       "kind": "app",
       "url": "https://tabbycat-one.vercel.app",
-      "repo": "https://github.com/coldysquares/tabbycat",
+      "status": "live",
+      "tags": [
+        "music"
+      ],
+      "repo": "https://github.com/coldysquares/tabbycat"
+    },
+    {
+      "id": "local-songbook",
+      "name": "Local Songbook",
+      "icon": "📓",
+      "description": "Songbook V2.",
+      "kind": "app",
+      "url": "https://local-songbook.vercel.app/",
       "status": "live",
       "tags": [
         "music"
@@ -71,50 +116,252 @@
     {
       "id": "slopscore-lab",
       "name": "Slopscore Lab",
+      "icon": "🌀",
       "description": "Generative remixing.",
       "kind": "app",
       "url": "https://slopscore-lab.vercel.app",
-      "repo": "https://github.com/coldysquares/slopscore-lab",
       "status": "live",
       "tags": [
         "music"
-      ]
+      ],
+      "repo": "https://github.com/coldysquares/slopscore-lab"
     },
     {
       "id": "ted-lab",
       "name": "TED LAB 1974",
+      "icon": "📼",
       "description": "Sound experiments.",
       "kind": "app",
       "url": "https://guvs.vercel.app/ted-lab/",
-      "repo": "https://github.com/coldysquares/guvs",
       "status": "live",
       "tags": [
         "music"
-      ]
+      ],
+      "repo": "https://github.com/coldysquares/guvs"
+    },
+    {
+      "id": "wollohy-playground",
+      "name": "Wollohy Playground",
+      "icon": "🕹",
+      "description": "WOLLOHY playground.",
+      "kind": "app",
+      "url": "https://wollohy-playground.vercel.app/",
+      "status": "live",
+      "tags": [
+        "music"
+      ],
+      "repo": "https://github.com/coldysquares/wollohy-playground"
+    },
+    {
+      "id": "wollohy",
+      "name": "Wollohy archive",
+      "icon": "💿",
+      "description": "Music archive.",
+      "kind": "app",
+      "url": "https://wollohy.vercel.app/",
+      "status": "live",
+      "tags": [
+        "music"
+      ],
+      "repo": "https://github.com/coldysquares/wollohy"
+    },
+    {
+      "id": "clip-studio",
+      "name": "Clip Studio",
+      "icon": "✂️",
+      "description": "Clip Studio.",
+      "kind": "app",
+      "url": "https://clip-studio.vercel.app/",
+      "status": "live",
+      "tags": [
+        "image"
+      ],
+      "repo": "https://github.com/coldysquares/clip-studio"
+    },
+    {
+      "id": "alchemist",
+      "name": "Aether Alchemist",
+      "icon": "⚗️",
+      "description": "Image studio.",
+      "kind": "app",
+      "url": "https://alchemist-image-studio.vercel.app/",
+      "status": "live",
+      "tags": [
+        "image"
+      ],
+      "repo": "https://github.com/coldysquares/alchemist-image-studio"
+    },
+    {
+      "id": "local-tools",
+      "name": "Local Tools",
+      "icon": "🧰",
+      "description": "Local image tools.",
+      "kind": "app",
+      "url": "https://local-tools.vercel.app/",
+      "status": "live",
+      "tags": [
+        "image"
+      ],
+      "repo": "https://github.com/coldysquares/local-tools"
     },
     {
       "id": "wiki-constellation",
       "name": "Wiki Constellation",
+      "icon": "✶",
       "description": "Research exploration.",
       "kind": "app",
       "url": "https://guvs.vercel.app/wiki-constellation/",
-      "repo": "https://github.com/coldysquares/guvs",
+      "status": "live",
+      "tags": [
+        "research"
+      ],
+      "repo": "https://github.com/coldysquares/guvs"
+    },
+    {
+      "id": "astrograph",
+      "name": "Astrograph",
+      "icon": "✷",
+      "description": "Astrograph.",
+      "kind": "app",
+      "url": "https://aster-graf.vercel.app/",
+      "status": "live",
+      "tags": [
+        "research"
+      ],
+      "repo": "https://github.com/coldysquares/aster-graf"
+    },
+    {
+      "id": "guvs",
+      "name": "GUVs",
+      "icon": "🧫",
+      "description": "GUVS collection.",
+      "kind": "app",
+      "url": "https://guvs.vercel.app/",
+      "status": "live",
+      "tags": [
+        "research"
+      ],
+      "repo": "https://github.com/coldysquares/guvs"
+    },
+    {
+      "id": "saperli-popette",
+      "name": "Saperli Popette",
+      "icon": "🫧",
+      "description": "Saperli Popette.",
+      "kind": "app",
+      "url": "https://saperli-popette.vercel.app/",
+      "status": "live",
+      "tags": [
+        "research"
+      ],
+      "repo": "https://github.com/coldysquares/saperli-popette"
+    },
+    {
+      "id": "systems-chaos-lab",
+      "name": "Systems & Chaos Lab",
+      "icon": "🌪",
+      "description": "Pocket lab.",
+      "kind": "app",
+      "url": "https://systems-chaos-lab.vercel.app/",
       "status": "live",
       "tags": [
         "research"
       ]
     },
     {
-      "id": "pocket-mp3",
-      "name": "PocketMP3",
-      "description": "Local-first audio app with on-device transcription. Song transcription upgrade in progress.",
+      "id": "stateroom",
+      "name": "STATERoom",
+      "icon": "🗄",
+      "description": "ZWEFF workspace.",
       "kind": "app",
-      "url": null,
-      "repo": "https://github.com/coldysquares/pocket-mp3",
-      "status": "building",
+      "url": "https://zweff-workspace.vercel.app/",
+      "status": "live",
       "tags": [
-        "audio"
-      ]
+        "systems"
+      ],
+      "repo": "https://github.com/coldysquares/zweff-workspace"
+    },
+    {
+      "id": "nickos",
+      "name": "NickOS",
+      "icon": "📥",
+      "description": "Voice and text capture into tasks, projects, events and ideas.",
+      "kind": "app",
+      "url": "https://nickos.vercel.app/",
+      "status": "live",
+      "tags": [
+        "systems"
+      ],
+      "repo": "https://github.com/coldysquares/nickos"
+    },
+    {
+      "id": "rhinoceros",
+      "name": "Rhinoceros",
+      "icon": "🦏",
+      "description": "Control room for Control Tower.",
+      "kind": "app",
+      "url": "https://rhinoceros.vercel.app/",
+      "status": "live",
+      "tags": [
+        "systems"
+      ],
+      "repo": "https://github.com/coldysquares/rhinoceros"
+    },
+    {
+      "id": "packet-now",
+      "name": "Packet Now",
+      "icon": "📦",
+      "description": "Packet Now.",
+      "kind": "app",
+      "url": "https://packet-now.vercel.app/",
+      "status": "live",
+      "tags": [
+        "systems"
+      ],
+      "repo": "https://github.com/coldysquares/packet-now"
+    },
+    {
+      "id": "task-keeper",
+      "name": "Task Keeper",
+      "icon": "✅",
+      "description": "Task Keeper.",
+      "kind": "app",
+      "url": "https://task-keeper-mvp.vercel.app/",
+      "status": "live",
+      "tags": [
+        "systems"
+      ],
+      "repo": "https://github.com/coldysquares/task-keeper-mvp"
     }
+  ],
+  "groups": [
+    [
+      "workbench",
+      "WORKBENCH"
+    ],
+    [
+      "audio",
+      "AUDIO"
+    ],
+    [
+      "music",
+      "MUSIC"
+    ],
+    [
+      "image",
+      "IMAGE AND VIDEO"
+    ],
+    [
+      "research",
+      "RESEARCH"
+    ],
+    [
+      "systems",
+      "SYSTEMS"
+    ],
+    [
+      "toys",
+      "TOYS"
+    ]
   ]
 }

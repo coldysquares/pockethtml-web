@@ -2,26 +2,8 @@ const STORAGE_CODE = 'pockethtml.code.v1';
 const STORAGE_NAME = 'pockethtml.filename.v1';
 const STORAGE_SOURCE = 'pockethtml.sourceUrl.v1';
 
-const starter = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My page</title>
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      max-width: 680px;
-      margin: 60px auto;
-      padding: 0 20px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Hello from PocketHTML.</h1>
-  <p>Edit this, then tap Preview.</p>
-</body>
-</html>`;
+// New files start blank.
+const starter = '';
 
 const editor = document.querySelector('#editor');
 const preview = document.querySelector('#preview');
@@ -46,6 +28,8 @@ let filename = localStorage.getItem(STORAGE_NAME) || 'untitled.html';
 let sourceUrl = localStorage.getItem(STORAGE_SOURCE) || '';
 let docId = localStorage.getItem(STORAGE_DOC) || '';
 editor.value = localStorage.getItem(STORAGE_CODE) || starter;
+// Drop the old built-in sample if it was never edited.
+if (/<title>My page<\/title>/.test(editor.value) && /Hello from PocketHTML\./.test(editor.value) && editor.value.length < 700) editor.value = '';
 filenameEl.textContent = filename;
 
 function persistDoc() {
@@ -220,6 +204,25 @@ document.querySelector('#refreshButton').addEventListener('click', () => {
   setMode('preview');
 });
 
+// Clear empties the current file. Tap once to arm, again within 3 seconds to clear.
+const clearButton = document.querySelector('#clearButton');
+let clearArmed = null;
+clearButton.addEventListener('click', () => {
+  if (!clearArmed) {
+    clearButton.textContent = 'Tap to confirm';
+    clearArmed = setTimeout(() => { clearArmed = null; clearButton.textContent = 'Clear'; }, 3000);
+    return;
+  }
+  clearTimeout(clearArmed);
+  clearArmed = null;
+  clearButton.textContent = 'Clear';
+  editor.value = '';
+  saveLocal();
+  renderPreview(true);
+  setMode('code');
+  editor.focus();
+});
+
 document.querySelector('#newButton').addEventListener('click', async () => {
   if (!library && !confirm('Start a new file? Your current work will be replaced.')) return;
   await startDoc({ name: 'untitled.html', code: starter });
@@ -360,8 +363,12 @@ async function boot() {
   const params = new URLSearchParams(location.search);
   const wantDoc = params.get('doc');
   const wantSrc = params.get('src');
+  const wantNew = params.has('new');
   try {
-    if (wantDoc && library) {
+    if (wantNew) {
+      await startDoc({ name: 'untitled.html', code: starter });
+      setMode('code');
+    } else if (wantDoc && library) {
       const doc = await library.get(wantDoc);
       if (doc) {
         await loadDoc(doc);
@@ -375,14 +382,14 @@ async function boot() {
       const name = url.pathname.split('/').filter(Boolean).slice(-2).join('-').replace(/-index\.html$/, '.html') || 'tool.html';
       await openAsDoc(name, await response.text());
       setMode('code');
-    } else if (library && !docId && editor.value !== starter) {
+    } else if (library && !docId && editor.value.trim()) {
       // First run with the library: keep whatever was already being edited.
       await persistDoc();
     }
   } catch (error) {
     alert(error.message);
   }
-  if (wantDoc || wantSrc) history.replaceState(null, '', location.pathname);
+  if (wantDoc || wantSrc || wantNew) history.replaceState(null, '', location.pathname);
   renderPreview();
 }
 
@@ -390,6 +397,6 @@ boot();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }

@@ -6,101 +6,218 @@
   <meta name="theme-color" content="#0d0f12">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="PocketHTML">
-  <title>PocketHTML</title>
+  <meta name="apple-mobile-web-app-title" content="Pocket">
+  <title>Pocket</title>
+  <script>
+    // Old links like /?doc=<id> or /?src=... belong to the editor, which now lives at /edit/.
+    if (/[?&](doc|src|new)=/.test(location.search)) location.replace('edit/' + location.search);
+  </script>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .home { width: min(100%, 860px); margin: 0 auto; padding: calc(18px + var(--safe-top)) 16px calc(28px + var(--safe-bottom)); display: grid; gap: 14px; }
+    .home-top { display: flex; align-items: end; justify-content: space-between; gap: 12px; }
+    .home-count { color: var(--muted); font-size: 12px; padding-bottom: 5px; white-space: nowrap; }
+    .home-bar { display: flex; gap: 8px; }
+    .home-search { flex: 1; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font-size: 16px; }
+    .view-toggle { min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--muted); font-weight: 700; font-size: 13px; }
+    .group-title { margin: 10px 0 0; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .12em; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 14px 8px; }
+    .tile { display: grid; justify-items: center; gap: 6px; text-decoration: none; color: var(--text); -webkit-tap-highlight-color: transparent; }
+    .tile-icon { width: 60px; height: 60px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel-2); display: grid; place-items: center; font-size: 28px; line-height: 1; position: relative; overflow: hidden; }
+    .tile-icon.mono { font-size: 22px; font-weight: 800; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--accent); }
+    .tile-icon.new { color: var(--accent); font-size: 30px; font-weight: 300; border-style: dashed; }
+    .tile-dot { position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; border-radius: 50%; }
+    .tile-dot.building { background: #ffc46b; }
+    .tile-dot.offline { background: var(--accent); }
+    .tile-name { font-size: 12px; line-height: 1.2; text-align: center; max-width: 84px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .cards { display: grid; gap: 8px; }
+    .card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 13px 14px; display: grid; gap: 6px; }
+    .card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .card-name { font-weight: 750; font-size: 17px; color: var(--text); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .badge { flex: none; font-size: 11px; font-weight: 800; letter-spacing: .04em; padding: 3px 8px; border-radius: 999px; background: var(--panel-2); color: var(--muted); }
+    .badge.live { color: var(--accent); }
+    .badge.building { color: #ffc46b; }
+    .badge.draft { color: #c9a6ff; }
+    .card-desc { color: var(--muted); font-size: 14px; line-height: 1.4; }
+    .card-meta { color: var(--muted); font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .card-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .card-actions a { min-height: 36px; padding: 0 13px; display: inline-flex; align-items: center; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2); color: var(--text); font-size: 13px; font-weight: 700; text-decoration: none; }
+    .card-actions a.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+    .note { color: var(--muted); font-size: 13px; }
+    .legend { color: var(--muted); font-size: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .legend span::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+    .legend .l-offline::before { background: var(--accent); }
+    .legend .l-building::before { background: #ffc46b; }
+  </style>
 </head>
 <body>
-  <main class="app-shell">
-    <header class="topbar">
+  <main class="home">
+    <header class="home-top">
       <div>
-        <div class="eyebrow">LOCAL HTML WORKBENCH</div>
-        <h1>PocketHTML</h1>
+        <div class="eyebrow">EVERYTHING IN ONE PLACE</div>
+        <h1>Pocket</h1>
       </div>
-      <div class="topbar-actions">
-        <div class="status" id="saveStatus" aria-live="polite">Saved locally</div>
-        <button id="focusButton" class="focus-button" type="button" aria-label="Hide PocketHTML controls and show the preview in focus mode">
-          Full view
-        </button>
-      </div>
+      <div class="home-count" id="count"></div>
     </header>
 
     <nav class="pocket-switch" aria-label="Pocket tools">
-      <a class="pocket-switch-link active" href="https://pockethtml-web.vercel.app/" aria-current="page">HTML</a>
+      <a class="pocket-switch-link active" href="./" aria-current="page">HOME</a>
+      <a class="pocket-switch-link" href="edit/">HTML</a>
       <a class="pocket-switch-link" href="https://pocketpdf.vercel.app/">PDF</a>
-      <a class="pocket-switch-link" href="tools/">TOOLS</a>
     </nav>
 
-    <nav class="mode-switch" aria-label="View mode">
-      <button class="mode-button active" data-mode="code" type="button">Code</button>
-      <button class="mode-button" data-mode="preview" type="button">Preview</button>
-    </nav>
+    <div class="home-bar">
+      <input id="search" class="home-search" type="search" placeholder="Find a tool or file" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button id="viewToggle" class="view-toggle" type="button">List</button>
+    </div>
+    <div class="legend"><span class="l-offline">works offline</span><span class="l-building">in progress</span></div>
 
-    <section class="toolbar" aria-label="File actions">
-      <button id="libraryButton" class="button secondary" type="button">Library</button>
-      <label class="button secondary file-button">
-        Open
-        <input id="fileInput" type="file" accept=".html,.htm,text/html,text/plain">
-      </label>
-      <button id="importUrlButton" class="button secondary" type="button">Import URL</button>
-      <button id="newButton" class="button secondary" type="button">New</button>
-      <button id="downloadButton" class="button secondary" type="button">Export</button>
-      <button id="refreshButton" class="button accent" type="button">Refresh</button>
-    </section>
-
-    <section id="codePane" class="pane code-pane">
-      <div class="filename-row">
-        <span id="filename">untitled.html</span>
-        <span class="hint">autosaves in this browser</span>
-      </div>
-      <textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="HTML editor"></textarea>
-      <div class="symbol-bar" aria-label="Coding symbols">
-        <button type="button" data-insert="<">&lt;</button>
-        <button type="button" data-insert=">">&gt;</button>
-        <button type="button" data-insert="/">/</button>
-        <button type="button" data-insert="&quot;">&quot;</button>
-        <button type="button" data-insert="'">'</button>
-        <button type="button" data-insert="=">=</button>
-        <button type="button" data-insert="()">()</button>
-        <button type="button" data-insert="{}">{}</button>
-        <button type="button" data-insert="[]">[]</button>
-      </div>
-    </section>
-
-    <section id="previewPane" class="pane preview-pane" hidden>
-      <iframe id="preview" title="HTML preview" scrolling="yes" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"></iframe>
-    </section>
-
-    <footer>
-      <span>Everything stays on this device unless you export it.</span>
-    </footer>
+    <div id="groups"></div>
+    <p class="note" id="note"></p>
   </main>
 
-  <div id="focusBar" class="focus-bar" hidden>
-    <span class="focus-bar-label">PocketHTML · Preview</span>
-    <button id="restoreControlsButton" class="restore-controls" type="button" aria-label="Show PocketHTML controls">
-      Controls
-    </button>
-  </div>
-
-  <div id="librarySheet" class="sheet" hidden>
-    <section class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="libraryTitle">
-      <header class="sheet-head">
-        <div>
-          <div class="eyebrow">SAVED ON THIS PHONE</div>
-          <h2 id="libraryTitle">Library</h2>
-        </div>
-        <button id="libraryClose" class="focus-button" type="button">Done</button>
-      </header>
-      <div id="libraryList" class="library-list"></div>
-      <a class="library-tools-link" href="tools/">All tools →</a>
-    </section>
-  </div>
-
   <script src="library.js"></script>
-  <script src="app.js"></script>
+  <script>
+  (function () {
+    const REPO = 'https://github.com/coldysquares/pockethtml-web';
+    const groupsEl = document.getElementById('groups');
+    const noteEl = document.getElementById('note');
+    const searchEl = document.getElementById('search');
+    const toggleEl = document.getElementById('viewToggle');
+    let registry = { tools: [], groups: [] };
+    let docs = [];
+    let view = 'grid';
+    try { view = localStorage.getItem('pocket.home.view') || 'grid'; } catch (e) {}
+
+    function el(tag, cls, text) {
+      const n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (text != null) n.textContent = text;
+      return n;
+    }
+    function external(href) { return /^https?:/.test(href) && !href.startsWith(location.origin); }
+    function link(text, href, cls) {
+      const a = el('a', cls || '', text);
+      a.href = href;
+      return a;
+    }
+    function hrefOf(t) { return t.kind === 'hosted' ? 'tools/' + t.path : t.url; }
+    function offline(t) { return t.kind === 'hosted' || t.id === 'pockethtml'; }
+    function size(b) { return b < 1048576 ? Math.max(1, Math.round(b / 1024)) + ' KB' : (b / 1048576).toFixed(1) + ' MB'; }
+    function when(ms) { return new Date(ms).toLocaleDateString([], { month: 'short', day: 'numeric' }); }
+    function monogram(text) {
+      const words = String(text || '?').replace(/\.html?$/i, '').split(/[^A-Za-z0-9]+/).filter(Boolean);
+      return ((words[0] || '?')[0] + ((words[1] || '')[0] || '')).toUpperCase();
+    }
+
+    function tile(name, href, icon, dot) {
+      const a = link('', href || '#', 'tile');
+      const box = el('div', 'tile-icon' + (icon ? '' : ' mono'), icon || monogram(name));
+      if (dot) box.append(el('span', 'tile-dot ' + dot));
+      a.append(box, el('div', 'tile-name', name));
+      if (!href) a.removeAttribute('href');
+      return a;
+    }
+
+    function toolCard(t) {
+      const card = el('article', 'card');
+      const top = el('div', 'card-top');
+      const href = hrefOf(t);
+      const name = href ? link((t.icon ? t.icon + '  ' : '') + t.name, href, 'card-name') : el('span', 'card-name', t.name);
+      top.append(name, el('span', 'badge ' + (t.status || ''), t.status || ''));
+      card.append(top);
+      if (t.description) card.append(el('div', 'card-desc', t.description));
+      const meta = [];
+      if (t.version) meta.push('v' + t.version);
+      if (t.updated) meta.push('updated ' + t.updated);
+      if (offline(t)) meta.push('works offline');
+      if (meta.length) card.append(el('div', 'card-meta', meta.join(' · ')));
+      const actions = el('div', 'card-actions');
+      if (href) actions.append(link('Open', href, 'primary'));
+      if (t.kind === 'hosted') {
+        actions.append(link('Edit in PocketHTML', 'edit/?src=' + encodeURIComponent('/tools/' + t.path + 'index.html')));
+        actions.append(link('History', REPO + '/commits/main/tools/' + t.path));
+      } else if (t.repo) {
+        actions.append(link('Repo', t.repo));
+      }
+      card.append(actions);
+      return card;
+    }
+
+    function docCard(d) {
+      const card = el('article', 'card');
+      const top = el('div', 'card-top');
+      top.append(link(d.title || d.name, 'edit/?doc=' + encodeURIComponent(d.id), 'card-name'), el('span', 'badge draft', 'html'));
+      card.append(top, el('div', 'card-meta', d.name + ' · ' + size(d.size) + ' · ' + when(d.updated)));
+      const actions = el('div', 'card-actions');
+      actions.append(link('Open', 'edit/?doc=' + encodeURIComponent(d.id), 'primary'));
+      card.append(actions);
+      return card;
+    }
+
+    function section(title, items) {
+      if (!items.length) return;
+      groupsEl.append(el('h2', 'group-title', title));
+      const box = el('div', view === 'grid' ? 'grid' : 'cards');
+      items.forEach(item => box.append(item));
+      groupsEl.append(box);
+    }
+
+    function matches(q, ...fields) {
+      return !q || fields.some(f => String(f || '').toLowerCase().includes(q));
+    }
+
+    function render() {
+      groupsEl.textContent = '';
+      toggleEl.textContent = view === 'grid' ? 'List' : 'Grid';
+      const q = searchEl.value.trim().toLowerCase();
+      const tools = (registry.tools || []).filter(t => matches(q, t.name, t.description, (t.tags || []).join(' ')));
+      const mine = docs.filter(d => matches(q, d.title, d.name));
+
+      const docItems = mine.map(d => view === 'grid'
+        ? tile(d.title || d.name, 'edit/?doc=' + encodeURIComponent(d.id), '', '')
+        : docCard(d));
+      if (view === 'grid' && !q) docItems.unshift((() => { const a = tile('New HTML', 'edit/?new=1', '+', ''); a.querySelector('.tile-icon').className = 'tile-icon new'; return a; })());
+      section('YOUR HTML', docItems);
+
+      const groups = registry.groups && registry.groups.length ? registry.groups : [['', 'TOOLS']];
+      const placed = new Set();
+      groups.forEach(([tag, title]) => {
+        const items = tools.filter(t => !placed.has(t.id) && (tag === '' || (t.tags || [])[0] === tag));
+        items.forEach(t => placed.add(t.id));
+        section(title, items.map(t => view === 'grid'
+          ? tile(t.name, hrefOf(t), t.icon, t.status === 'building' ? 'building' : offline(t) ? 'offline' : '')
+          : toolCard(t)));
+      });
+      section('OTHER', tools.filter(t => !placed.has(t.id)).map(t => view === 'grid' ? tile(t.name, hrefOf(t), t.icon, '') : toolCard(t)));
+
+      document.getElementById('count').textContent = (registry.tools || []).length + ' tools · ' + docs.length + ' html';
+      if (!groupsEl.children.length) groupsEl.append(el('p', 'note', q ? 'Nothing matches.' : 'Nothing here yet.'));
+    }
+
+    searchEl.addEventListener('input', render);
+    toggleEl.addEventListener('click', () => {
+      view = view === 'grid' ? 'list' : 'grid';
+      try { localStorage.setItem('pocket.home.view', view); } catch (e) {}
+      render();
+    });
+
+    Promise.all([
+      fetch('tools/registry.json', { cache: 'no-cache' }).then(r => r.json()).catch(() => { noteEl.textContent = 'Could not load the tool list. Showing what is saved on this phone.'; return { tools: [] }; }),
+      (window.PocketLibrary ? window.PocketLibrary.list() : Promise.resolve([])).catch(() => [])
+    ]).then(([reg, list]) => {
+      registry = reg;
+      docs = list;
+      render();
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+    }
+  })();
+  </script>
 </body>
 </html>
