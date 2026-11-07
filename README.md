@@ -16,7 +16,7 @@ A tiny, phone-first HTML editor and previewer.
 - **Library**: every file you open, import or start is saved in this browser (IndexedDB). Tap Library to reopen or delete one. Opening the same file twice reuses its entry.
 - **Tools** (`/tools/`): one list of everything made and in progress: tools hosted in this repo, other deployed apps, and drafts saved in the Library.
 - Switching to Preview no longer reloads the page unless the code changed, so a tool that is mid-task keeps running. Refresh still forces a reload.
-- The service worker is network first: a new deploy shows up on the next load, and pages opened before still work offline.
+- The service worker is network first with a 3-second timeout: online, a new deploy shows up on the next load; on weak signal or offline, the cached copy opens instead of hanging. The app, the Tools hub and every hosted tool in `tools/registry.json` are cached on install, so they work offline even if never opened. Library files live in IndexedDB and open offline too.
 
 ## Adding a tool
 Each hosted tool is one self-contained HTML file at `tools/<slug>/index.html`, listed in `tools/registry.json`.
