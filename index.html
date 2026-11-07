@@ -138,6 +138,8 @@
       if (meta.length) card.append(el('div', 'card-meta', meta.join(' · ')));
       const actions = el('div', 'card-actions');
       if (href) actions.append(link('Open', href, 'primary'));
+      const older = draftsOf.get(family(t.name));
+      if (older && older.length) card.append(el('div', 'card-meta', older.length + (older.length > 1 ? ' older drafts of this are' : ' older draft of this is') + ' in your Library, folded in here'));
       if (t.kind === 'hosted') {
         actions.append(link('Edit in PocketHTML', 'edit/?src=' + encodeURIComponent('/tools/' + t.path + 'index.html')));
         actions.append(link('History', REPO + '/commits/main/tools/' + t.path));
@@ -152,7 +154,7 @@
       const card = el('article', 'card');
       const top = el('div', 'card-top');
       top.append(link(d.title || d.name, 'edit/?doc=' + encodeURIComponent(d.id), 'card-name'), el('span', 'badge draft', 'html'));
-      card.append(top, el('div', 'card-meta', d.name + ' · ' + size(d.size) + ' · ' + when(d.updated)));
+      card.append(top, el('div', 'card-meta', d.name + ' · ' + size(d.size) + ' · ' + when(d.updated) + (d.copies > 1 ? ' · newest of ' + d.copies + ' versions' : '')));
       const actions = el('div', 'card-actions');
       actions.append(link('Open', 'edit/?doc=' + encodeURIComponent(d.id), 'primary'));
       card.append(actions);
@@ -167,6 +169,15 @@
       groupsEl.append(box);
     }
 
+    let draftsOf = new Map();
+    function family(text) {
+      return String(text || '').toLowerCase()
+        .replace(/\.html?$/, '')
+        .split(/\s*(?:\||\/\/|—|–|:|\s-\s)\s*/)[0]
+        .replace(/\b(?:v(?:er(?:sion)?)?\s*\d+(?:\.\d+)*|\d+\.\d+|final|copy|new|old|edition)\b/g, '')
+        .replace(/[^a-z0-9]+/g, ' ').trim() || 'untitled';
+    }
+
     function matches(q, ...fields) {
       return !q || fields.some(f => String(f || '').toLowerCase().includes(q));
     }
@@ -176,7 +187,21 @@
       toggleEl.textContent = view === 'grid' ? 'List' : 'Grid';
       const q = searchEl.value.trim().toLowerCase();
       const tools = (registry.tools || []).filter(t => matches(q, t.name, t.description, (t.tags || []).join(' ')));
-      const mine = docs.filter(d => matches(q, d.title, d.name));
+      // One tile per project: copies and versions of the same file collapse into the newest one,
+      // and drafts of a tool that already lives in Pocket are folded into that tool.
+      const toolKeys = new Set((registry.tools || []).map(t => family(t.name)));
+      const fams = new Map();
+      docs.forEach(d => {
+        const k = family(d.title || d.name);
+        if (!fams.has(k)) fams.set(k, []);
+        fams.get(k).push(d);
+      });
+      const mine = [...fams.entries()]
+        .filter(([k]) => !toolKeys.has(k))
+        .map(([, list]) => Object.assign({}, list.sort((a, b) => b.updated - a.updated)[0], { copies: list.length }))
+        .sort((a, b) => b.updated - a.updated)
+        .filter(d => matches(q, d.title, d.name));
+      draftsOf = new Map([...fams.entries()].filter(([k]) => toolKeys.has(k)));
 
       const docItems = mine.map(d => view === 'grid'
         ? tile(d.title || d.name, 'edit/?doc=' + encodeURIComponent(d.id), '', '')
@@ -202,7 +227,7 @@
       });
       section('OTHER', tools.filter(t => !placed.has(t.id)).map(t => view === 'grid' ? tile(t.name, hrefOf(t), t.icon, '') : toolCard(t)));
 
-      document.getElementById('count').textContent = (registry.tools || []).length + ' tools · ' + docs.length + ' html';
+      document.getElementById('count').textContent = (registry.tools || []).length + ' tools · ' + mine.length + ' html';
       if (!groupsEl.children.length) groupsEl.append(el('p', 'note', q ? 'Nothing matches.' : 'Nothing here yet.'));
     }
 

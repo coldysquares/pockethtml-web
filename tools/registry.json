@@ -40,10 +40,10 @@
     {
       "id": "night-cruiser",
       "name": "Night Cruiser",
-      "description": "Generative driving radio: 6 stations made on your phone, rain, echo, drive, your saved music, voice commands and trivia. Works offline.",
+      "description": "Generative driving radio made on your phone: 6 stations that build from intro to peak, rain, echo, fuzz, your saved music, voice and trivia. Works offline.",
       "kind": "hosted",
       "path": "night-cruiser/",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "status": "live",
       "tags": [
         "audio"
