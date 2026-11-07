@@ -13,8 +13,17 @@ Working plan for making Nick's apps one place he can open from his phone, with p
 - 2026-11-07: Root is now the Pocket home grid; the editor moved to `/edit/`; `/tools/` redirects home; old `/?doc=` and `/?src=` links forward to the editor. Clear button (tap twice). New files start blank. Registry lists 25 live apps with icons and groups.
 - 2026-11-07: WAV to MP3 picker no longer uses `audio/*`, which iPhone can treat as a photo and video picker.
 
+- 2026-11-07: PocketMP3 audio picker lists audio types instead of `audio/*`; its service worker was cache first with a fixed name, so deploys never reached the phone. Now network first with a 3 s timeout (pocket-mp3 PR).
+- 2026-11-07: Registry `"offline": true` marks apps checked to open offline (PocketHTML, PocketPDF, PocketMP3). Home shows them with a green dot.
+
+## Offline survey (2026-11-07, from the live pages)
+- Have a service worker: PocketPDF, PocketMP3, Aether Alchemist, Systems & Chaos Lab, Rhinoceros. Only PocketPDF and PocketMP3 are marked offline so far; the other three need a check.
+- No service worker (need signal): Pitchback, Tabbycat, Local Songbook, Slopscore Lab, TED LAB, Wollohy Playground, Wollohy archive, Clip Studio, Local Tools, Wiki Constellation, Astrograph, GUVs, Saperli Popette, STATERoom, NickOS, Packet Now, Task Keeper.
+- Picker scan: only PocketMP3, Slopscore Lab and WAV to MP3 used `audio/*`. Pitchback and Clip Studio set no `accept` in their first-load code; if their upload is the broken one, check the source.
+
 ## Next
-1. Fix the audio pickers in PocketMP3 (`audio/*` in its file input) and in Slopscore Lab if it stays.
+1. Slopscore Lab audio picker (`audio/*`), once Nick decides whether it stays.
+2. Add the same network-first service worker to the phone apps Nick uses most (start with Astrograph, Tabbycat, Pitchback).
 2. Nick decides keep, merge or retire for each app (list below).
 3. Mark each app phone, computer or both; add computer-only apps (local tools on the Mac) to the registry with `"where": "computer"`.
 4. Real descriptions for the apps whose registry description is only their page title.
