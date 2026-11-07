@@ -1,6 +1,11 @@
-# PocketHTML Web
+# Pocket (PocketHTML Web)
 
-A tiny, phone-first HTML editor and previewer.
+Phone-first home for all of Nick's tools, plus a tiny HTML editor and previewer.
+
+## v0.3: Pocket home
+- `/` is the home grid: every app in `tools/registry.json` and every HTML in the Library, with icons, search and a list view.
+- The editor lives at `/edit/`. It has a Clear button (tap twice) and new files start blank.
+- `/tools/` redirects home. See PLAN.md for what is next.
 
 ## v0.1
 - Edit HTML in-browser

@@ -1,0 +1,39 @@
+# Pocket apps plan
+
+Working plan for making Nick's apps one place he can open from his phone, with phone and computer work kept in sync. Claude keeps this file current across sessions; read it before picking the work back up.
+
+## Goal
+- One home page (this repo's root) that opens every tool and every saved HTML, with icons.
+- Phone apps work offline and store locally.
+- Computer-only apps are listed too, and anything that can bridge to the phone does.
+- Later: phone data syncs up when the computer is back online.
+
+## Done
+- 2026-11-07: Service worker falls back to cache after 3 s and precaches every hosted tool (PR #6).
+- 2026-11-07: Root is now the Pocket home grid; the editor moved to `/edit/`; `/tools/` redirects home; old `/?doc=` and `/?src=` links forward to the editor. Clear button (tap twice). New files start blank. Registry lists 25 live apps with icons and groups.
+- 2026-11-07: WAV to MP3 picker no longer uses `audio/*`, which iPhone can treat as a photo and video picker.
+
+## Next
+1. Fix the audio pickers in PocketMP3 (`audio/*` in its file input) and in Slopscore Lab if it stays.
+2. Nick decides keep, merge or retire for each app (list below).
+3. Mark each app phone, computer or both; add computer-only apps (local tools on the Mac) to the registry with `"where": "computer"`.
+4. Real descriptions for the apps whose registry description is only their page title.
+5. Sync design (see below).
+
+## Decisions needed from Nick
+| App | Question |
+| --- | --- |
+| Slopscore Lab | Nick unsure of its use beyond a toy. Keep, fold into Wollohy Playground or TED LAB, or retire? |
+| Local Songbook vs Tabbycat | Both are songbooks. Merge into one? |
+| Wiki Constellation | Three deployments: guvs.vercel.app/wiki-constellation, wiki-constellation.vercel.app, wiki-constellation-run.vercel.app. Which is the real one? |
+| Wollohy, wollohy-twcp | Two deployments of the music archive. Keep one? |
+| Saperli Popette, saperli-popette-byok | Two deployments. Keep one? |
+| Portfolio sites | live-portfolio, nick-berghane-portfolio, nick-berghane-hiring, chronosaudit: sites, not tools, so not on the home grid. Confirm. |
+| Writing sites | zweff-live, editorial-seed-preview (The Index), divergent-cognition, worried-about-me-lately, coconuthing-hut: add a SITES group? |
+| Dead deployments | pocket-mp3-c89l, sketch-2-png, awd, tabbycat (404), constellation (402): delete from Vercel? |
+| agent-scouts | Behind Vercel login. Keep private? |
+
+## Sync design (draft, not built)
+- Every Pocket app on the same origin shares one IndexedDB, so moving tools into this repo (`tools/<slug>/`) is the cheapest way to share a library between them.
+- Apps on other origins cannot read this storage. Options: move them under this domain, or sync through a small store (GitHub repo, or a Vercel Blob or KV store) keyed to Nick.
+- Phone writes locally first and queues changes; when online, pushes the queue. The computer pulls on start.

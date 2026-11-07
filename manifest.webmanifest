@@ -1,13 +1,13 @@
 {
-  "name": "PocketHTML",
-  "short_name": "PocketHTML",
+  "name": "Pocket",
+  "short_name": "Pocket",
   "description": "A tiny local HTML editor and previewer.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0d0f12",
   "theme_color": "#0d0f12",
   "shortcuts": [
-    { "name": "Tools", "url": "./tools/" }
+    { "name": "HTML editor", "url": "./edit/" }
   ],
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },

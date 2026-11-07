@@ -5,7 +5,7 @@
 // still lands in the cache for next time.
 // Offline: everything precached at install (the app, the tools hub and every
 // hosted tool in tools/registry.json) opens with no connection.
-const CACHE = 'pockethtml-v7';
+const CACHE = 'pockethtml-v8';
 const NETWORK_TIMEOUT_MS = 3000;
 const ASSETS = [
   './',
@@ -18,6 +18,7 @@ const ASSETS = [
   './icon-192.png',
   './icon-512.png',
   './apple-touch-icon.png',
+  './edit/',
   './tools/',
   './tools/registry.json'
 ];
@@ -55,7 +56,7 @@ function fromCache(request) {
   return caches.match(request, { ignoreSearch: request.mode === 'navigate' }).then(cached => {
     if (cached || request.mode !== 'navigate') return cached;
     const path = new URL(request.url).pathname;
-    return caches.match(path.startsWith('/tools/') ? './tools/' : './index.html');
+    return caches.match(path.startsWith('/edit/') ? './edit/' : './index.html');
   });
 }
 
