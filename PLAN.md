@@ -20,6 +20,8 @@ Working plan for making Nick's apps one place he can open from his phone, with p
 
 - 2026-11-07: Rule from Nick: one best version of every product, never duplicates. Home collapses Library copies into one tile per project and folds drafts of hosted tools into the tool. Night Cruiser 2.0 rebuilt: new synth engine (supersaw, keys, FM bells, acid bass, layered drums, sidechain, tape wobble), song sections, motif-based melodies, drive-first layout.
 
+- 2026-11-07: Pitchback now opens offline (pitchback-app PR, live). Astrograph offline code is merged in aster-graf but that Vercel project does not deploy from GitHub, so it is not live yet. Tabbycat's live site is a loader that pulls a pinned commit from jsDelivr, not the repo; making it offline needs a decision (see below).
+
 ## Offline survey (2026-11-07, from the live pages)
 - Have a service worker: PocketPDF, PocketMP3, Aether Alchemist, Systems & Chaos Lab, Rhinoceros. Only PocketPDF and PocketMP3 are marked offline so far; the other three need a check.
 - No service worker (need signal): Pitchback, Tabbycat, Local Songbook, Slopscore Lab, TED LAB, Wollohy Playground, Wollohy archive, Clip Studio, Local Tools, Wiki Constellation, Astrograph, GUVs, Saperli Popette, STATERoom, NickOS, Packet Now, Task Keeper.
@@ -45,6 +47,9 @@ Working plan for making Nick's apps one place he can open from his phone, with p
 | Writing sites | zweff-live, editorial-seed-preview (The Index), divergent-cognition, worried-about-me-lately, coconuthing-hut: add a SITES group? |
 | Dead deployments | pocket-mp3-c89l, sketch-2-png, awd, tabbycat (404), constellation (402): delete from Vercel? |
 | agent-scouts | Behind Vercel login. Keep private? |
+
+| Tabbycat | Live site loads a pinned commit from jsDelivr. Option A: deploy the repo itself with offline support on the same domain (songs stay). Option B: move it into Pocket (offline, shared storage) but songs saved in the old site would need an export and import. |
+| Astrograph | Is aster-graf (genealogy) the app Nick means by Astrograph? Its Vercel project needs a redeploy Claude cannot trigger without Vercel team access. |
 
 ## Sync design (draft, not built)
 - Every Pocket app on the same origin shares one IndexedDB, so moving tools into this repo (`tools/<slug>/`) is the cheapest way to share a library between them.

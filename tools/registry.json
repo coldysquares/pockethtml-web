@@ -119,7 +119,8 @@
       "tags": [
         "audio"
       ],
-      "repo": "https://github.com/coldysquares/pitchback-app"
+      "repo": "https://github.com/coldysquares/pitchback-app",
+      "offline": true
     },
     {
       "id": "tabbycat",
