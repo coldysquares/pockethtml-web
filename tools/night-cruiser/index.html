@@ -3,133 +3,135 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#04060b">
+<meta name="theme-color" content="#030409">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Night Cruiser</title>
 <style>
-:root{--accent:#f43f5e;--glow:rgba(244,63,94,.16);--bg:#04060b;--panel:#0c121e;--line:#222d40;--muted:#8794a8;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}
+:root{--a:#ff3d6e;--g:rgba(255,61,110,.18);--bg:#030409;--p:#0b0f19;--l:#1d2638;--m:#7f8ba1;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:#f3f6fa;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif}
-body{min-height:100dvh;background:radial-gradient(ellipse at 50% -20%,var(--glow),transparent 60%),var(--bg);transition:background .5s}
+html,body{margin:0;background:var(--bg);color:#eef2f8;font-family:var(--mono)}
+body{min-height:100dvh;background:radial-gradient(120% 60% at 50% -10%,var(--g),transparent 70%),var(--bg);transition:background .6s}
 button,input,select{font:inherit;color:inherit}
-button{cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.mono{font-family:var(--mono)}
-.app{max-width:640px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top)) 12px calc(22px + env(safe-area-inset-bottom));display:grid;gap:10px}
-.panel{background:linear-gradient(145deg,#111a29,#090e17);border:1px solid var(--line);border-radius:20px;padding:14px}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.back{font:700 11px var(--mono);letter-spacing:.1em;color:var(--muted);text-decoration:none}
-.brand{font:900 11px var(--mono);letter-spacing:.3em;color:var(--accent)}
-.clock{font:800 clamp(28px,8vw,40px)/1 var(--mono);letter-spacing:-1px;margin-top:4px}
-.sub{font:11px var(--mono);color:var(--muted);margin-top:5px;letter-spacing:.05em}
-.speed{border:1px solid var(--line);background:#070b13;border-radius:16px;padding:8px 12px;min-width:86px;text-align:center}
-.speed b{display:block;font:800 26px var(--mono);color:var(--accent)}
-.speed small{font:9px var(--mono);color:var(--muted);letter-spacing:.1em}
-.label{font:800 10px var(--mono);letter-spacing:.2em;color:var(--muted);margin:2px 2px 8px}
-.stations{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-.st{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:11px 2px;min-width:0;text-align:center}
-.st .e{display:block;font-size:19px}.st b{display:block;font:800 10px var(--mono);margin-top:6px;letter-spacing:.06em}.st small{display:block;font:9px var(--mono);color:var(--muted);margin-top:3px}
-.st.on{border:2px solid var(--accent);background:var(--glow);box-shadow:0 0 18px var(--glow)}
-.now{text-align:center}
-.viz{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:54px;margin:6px 0 10px}
-.viz i{display:block;width:5px;border-radius:3px;background:var(--accent);opacity:.85;height:4px;transition:height .08s}
-.title{font:900 18px var(--mono);letter-spacing:.04em}
-.desc{font-size:12px;color:var(--muted);margin-top:5px}
-.pill{display:inline-block;font:10px var(--mono);border:1px solid var(--line);border-radius:8px;padding:4px 8px;margin-top:9px;color:#cbd5e1}
-.transport{display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px}
-.transport button{height:70px;border:1px solid var(--line);border-radius:18px;background:var(--panel);font:800 12px var(--mono)}
-.transport .main{background:var(--accent);border:0;color:#090d15;font-size:15px;box-shadow:0 6px 24px var(--glow)}
-.grid2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-.tog{border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:12px 6px;text-align:center;font:800 10px var(--mono);letter-spacing:.06em}
-.tog .e{display:block;font-size:19px;margin-bottom:5px}.tog small{display:block;color:var(--muted);margin-top:4px;font-weight:400}
-.tog.on{border-color:var(--accent);background:var(--glow)}
-.slider{margin:6px 0 12px}.slider .row{font:800 10px var(--mono);letter-spacing:.1em}.slider output{color:var(--accent)}
-input[type=range]{width:100%;accent-color:var(--accent);margin:8px 0 0}
-.tracks{list-style:none;margin:8px 0 0;padding:0;max-height:220px;overflow:auto;border-top:1px solid var(--line)}
-.tracks li{display:flex;justify-content:space-between;gap:8px;padding:10px 4px;border-bottom:1px solid #161e2c;font:12px var(--mono)}
-.tracks li.on{color:var(--accent)}
+button{cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;border:0;background:none}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--a);outline-offset:3px}
+.app{max-width:560px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 12px calc(18px + env(safe-area-inset-bottom));display:grid;gap:12px}
+.top{display:flex;align-items:center;justify-content:space-between;font-size:11px;letter-spacing:.14em;color:var(--m)}
+.top a{color:var(--m);text-decoration:none}
+.top .clock{color:#fff;font-weight:800;font-size:13px;letter-spacing:.06em}
+.chip{border:1px solid var(--l);border-radius:999px;padding:6px 10px;font-size:10px;letter-spacing:.12em;color:var(--m)}
+.chip.on{color:var(--a);border-color:var(--a)}
+.dial{position:relative;border:1px solid var(--l);border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#0d1220,#05070d)}
+.dial canvas{display:block;width:100%;height:150px}
+.dial::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px);mix-blend-mode:overlay}
+.dial .info{padding:4px 18px 18px}
+.freq{font-size:11px;letter-spacing:.3em;color:var(--a)}
+.name{font-size:clamp(24px,7.5vw,34px);font-weight:900;letter-spacing:.02em;line-height:1.05;margin-top:6px;text-shadow:0 0 18px var(--g)}
+.desc{font-size:12px;color:var(--m);margin-top:6px;line-height:1.45;font-family:-apple-system,system-ui,sans-serif}
+.meta{display:flex;justify-content:space-between;margin-top:12px;font-size:10px;letter-spacing:.18em;color:var(--m)}
+.meta b{color:#fff;font-weight:800}
+.transport{display:grid;grid-template-columns:1fr 1.7fr 1fr;gap:10px}
+.transport button{height:88px;border-radius:24px;border:1px solid var(--l);background:var(--p);font-size:13px;font-weight:800;letter-spacing:.12em}
+.transport .play{background:var(--a);color:#07090f;border:0;font-size:18px;box-shadow:0 10px 34px var(--g)}
+.transport button:active{transform:scale(.97)}
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:30%;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 6px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.st{scroll-snap-align:start;border:1px solid var(--l);background:var(--p);border-radius:20px;padding:14px 10px;text-align:left;min-height:96px;display:flex;flex-direction:column;justify-content:space-between}
+.st .e{font-size:24px}.st b{font-size:12px;letter-spacing:.1em}.st small{font-size:10px;color:var(--m)}
+.st.on{border:2px solid var(--a);background:var(--g)}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.q{border:1px solid var(--l);background:var(--p);border-radius:18px;height:74px;font-size:10px;letter-spacing:.14em;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.q .e{font-size:20px}
+.q.on{border-color:var(--a);background:var(--g);color:#fff}
+details{border:1px solid var(--l);border-radius:20px;background:var(--p)}
+summary{list-style:none;padding:16px 18px;font-size:11px;letter-spacing:.2em;font-weight:800;display:flex;justify-content:space-between;cursor:pointer}
+summary::-webkit-details-marker{display:none}
+summary span:last-child{color:var(--m)}
+details[open] summary span:last-child{transform:rotate(180deg)}
+.inner{padding:0 18px 18px;display:grid;gap:14px}
+.sl label{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.16em;color:var(--m)}
+.sl output{color:var(--a)}
+input[type=range]{width:100%;accent-color:var(--a);margin:10px 0 0}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.btn{border:1px solid var(--l);border-radius:14px;padding:12px 14px;font-size:11px;letter-spacing:.1em;font-weight:800;background:#0e1422}
+.btn.wide{flex:1}
+select.btn{appearance:none}
+.heard{font-size:11px;color:var(--m);line-height:1.5;min-height:16px;font-family:-apple-system,system-ui,sans-serif}
+.tracks{list-style:none;margin:0;padding:0;max-height:240px;overflow:auto}
+.tracks li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 2px;border-top:1px solid #141b29;font-size:12px}
+.tracks li.on{color:var(--a)}
 .tracks li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tracks li button{border:0;background:none;color:var(--muted);font:11px var(--mono);padding:0 4px}
-.btn{border:1px solid var(--line);background:#101827;border-radius:12px;padding:10px 12px;font:800 11px var(--mono);letter-spacing:.06em}
-.btn.on{border-color:var(--accent);background:var(--glow)}
-.note{font:10px/1.6 var(--mono);color:#5d6b80;text-align:center;letter-spacing:.05em;padding:4px 8px}
-.heard{font:11px var(--mono);color:var(--muted);margin-top:6px;min-height:15px}
-@media(max-width:370px){.panel{padding:12px}.st b{font-size:9px}}
+.tracks li button{color:var(--m);font-size:12px;padding:4px 6px}
+.empty{font-size:12px;color:var(--m);font-family:-apple-system,system-ui,sans-serif;line-height:1.5}
+.foot{text-align:center;font-size:9px;letter-spacing:.22em;color:#46526a;padding:4px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
-<body data-station="0">
+<body>
 <main class="app">
 
-<header class="panel row">
-  <div>
-    <a class="back" href="../../">← POCKET</a>
-    <div class="brand" style="margin-top:8px">NIGHT CRUISER</div>
-    <div class="clock" id="clock">--:--</div>
-    <div class="sub" id="stationLine">NIGHTRIDE 84 · 88.9</div>
-  </div>
-  <button class="speed" id="gps" aria-label="Turn GPS speed on or off"><b id="speed">--</b><small id="gpsState">GPS OFF</small></button>
-</header>
+<div class="top">
+  <a href="../../">← POCKET</a>
+  <span class="clock" id="clock">--:--</span>
+  <button class="chip" id="gps">GPS --</button>
+</div>
 
-<section>
-  <div class="label">STATIONS</div>
-  <div class="stations" id="stations"></div>
-</section>
-
-<section class="panel now">
-  <div class="viz" id="viz"></div>
-  <div class="title" id="title">NIGHTRIDE 84</div>
-  <div class="desc" id="desc">Cinematic synthwave, retro drums, melodic hooks.</div>
-  <span class="pill" id="status">READY · WORKS OFFLINE</span>
-</section>
-
-<footer class="transport">
-  <button id="prev">◀<br>PREV</button>
-  <button class="main" id="play">▶ PLAY</button>
-  <button id="next">NEXT<br>▶</button>
-</footer>
-
-<section class="grid2">
-  <button class="tog" id="rainBtn"><span class="e">🌧️</span>RAIN<small id="rainState">off</small></button>
-  <button class="tog" id="driveBtn"><span class="e">🔥</span>DRIVE<small id="driveState">off</small></button>
-  <button class="tog" id="delayBtn"><span class="e">〰️</span>ECHO<small id="delayState">off</small></button>
-</section>
-
-<section class="panel">
-  <div class="slider"><div class="row"><label for="energy">ENERGY</label><output id="energyOut">65%</output></div><input id="energy" type="range" min="0" max="100" value="65"></div>
-  <div class="slider"><div class="row"><label for="variation">MELODY VARIATION</label><output id="variationOut">60%</output></div><input id="variation" type="range" min="0" max="100" value="60"></div>
-  <div class="slider"><div class="row"><label for="space">SPACE / EFFECTS</label><output id="spaceOut">45%</output></div><input id="space" type="range" min="0" max="100" value="45"></div>
-  <div class="slider" style="margin-bottom:0"><div class="row"><label for="volume">VOLUME</label><output id="volumeOut">70%</output></div><input id="volume" type="range" min="0" max="100" value="70"></div>
-</section>
-
-<section class="panel">
-  <div class="row">
-    <div><div class="label" style="margin:0">MY MUSIC</div><div class="sub" id="libLine">Saved on this phone, plays offline</div></div>
-    <div class="row" style="gap:6px">
-      <button class="btn" id="addMusic">+ ADD</button>
-    </div>
-  </div>
-  <input id="fileInput" type="file" multiple hidden accept=".mp3,.m4a,.wav,.aac,.aif,.aiff,.flac,.ogg,.opus,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/x-wav,audio/aac,audio/flac,audio/ogg">
-  <ul class="tracks" id="tracks"></ul>
-</section>
-
-<section class="panel">
-  <div class="row">
-    <div><div class="label" style="margin:0">VOICE</div><div class="heard" id="heard">Say: next, punk, chill, rain, pause, time, trivia</div></div>
-    <button class="btn" id="voiceBtn">🎙 OFF</button>
-  </div>
-  <div class="row" style="margin-top:10px;gap:7px">
-    <button class="btn" id="statusBtn" style="flex:1">🗣 TIME + STATION</button>
-    <button class="btn" id="triviaBtn" style="flex:1">🧠 TRIVIA</button>
-  </div>
-  <div class="row" style="margin-top:10px">
-    <label for="sleep" class="label" style="margin:0">SLEEP TIMER</label>
-    <select id="sleep" class="btn"><option value="0">OFF</option><option value="15">15 MIN</option><option value="30">30 MIN</option><option value="60">60 MIN</option></select>
+<section class="dial">
+  <canvas id="scope" width="560" height="150" aria-hidden="true"></canvas>
+  <div class="info">
+    <div class="freq" id="freq">88.9 FM</div>
+    <div class="name" id="name">NIGHTRIDE 84</div>
+    <div class="desc" id="desc"></div>
+    <div class="meta"><span id="section">READY</span><span><b id="bpm">104</b> BPM</span><span id="status">OFFLINE OK</span></div>
   </div>
 </section>
 
-<div class="note">SET IT UP BEFORE YOU DRIVE · EYES ON THE ROAD<br>GENERATED ON YOUR PHONE · NO SIGNAL NEEDED (EXCEPT LIVE)</div>
+<div class="transport">
+  <button id="prev" aria-label="Previous">◀◀</button>
+  <button class="play" id="play">▶ PLAY</button>
+  <button id="next" aria-label="Next">▶▶</button>
+</div>
+
+<div class="strip" id="strip" role="list"></div>
+
+<div class="quick">
+  <button class="q" id="qRain"><span class="e">🌧️</span>RAIN</button>
+  <button class="q" id="qEcho"><span class="e">〰️</span>ECHO</button>
+  <button class="q" id="qFuzz"><span class="e">🔥</span>FUZZ</button>
+  <button class="q" id="qVoice"><span class="e">🎙️</span>VOICE</button>
+</div>
+
+<details id="tune">
+  <summary><span>TUNE THE SOUND</span><span>▾</span></summary>
+  <div class="inner">
+    <div class="sl"><label for="energy">ENERGY <output id="energyOut"></output></label><input id="energy" type="range" min="0" max="100" value="60"></div>
+    <div class="sl"><label for="variation">MELODY MOVEMENT <output id="variationOut"></output></label><input id="variation" type="range" min="0" max="100" value="55"></div>
+    <div class="sl"><label for="space">SPACE <output id="spaceOut"></output></label><input id="space" type="range" min="0" max="100" value="45"></div>
+    <div class="sl"><label for="tape">TAPE GRIT <output id="tapeOut"></output></label><input id="tape" type="range" min="0" max="100" value="35"></div>
+    <div class="sl"><label for="volume">VOLUME <output id="volumeOut"></output></label><input id="volume" type="range" min="0" max="100" value="75"></div>
+    <div class="row"><span style="font-size:10px;letter-spacing:.16em;color:var(--m)">SLEEP TIMER</span>
+      <select id="sleep" class="btn"><option value="0">OFF</option><option value="15">15 MIN</option><option value="30">30 MIN</option><option value="60">60 MIN</option></select></div>
+  </div>
+</details>
+
+<details id="musicBox">
+  <summary><span>MY MUSIC · <span id="trackCount">0</span></span><span>▾</span></summary>
+  <div class="inner">
+    <div class="row"><span class="empty">Saved on this phone. Plays with no signal, here and in Tape Deck.</span><button class="btn" id="addMusic">+ ADD</button></div>
+    <input id="fileInput" type="file" multiple hidden accept=".mp3,.m4a,.wav,.aac,.aif,.aiff,.flac,.ogg,.opus,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/x-wav,audio/aac,audio/flac,audio/ogg">
+    <ul class="tracks" id="tracks"></ul>
+  </div>
+</details>
+
+<details>
+  <summary><span>CO-PILOT</span><span>▾</span></summary>
+  <div class="inner">
+    <div class="heard" id="heard">Voice: say next, punk, chill, space, rain, louder, pause, time, trivia.</div>
+    <div class="row"><button class="btn wide" id="statusBtn">🗣 TIME + STATION</button><button class="btn wide" id="triviaBtn">🧠 TRIVIA</button></div>
+  </div>
+</details>
+
+<div class="foot">SET UP BEFORE YOU DRIVE · EYES ON THE ROAD</div>
 </main>
 
 <audio id="player" playsinline preload="none"></audio>
@@ -192,428 +194,430 @@ const PocketAudio = (() => {
 (() => {
 'use strict';
 const $ = id => document.getElementById(id);
+const rnd = (a, b) => a + Math.random() * (b - a);
+const pickOne = a => a[Math.floor(Math.random() * a.length)];
 
+/* ================= STATIONS ================= */
 const STATIONS = [
-  {id:'synth', name:'NIGHTRIDE 84', freq:'88.9', e:'🌆', short:'SYNTH', color:'#f43f5e',
-   desc:'Cinematic synthwave, retro drums, melodic hooks.', bpm:104, root:110,
-   scale:[0,2,3,5,7,8,10], prog:[0,5,3,4], lead:'sawtooth', cutoff:5200,
-   bass:[0,0,7,0,3,0,7,10], kick:[0,8], snare:[4,12], hat:2, mel:.72},
-  {id:'lofi', name:'MIDNIGHT TAPE', freq:'92.3', e:'🌙', short:'LO-FI', color:'#10b981',
-   desc:'Dusty drums, warm chords, sleepy late-night melodies.', bpm:80, root:130.81,
-   scale:[0,2,3,5,7,9,10], prog:[0,3,5,4], lead:'triangle', cutoff:2600,
-   bass:[0,7,0,3,0,7,5,3], kick:[0,10], snare:[4,12], hat:4, mel:.5, swing:.12},
-  {id:'cyber', name:'NEON UNDERGROUND', freq:'96.7', e:'⚡', short:'CYBER', color:'#f59e0b',
-   desc:'Dark bass, industrial percussion, hard electronic drive.', bpm:124, root:82.41,
-   scale:[0,1,3,5,7,8,10], prog:[0,0,5,3], lead:'square', cutoff:6500,
-   bass:[0,0,0,7,0,3,0,10], kick:[0,4,8,12], snare:[4,12], hat:2, mel:.7},
-  {id:'space', name:'STARLIGHT', freq:'101.5', e:'🪐', short:'SPACE', color:'#38bdf8',
-   desc:'Wide slow pads and floating melodies. No drums.', bpm:64, root:98,
-   scale:[0,2,4,7,9], prog:[0,4,5,3], lead:'sine', cutoff:1900,
-   bass:[0,0,0,0,7,0,0,0], kick:[], snare:[], hat:0, mel:.4, pad:true},
-  {id:'energy', name:'VOLTAGE', freq:'104.2', e:'🔋', short:'ENERGY', color:'#a855f7',
-   desc:'Four-on-the-floor drums, bright hooks, uplifting bass.', bpm:128, root:110,
-   scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'square', cutoff:7000,
-   bass:[0,0,7,0,0,5,7,10], kick:[0,4,8,12], snare:[4,12], hat:2, mel:.8},
-  {id:'punk', name:'PUNK AFTER DARK', freq:'107.9', e:'🎸', short:'PUNK', color:'#fb923c',
-   desc:'Fast drums, fuzzed guitar-ish synths, rebellious riffs.', bpm:156, root:82.41,
-   scale:[0,3,5,7,10], prog:[0,3,4,3], lead:'sawtooth', cutoff:6000, fuzz:true,
-   bass:[0,0,0,0,3,3,5,5], kick:[0,6,8], snare:[4,12], hat:2, mel:.85},
-  {id:'mine', name:'MY MUSIC', freq:'LOCAL', e:'💾', short:'MINE', color:'#c4f042',
-   desc:'Your saved tracks, played from this phone.', local:true},
-  {id:'live', name:'SOMAFM DEF CON', freq:'LIVE', e:'📡', short:'LIVE', color:'#e879f9',
-   desc:'Internet radio. Needs signal.', stream:'https://ice1.somafm.com/defcon-128-mp3'}
+  { id:'synth', name:'NIGHTRIDE 84', freq:'88.9', e:'🌆', short:'SYNTH', c:'#ff3d6e',
+    desc:'Supersaw leads, gated snares, pulsing bass. Headlights and long straight roads.',
+    bpm:100, root:43.65, scale:[0,2,3,5,7,8,10], prog:[0,5,3,6], lead:'supersaw', bassStyle:'pulse', drums:'synth', arp:true, pad:true, duck:.45 },
+  { id:'lofi', name:'MIDNIGHT TAPE', freq:'92.3', e:'🌙', short:'LO-FI', c:'#2fd18b',
+    desc:'Warm Rhodes-ish keys, dusty swung drums, vinyl crackle, tape wobble.',
+    bpm:78, root:55, scale:[0,2,3,5,7,9,10], prog:[1,4,0,5], lead:'keys', bassStyle:'round', drums:'lofi', swing:.18, crackle:true, wobble:1, seventh:true },
+  { id:'cyber', name:'NEON UNDERGROUND', freq:'96.7', e:'⚡', short:'CYBER', c:'#ffb020',
+    desc:'Acid bassline, four-to-the-floor, dark minor stabs.',
+    bpm:124, root:41.2, scale:[0,1,3,5,7,8,10], prog:[0,0,5,6], lead:'square', bassStyle:'acid', drums:'four', duck:.5 },
+  { id:'space', name:'STARLIGHT', freq:'101.5', e:'🪐', short:'SPACE', c:'#46c3ff',
+    desc:'Slow wide pads, glassy bells, no drums. Desert at night.',
+    bpm:60, root:49, scale:[0,2,4,7,9], prog:[0,3,4,2], lead:'bell', bassStyle:'drone', drums:'none', pad:true, bigVerb:true },
+  { id:'energy', name:'VOLTAGE', freq:'104.2', e:'🔋', short:'ENERGY', c:'#b46bff',
+    desc:'Bright major hooks, claps, rolling arps. Wakes the car up.',
+    bpm:126, root:49, scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'supersaw', bassStyle:'offbeat', drums:'four', arp:true, clap:true, duck:.5 },
+  { id:'punk', name:'PUNK AFTER DARK', freq:'107.9', e:'🎸', short:'PUNK', c:'#ff7a2f',
+    desc:'Power-chord fuzz, fast drums, shouting-into-the-wind riffs.',
+    bpm:168, root:41.2, scale:[0,3,5,7,10], prog:[0,3,5,4], lead:'fuzz', bassStyle:'eighths', drums:'punk', power:true },
+  { id:'mine', name:'MY MUSIC', freq:'LOCAL', e:'💾', short:'MINE', c:'#c4f042', desc:'Your saved tracks, played from this phone.', local:true },
+  { id:'live', name:'SOMAFM DEF CON', freq:'LIVE', e:'📡', short:'LIVE', c:'#ef6cff', desc:'Internet radio. Needs signal.', stream:'https://ice1.somafm.com/defcon-128-mp3' }
 ];
+const SECTIONS = ['INTRO','CRUISE','PEAK','CRUISE','DRIFT','CRUISE','PEAK','CRUISE'];
 
 const S = {
-  i:0, playing:false, ctx:null, master:null, bus:null, filter:null, comp:null,
-  delay:null, delayFb:null, delayWet:null, verb:null, verbWet:null, fuzz:null, fuzzWet:null,
-  rainGain:null, mediaSrc:null, analyser:null,
-  rain:false, drive:false, echo:false,
-  energy:.65, variation:.6, space:.45, volume:.7,
-  step:0, nextTime:0, timer:null, lastDeg:2,
-  tracks:[], ti:0, url:null,
-  voice:false, rec:null, gps:null, speed:null, sleep:null, wake:null, qi:0, score:0, trivia:false
+  i:0, playing:false, ctx:null,
+  energy:.6, variation:.55, space:.45, tape:.35, volume:.75,
+  rain:false, echo:false, fuzz:false,
+  step:0, next:0, timer:null, motif:null, section:'INTRO', lastSection:-1,
+  tracks:[], ti:0, url:null, voice:false, rec:null, gps:null, speed:null, sleep:null, wake:null, qi:0, score:0, trivia:false
 };
-const player = $('player');
-const live = $('live');
+const N = {}; // audio nodes
+const player = $('player'), live = $('live');
+const st = () => STATIONS[S.i];
 
-/* ---------- UI ---------- */
-$('stations').innerHTML = STATIONS.map((s,i) =>
-  `<button class="st" data-i="${i}"><span class="e">${s.e}</span><b>${s.short}</b><small>${s.freq}</small></button>`).join('');
-$('viz').innerHTML = '<i></i>'.repeat(24);
-const bars = [...$('viz').children];
-
-function clock(){ $('clock').textContent = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
-clock(); setInterval(clock, 5000);
-
-function station(){ return STATIONS[S.i]; }
-function setStatus(t){ $('status').textContent = t; }
-function paint(){
-  const s = station();
-  document.documentElement.style.setProperty('--accent', s.color);
-  document.documentElement.style.setProperty('--glow', s.color + '29');
-  document.querySelectorAll('.st').forEach((b,i) => b.classList.toggle('on', i===S.i));
-  $('title').textContent = s.local && S.tracks[S.ti] ? S.tracks[S.ti].name : s.name;
-  $('desc').textContent = s.local && !S.tracks.length ? 'Tap + ADD below to save music to this phone.' : s.desc;
-  $('stationLine').textContent = s.name + ' · ' + s.freq;
-  $('play').textContent = S.playing ? 'Ⅱ PAUSE' : '▶ PLAY';
-  if (!S.playing) setStatus(s.stream ? 'LIVE · NEEDS SIGNAL' : 'READY · WORKS OFFLINE');
-  renderTracks();
-  media();
-}
-
-/* ---------- Audio graph ---------- */
+/* ================= AUDIO GRAPH ================= */
+function shaper(k){ const n=2048,c=new Float32Array(n); for(let i=0;i<n;i++){const x=i*2/n-1;c[i]=Math.tanh(k*x)/Math.tanh(k);} return c; }
 function impulse(ctx, sec, decay){
-  const len = ctx.sampleRate*sec, b = ctx.createBuffer(2, len, ctx.sampleRate);
-  for (let c=0;c<2;c++){ const d=b.getChannelData(c); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay); }
+  const len=Math.floor(ctx.sampleRate*sec), b=ctx.createBuffer(2,len,ctx.sampleRate);
+  for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay)*(i<ctx.sampleRate*.01?i/(ctx.sampleRate*.01):1);}
   return b;
 }
-function curve(k){
-  const n=2048, c=new Float32Array(n);
-  for(let i=0;i<n;i++){ const x=i*2/n-1; c[i]=(1+k)*x/(1+k*Math.abs(x)); }
-  return c;
-}
-function initAudio(){
-  if (S.ctx) { if (S.ctx.state==='suspended') S.ctx.resume(); return true; }
+function init(){
+  if (N.ctx) { if (N.ctx.state==='suspended') N.ctx.resume(); return true; }
   const AC = window.AudioContext || window.webkitAudioContext;
-  if (!AC) { setStatus('NO WEB AUDIO HERE'); return false; }
-  const ctx = S.ctx = new AC();
-  S.master = ctx.createGain(); S.master.gain.value = S.volume;
-  S.comp = ctx.createDynamicsCompressor(); S.comp.threshold.value=-18; S.comp.ratio.value=3.5; S.comp.attack.value=.01; S.comp.release.value=.2;
-  S.analyser = ctx.createAnalyser(); S.analyser.fftSize = 64;
-  S.master.connect(S.comp); S.comp.connect(S.analyser); S.analyser.connect(ctx.destination);
-  // Synth bus: voices -> bus -> filter -> master, with sends.
-  S.bus = ctx.createGain();
-  S.filter = ctx.createBiquadFilter(); S.filter.type='lowpass'; S.filter.frequency.value=6000;
-  S.bus.connect(S.filter); S.filter.connect(S.master);
-  S.fuzz = ctx.createWaveShaper(); S.fuzz.curve = curve(30); S.fuzz.oversample='4x';
-  S.fuzzWet = ctx.createGain(); S.fuzzWet.gain.value = 0;
-  S.filter.connect(S.fuzz); S.fuzz.connect(S.fuzzWet); S.fuzzWet.connect(S.master);
-  S.delay = ctx.createDelay(2); S.delayFb = ctx.createGain(); S.delayWet = ctx.createGain(); S.delayWet.gain.value=0;
-  const dlp = ctx.createBiquadFilter(); dlp.type='lowpass'; dlp.frequency.value=2600;
-  S.filter.connect(S.delay); S.delay.connect(dlp); dlp.connect(S.delayFb); S.delayFb.connect(S.delay); dlp.connect(S.delayWet); S.delayWet.connect(S.master);
-  S.verb = ctx.createConvolver(); S.verb.buffer = impulse(ctx, 2.6, 2.4); S.verbWet = ctx.createGain();
-  S.filter.connect(S.verb); S.verb.connect(S.verbWet); S.verbWet.connect(S.master);
-  // Rain goes through the master so the volume slider controls it.
-  const len = ctx.sampleRate*3, rb = ctx.createBuffer(1, len, ctx.sampleRate), rd = rb.getChannelData(0);
-  let b0=0,b1=0; for(let i=0;i<len;i++){ const w=Math.random()*2-1; b0=.99*b0+w*.06; b1=.6*b1+w*.4; rd[i]=(b0+b1*.5+(Math.random()<.0008?Math.random()*2-1:0))*.5; }
-  const rs = ctx.createBufferSource(); rs.buffer=rb; rs.loop=true;
-  const rf = ctx.createBiquadFilter(); rf.type='bandpass'; rf.frequency.value=1400; rf.Q.value=.4;
-  S.rainGain = ctx.createGain(); S.rainGain.gain.value=0;
-  rs.connect(rf); rf.connect(S.rainGain); S.rainGain.connect(S.master); rs.start();
-  // Local files and the live stream also run through the master.
-  try { S.mediaSrc = ctx.createMediaElementSource(player); S.mediaSrc.connect(S.master); } catch(e) {}
-  fx(); viz();
+  if (!AC) { $('status').textContent = 'NO WEB AUDIO'; return false; }
+  const c = N.ctx = new AC({ latencyHint:'playback' });
+  // Output: master -> glue compressor -> limiter -> analyser -> speakers
+  N.master = c.createGain(); N.master.gain.value = 0;
+  N.glue = c.createDynamicsCompressor(); N.glue.threshold.value=-16; N.glue.ratio.value=2.5; N.glue.attack.value=.02; N.glue.release.value=.25; N.glue.knee.value=8;
+  N.lim = c.createDynamicsCompressor(); N.lim.threshold.value=-2; N.lim.ratio.value=20; N.lim.attack.value=.002; N.lim.release.value=.08;
+  N.an = c.createAnalyser(); N.an.fftSize = 1024;
+  N.master.connect(N.glue); N.glue.connect(N.lim); N.lim.connect(N.an); N.an.connect(c.destination);
+  // Music bus: duck (sidechain) -> tone -> tape saturation -> master
+  N.music = c.createGain(); N.duck = c.createGain(); N.tone = c.createBiquadFilter(); N.tone.type='lowpass'; N.tone.frequency.value=16000; N.tone.Q.value=.3;
+  N.sat = c.createWaveShaper(); N.sat.curve = shaper(1.6); N.sat.oversample='2x';
+  N.music.connect(N.duck); N.duck.connect(N.tone); N.tone.connect(N.sat); N.sat.connect(N.master);
+  // Drum bus: not ducked, light saturation
+  N.drums = c.createGain(); N.drums.gain.value=.9; N.drums.connect(N.master);
+  // Sends
+  N.verb = c.createConvolver(); N.verb.buffer = impulse(c, 3.2, 2.6); N.verbIn = c.createGain(); N.verbOut = c.createGain();
+  const vhp = c.createBiquadFilter(); vhp.type='highpass'; vhp.frequency.value=220;
+  N.verbIn.connect(vhp); vhp.connect(N.verb); N.verb.connect(N.verbOut); N.verbOut.connect(N.master);
+  N.dly = c.createDelay(2); N.dlyIn = c.createGain(); N.dlyFb = c.createGain(); N.dlyOut = c.createGain();
+  const dlp = c.createBiquadFilter(); dlp.type='lowpass'; dlp.frequency.value=2800; const dhp=c.createBiquadFilter(); dhp.type='highpass'; dhp.frequency.value=300;
+  N.dlyIn.connect(N.dly); N.dly.connect(dlp); dlp.connect(dhp); dhp.connect(N.dlyFb); N.dlyFb.connect(N.dly); dhp.connect(N.dlyOut); N.dlyOut.connect(N.master);
+  // Fuzz send for FUZZ toggle
+  N.fz = c.createWaveShaper(); N.fz.curve = shaper(9); N.fz.oversample='4x'; N.fzOut = c.createGain(); N.fzOut.gain.value=0;
+  const fzlp = c.createBiquadFilter(); fzlp.type='lowpass'; fzlp.frequency.value=3800;
+  N.tone.connect(N.fz); N.fz.connect(fzlp); fzlp.connect(N.fzOut); N.fzOut.connect(N.master);
+  // Tape wobble LFO shared by all pitched voices
+  N.lfo = c.createOscillator(); N.lfo.frequency.value = .55; N.lfoAmt = c.createGain(); N.lfoAmt.gain.value = 0; N.lfo.connect(N.lfoAmt); N.lfo.start();
+  // Shared noise
+  const nl = c.sampleRate*2; N.noise = c.createBuffer(1, nl, c.sampleRate); const nd = N.noise.getChannelData(0); for(let i=0;i<nl;i++) nd[i]=Math.random()*2-1;
+  // Rain + vinyl bed (always running, faded in/out)
+  N.rain = c.createGain(); N.rain.gain.value=0;
+  const rs = c.createBufferSource(); rs.buffer=N.noise; rs.loop=true; const rbp=c.createBiquadFilter(); rbp.type='bandpass'; rbp.frequency.value=1700; rbp.Q.value=.35;
+  const rlp=c.createBiquadFilter(); rlp.type='lowpass'; rlp.frequency.value=5200; rs.connect(rbp); rbp.connect(rlp); rlp.connect(N.rain); N.rain.connect(N.master); rs.start();
+  N.vinyl = c.createGain(); N.vinyl.gain.value=0; N.vinyl.connect(N.master);
+  // Local music and live radio through the same master
+  try { N.media = c.createMediaElementSource(player); N.media.connect(N.master); } catch(e) {}
+  apply(); scope();
   return true;
 }
-function fx(){
-  if (!S.ctx) return;
-  const t = S.ctx.currentTime, s = station();
-  S.master.gain.setTargetAtTime(S.playing || S.rain ? S.volume : 0, t, .08);
-  S.verbWet.gain.setTargetAtTime(S.space*(s.pad?.7:.4), t, .2);
-  S.delayWet.gain.setTargetAtTime(S.echo ? .12+S.space*.3 : 0, t, .2);
-  S.delayFb.gain.setTargetAtTime(.15+S.space*.35, t, .2);
-  S.delay.delayTime.setTargetAtTime(s.bpm ? (60/s.bpm)*.75 : .3, t, .2);
-  S.fuzzWet.gain.setTargetAtTime(S.drive || s.fuzz ? .55 : 0, t, .1);
-  S.rainGain.gain.setTargetAtTime(S.rain ? .2 : 0, t, .4);
-  if (!S.playing) S.filter.frequency.setTargetAtTime(6000, t, .2);
-  if (!S.mediaSrc) player.volume = S.volume;
+function apply(){
+  if (!N.ctx) return;
+  const t = N.ctx.currentTime, s = st();
+  const on = S.playing || S.rain;
+  N.master.gain.setTargetAtTime(on ? S.volume*.9 : 0, t, .12);
+  N.verbOut.gain.setTargetAtTime((s.bigVerb?.6:.32)*S.space + .04, t, .3);
+  N.dlyOut.gain.setTargetAtTime(S.echo ? .18 + S.space*.25 : .04*S.space, t, .3);
+  N.dlyFb.gain.setTargetAtTime(S.echo ? .38 + S.space*.2 : .2, t, .3);
+  N.dly.delayTime.setTargetAtTime(s.bpm ? (60/s.bpm)*.75 : .33, t, .3);
+  N.fzOut.gain.setTargetAtTime(S.fuzz ? .35 : 0, t, .1);
+  N.sat.curve = shaper(1.2 + S.tape*3);
+  N.lfoAmt.gain.setTargetAtTime((s.wobble ? 9 : 2.5) * S.tape * (S.playing?1:0), t, .5);
+  N.rain.gain.setTargetAtTime(S.rain ? .16 : 0, t, .5);
+  N.vinyl.gain.setTargetAtTime(S.playing && (s.crackle || S.tape>.6) ? .12*S.tape+.03 : 0, t, .3);
   live.volume = S.volume;
 }
 
-/* ---------- Voices ---------- */
-const hz = (root, semi) => root*Math.pow(2, semi/12);
-function voice(freq, t, dur, vol, type, opt={}){
-  const c=S.ctx, o=c.createOscillator(), g=c.createGain();
-  o.type=type; o.frequency.setValueAtTime(freq,t); if (opt.detune) o.detune.value=opt.detune;
-  const a = opt.attack || .012;
-  g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(vol,t+a); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-  o.connect(g); g.connect(S.bus); o.start(t); o.stop(t+dur+.05);
+/* ================= INSTRUMENTS ================= */
+const mtof = m => 440*Math.pow(2,(m-69)/12);
+function hzOf(s, deg, oct){ // scale degree (can exceed length) -> Hz
+  const L = s.scale.length, o = Math.floor(deg / L), d = ((deg % L) + L) % L;
+  return s.root * Math.pow(2, oct + o + s.scale[d]/12);
 }
-function noise(t, dur, vol, hp){
-  const c=S.ctx, b=c.createBuffer(1, Math.max(1,c.sampleRate*dur), c.sampleRate), d=b.getChannelData(0);
-  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
-  const s=c.createBufferSource(); s.buffer=b; const f=c.createBiquadFilter(); f.type='highpass'; f.frequency.value=hp;
-  const g=c.createGain(); g.gain.value=vol; s.connect(f); f.connect(g); g.connect(S.bus); s.start(t);
+function out(node, pan, verb, dly){
+  const c=N.ctx, p=c.createStereoPanner ? c.createStereoPanner() : null;
+  if (p) { p.pan.value = pan||0; node.connect(p); p.connect(N.music); } else node.connect(N.music);
+  if (verb) { const g=c.createGain(); g.gain.value=verb; node.connect(g); g.connect(N.verbIn); }
+  if (dly) { const g=c.createGain(); g.gain.value=dly; node.connect(g); g.connect(N.dlyIn); }
 }
-function kick(t,v){ const c=S.ctx,o=c.createOscillator(),g=c.createGain(); o.frequency.setValueAtTime(130,t); o.frequency.exponentialRampToValueAtTime(42,t+.14); g.gain.setValueAtTime(.9*v,t); g.gain.exponentialRampToValueAtTime(.001,t+.3); o.connect(g); g.connect(S.bus); o.start(t); o.stop(t+.32); }
-const snare = (t,v) => { noise(t,.16,.35*v,1300); voice(190,t,.09,.12*v,'triangle'); };
-const hat = (t,v) => noise(t,.04,.14*v,7500);
+function env(g, t, a, peak, d, sus, r, len){
+  g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(.0001,t);
+  g.gain.linearRampToValueAtTime(peak, t+a);
+  g.gain.setTargetAtTime(Math.max(.0001,peak*sus), t+a, d/3);
+  g.gain.setTargetAtTime(.0001, t+len, r/3);
+}
+function osc(type, f, t, stop, det){
+  const o=N.ctx.createOscillator(); o.type=type; o.frequency.setValueAtTime(f,t); if (det) o.detune.value=det;
+  N.lfoAmt.connect(o.detune); o.onended = () => { try { N.lfoAmt.disconnect(o.detune); } catch(e) {} }; o.start(t); o.stop(stop); return o;
+}
+// Supersaw lead: 3 detuned saws through a sweeping lowpass
+function supersaw(f, t, len, vel, pan){
+  const c=N.ctx, lp=c.createBiquadFilter(), g=c.createGain(); lp.type='lowpass'; lp.Q.value=2;
+  const cut = 900 + 3800*S.energy*vel; lp.frequency.setValueAtTime(cut*1.8,t); lp.frequency.exponentialRampToValueAtTime(Math.max(300,cut*.6), t+len*.9);
+  [-11,0,11].forEach(d=>osc('sawtooth',f,t,t+len+.5,d).connect(lp));
+  lp.connect(g); env(g,t,.01,.07*vel,.25,.6,.25,len); out(g,pan,.35,.25);
+}
+function keys(f, t, len, vel, pan){ // Rhodes-ish: sine + soft triangle bell, fast decay
+  const c=N.ctx, g=c.createGain(), lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2400;
+  osc('sine',f,t,t+len+1).connect(lp); const b=osc('triangle',f*2,t,t+len+1,3); const bg=c.createGain(); bg.gain.setValueAtTime(.35,t); bg.gain.exponentialRampToValueAtTime(.01,t+.4); b.connect(bg); bg.connect(lp);
+  lp.connect(g); env(g,t,.006,.11*vel,.7,.25,.5,len); out(g,pan,.3,.12);
+}
+function bell(f, t, len, vel, pan){ // glassy FM-style bell
+  const c=N.ctx, car=osc('sine',f,t,t+len+3), mod=osc('sine',f*3.5,t,t+len+3), mg=c.createGain(), g=c.createGain();
+  mg.gain.setValueAtTime(f*2.2,t); mg.gain.exponentialRampToValueAtTime(f*.05,t+2); mod.connect(mg); mg.connect(car.frequency);
+  car.connect(g); env(g,t,.004,.06*vel,1.2,.2,2,len); out(g,pan,.7,.3);
+}
+function square(f, t, len, vel, pan){
+  const c=N.ctx, g=c.createGain(), lp=c.createBiquadFilter(); lp.type='lowpass'; lp.Q.value=6;
+  lp.frequency.setValueAtTime(600+3000*S.energy,t); lp.frequency.exponentialRampToValueAtTime(400,t+len);
+  osc('square',f,t,t+len+.4,-6).connect(lp); osc('square',f*1.003,t,t+len+.4,6).connect(lp);
+  lp.connect(g); env(g,t,.004,.045*vel,.15,.4,.12,len); out(g,pan,.25,.3);
+}
+function fuzzLead(f, t, len, vel, pan){
+  const c=N.ctx, ws=c.createWaveShaper(), g=c.createGain(), lp=c.createBiquadFilter(); ws.curve=shaper(7); lp.type='lowpass'; lp.frequency.value=3200;
+  osc('sawtooth',f,t,t+len+.3,-8).connect(ws); osc('sawtooth',f*1.5,t,t+len+.3,8).connect(ws);
+  ws.connect(lp); lp.connect(g); env(g,t,.003,.05*vel,.1,.7,.08,len); out(g,pan,.15,0);
+}
+const LEADS = { supersaw, keys, bell, square, fuzz:fuzzLead };
+function pad(freqs, t, len){
+  const c=N.ctx, lp=c.createBiquadFilter(), g=c.createGain(); lp.type='lowpass'; lp.Q.value=.7;
+  lp.frequency.setValueAtTime(500,t); lp.frequency.linearRampToValueAtTime(900+1600*S.energy, t+len*.5); lp.frequency.linearRampToValueAtTime(600, t+len);
+  freqs.forEach((f,i)=>{ osc('sawtooth',f,t,t+len+2,-7+i*3).connect(lp); osc('sawtooth',f,t,t+len+2,7-i*2).connect(lp); });
+  lp.connect(g); env(g,t,Math.min(1.8,len*.35),.022,1,.85,1.6,len); out(g,0,.8,.1);
+}
+function stab(freqs, t, vel){ // short chord hit (keys stations, punk power chords)
+  freqs.forEach((f,i)=>{ const s=st(); (s.power?fuzzLead:keys)(f,t,s.power?.22:.9,vel*(i?0.7:1),(i-1)*.25); });
+}
+function bass(f, t, len, vel, style){
+  const c=N.ctx, g=c.createGain(), lp=c.createBiquadFilter(); lp.type='lowpass';
+  if (style==='acid') { lp.Q.value=14; lp.frequency.setValueAtTime(300+2200*S.energy*vel,t); lp.frequency.exponentialRampToValueAtTime(140,t+len*.9); osc('sawtooth',f,t,t+len+.2).connect(lp); }
+  else { lp.Q.value=1; lp.frequency.setValueAtTime(style==='round'?420:style==='drone'?260:700,t); osc(style==='round'||style==='drone'?'triangle':'sawtooth',f,t,t+len+.3).connect(lp); }
+  const sub = osc('sine',f,t,t+len+.3); const sg=c.createGain(); sg.gain.value=.9; sub.connect(sg); sg.connect(g);
+  lp.connect(g); env(g,t,style==='drone'?.8:.005,(style==='drone'?.12:.2)*vel,.2,.7,.08,len); out(g,0,0,0);
+}
+// Drums
+function kick(t, v){
+  const c=N.ctx, o=c.createOscillator(), g=c.createGain();
+  o.frequency.setValueAtTime(155,t); o.frequency.exponentialRampToValueAtTime(46,t+.11);
+  g.gain.setValueAtTime(1.0*v,t); g.gain.exponentialRampToValueAtTime(.001,t+.42);
+  o.connect(g); g.connect(N.drums); o.start(t); o.stop(t+.45);
+  noiseHit(t,.012,.25*v,3000,'highpass');
+  const s = st(); if (s.duck) { N.duck.gain.cancelScheduledValues(t); N.duck.gain.setValueAtTime(1-s.duck*(.6+S.energy*.4),t); N.duck.gain.setTargetAtTime(1,t+.02,.09); }
+}
+function noiseHit(t, len, v, f, type, q, dest){
+  const c=N.ctx, s=c.createBufferSource(); s.buffer=N.noise; const fl=c.createBiquadFilter(); fl.type=type||'highpass'; fl.frequency.value=f; if (q) fl.Q.value=q;
+  const g=c.createGain(); g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.001,t+len);
+  s.connect(fl); fl.connect(g); g.connect(dest || N.drums); s.start(t, Math.random()*1.5, len+.05); return g;
+}
+function snare(t, v, soft){
+  noiseHit(t, soft?.18:.22, (soft?.28:.42)*v, soft?1400:1900, 'bandpass', .8);
+  const c=N.ctx, o=c.createOscillator(), g=c.createGain(); o.frequency.setValueAtTime(210,t); o.frequency.exponentialRampToValueAtTime(150,t+.08);
+  g.gain.setValueAtTime(.32*v,t); g.gain.exponentialRampToValueAtTime(.001,t+.12); o.connect(g); g.connect(N.drums); o.start(t); o.stop(t+.14);
+  if (!soft) { const vg=c.createGain(); vg.gain.value=.25; g.connect(vg); vg.connect(N.verbIn); }
+}
+function clap(t, v){ [0,.012,.024].forEach(d=>noiseHit(t+d,.09,.22*v,1200,'bandpass',1.4)); }
+function hat(t, v, open){ noiseHit(t, open?.22:.035, (open?.12:.13)*v, open?7000:9000, 'highpass'); }
+function crackle(t){ if (Math.random()<.5) noiseHit(t, .006, rnd(.3,1), 2500, 'highpass', 0, N.vinyl); }
 
-function chord(s, deg, t, barDur){
-  const sc=s.scale, notes=[0,2,4].map(k=>sc[(deg+k)%sc.length]+(deg+k>=sc.length?12:0));
-  const dur = s.pad ? barDur*1.6 : barDur*.95;
-  notes.forEach((n,i)=>voice(hz(s.root,n+12), t, dur, (s.pad?.05:.032)*(.7+S.energy*.5), s.pad?'sine':'triangle', {attack:s.pad?1.2:.08, detune:i===2?6:-3}));
+/* ================= COMPOSER ================= */
+function chordTones(s, deg, n){ const out=[]; for (let k=0;k<n;k++) out.push(deg + k*2); return out; }
+function newMotif(s){
+  // 2-bar rhythm on 16ths with scale-degree contour; strong beats land on chord tones.
+  const rhythm = []; const density = s.lead==='bell' ? .18 : s.lead==='keys' ? .32 : .45 + S.energy*.25;
+  for (let i=0;i<32;i++) rhythm.push(i%4===0 ? Math.random()<density+.25 : Math.random()<density*(i%2?.45:.8));
+  let d = pickOne([2,4,7]), notes = [];
+  for (let i=0;i<32;i++) { if (!rhythm[i]) { notes.push(null); continue; } d += pickOne([-2,-1,-1,0,1,1,2,3]); d = Math.max(0, Math.min(11, d)); notes.push(d); }
+  return notes;
 }
-function lead(s, beat, t){
-  const sc=s.scale, v=S.variation;
-  let deg = S.lastDeg + [-2,-1,-1,0,1,1,2][Math.floor(Math.random()*7)];
-  if (Math.random() < .25*(1-v)) deg = [0,2,4][Math.floor(Math.random()*3)];
-  if (Math.random() < .15*v) deg += Math.random()<.5 ? -3 : 3;
-  deg = Math.max(0, Math.min(sc.length*2-1, deg));
-  if (beat===0 || beat===8) deg = [0,2,4,sc.length][Math.floor(Math.random()*4)];
-  S.lastDeg = deg;
-  const semi = sc[deg%sc.length] + 12*Math.floor(deg/sc.length);
-  const dur = s.pad ? 1.8 : s.id==='lofi' ? .5 : s.id==='punk' ? .16 : .3;
-  voice(hz(s.root*2, semi), t, dur, .05+S.energy*.05, s.lead, {detune:s.fuzz?9:4, attack:s.pad?.4:.012});
+function mutate(m){
+  const v = S.variation; return m.map(n => n===null ? (Math.random()<v*.08 ? pickOne([2,4,7]) : null) : (Math.random()<v*.3 ? Math.max(0,Math.min(11,n+pickOne([-2,-1,1,2]))) : n));
 }
-
-/* ---------- Lookahead scheduler (steady timing on phones) ---------- */
 function stepAt(t){
-  const s=station(), st=S.step%64, beat=st%16, bar=Math.floor(st/16), e=S.energy;
-  const barDur = 60/s.bpm*4;
-  if (beat===0) {
-    chord(s, s.prog[bar%s.prog.length], t, barDur);
-    S.filter.frequency.setTargetAtTime(s.cutoff*(.55+e*.6)*(1+Math.sin(S.step/40)*.15*S.space), t, .5);
+  const s = st(), step = S.step, b16 = step % 16, bar = Math.floor(step/16), barInPhrase = bar % 8;
+  const secIdx = Math.floor(bar/8) % SECTIONS.length, sec = S.energy < .2 ? 'DRIFT' : SECTIONS[secIdx];
+  if (secIdx !== S.lastSection || !S.motif) { S.lastSection = secIdx; S.section = sec; S.motif = newMotif(s); $('section').textContent = sec; }
+  if (b16===0 && barInPhrase%2===0 && barInPhrase) S.motif = mutate(S.motif);
+  const chordDeg = s.prog[bar % s.prog.length], barDur = 60/s.bpm*4;
+  const human = () => rnd(-.004,.004), vel = () => rnd(.82,1);
+  const full = sec==='CRUISE' || sec==='PEAK', peak = sec==='PEAK', drift = sec==='DRIFT' || sec==='INTRO';
+  // Harmony
+  if (b16===0) {
+    const tones = chordTones(s, chordDeg, s.seventh ? 4 : 3).map(d => hzOf(s, d, 2));
+    if (s.pad || drift) pad(tones, t, barDur*(s.pad?1.02:1));
+    if (!s.pad || peak) { if (s.drums==='lofi' || s.power) stab(tones.slice(0, s.power?2:4), t+human(), .8); }
+    N.tone.frequency.setTargetAtTime(drift ? 2600 : peak ? 16000 : 9000, t, 1.5);
   }
-  if (e > .08) {
-    if (s.kick.includes(beat)) kick(t, .6+e*.4);
-    if (s.snare.includes(beat)) snare(t, .5+e*.5);
-    if (s.hat && beat%s.hat===0 && Math.random() < .55+e*.45) hat(t, beat%4===0 ? 1 : .6);
-    if (e>.75 && beat===15 && s.snare.length) snare(t, .4);
-  } else if (s.kick.length && beat===0) kick(t, .35);
-  if (beat%2===0 && Math.random() < .7+e*.3) {
-    const n = s.bass[(beat/2)%s.bass.length];
-    const chordRoot = s.scale[s.prog[bar%s.prog.length]%s.scale.length];
-    voice(hz(s.root/2, chordRoot+n), t, s.pad?1.2:.28, .16+e*.12, s.fuzz?'sawtooth':'triangle', {attack:.008});
+  if (s.power && full && b16%4===0 && b16) stab(chordTones(s, chordDeg, 2).map(d=>hzOf(s,d,1)), t+human(), .7);
+  if (s.drums==='lofi' && b16===10 && Math.random()<.5) stab(chordTones(s, chordDeg, 3).map(d=>hzOf(s,d,2)), t, .5);
+  // Drums
+  const sw = s.swing && step%2 ? s.swing*(60/s.bpm/4) : 0, T = t + sw;
+  if (s.drums !== 'none' && !(drift && sec==='DRIFT')) {
+    const k = { synth:[0,8], lofi:[0,7,10], four:[0,4,8,12], punk:[0,6,8,14] }[s.drums] || [];
+    const sn = { synth:[4,12], lofi:[4,12], four:[4,12], punk:[4,12] }[s.drums] || [];
+    if (k.includes(b16) && (full || b16===0)) kick(T, vel());
+    if (sn.includes(b16) && full) { s.clap ? (clap(T, vel()), snare(T,.5)) : snare(T, vel(), s.drums==='lofi'); }
+    if (full || sec==='INTRO') {
+      if (s.drums==='four') { if (b16%4===2) hat(T, vel(), true); else if (b16%2===0 && S.energy>.4) hat(T, .6); }
+      else if (s.drums==='punk') { if (b16%2===0) hat(T, vel()); }
+      else if (s.drums==='lofi') { if (b16%2===0 && Math.random()<.85) hat(T, b16%4===0 ? .8 : .5); }
+      else if (b16%2===0) hat(T, b16%4===2 ? .9 : .55);
+      if (peak && b16===15) snare(T, .45, true);
+      if (b16===14 && barInPhrase===7) { snare(T,.5); snare(T+60/s.bpm/8,.6); }
+    }
   }
-  const p = s.pad ? (beat%4===0 ? s.mel : 0) : s.mel*(.55+e*.5)*(.85+S.variation*.3);
-  if (Math.random() < p && (s.pad || beat%2===0 || Math.random()<e*.5)) lead(s, beat, t);
+  if (s.crackle) crackle(t);
+  // Bass
+  const bDeg = chordDeg, bf = hzOf(s, bDeg, 0);
+  if (!drift || s.bassStyle==='drone') {
+    const st16 = 60/s.bpm/4;
+    if (s.bassStyle==='pulse' && b16%2===0) bass(bf*(b16%8===6?1.5:1), t, st16*1.6, b16%4===0?1:.7, 'pulse');
+    else if (s.bassStyle==='acid' && (b16%2===0 || Math.random()<S.energy*.4)) bass(bf*pickOne([1,1,1,2,1.5]), t, st16*1.4, Math.random()<.3?1:.7, 'acid');
+    else if (s.bassStyle==='offbeat' && b16%4===2) bass(bf, t, st16*1.8, 1, 'pulse');
+    else if (s.bassStyle==='eighths' && b16%2===0) bass(bf, t, st16*1.5, .9, 'pulse');
+    else if (s.bassStyle==='round' && (b16===0 || b16===7 || b16===10)) bass(bf*(b16===10?1.5:1), t+sw, st16*4, .9, 'round');
+    else if (s.bassStyle==='drone' && b16===0) bass(bf, t, barDur*1.1, .8, 'drone');
+  }
+  // Arp on peaks
+  if (s.arp && (peak || (full && S.energy>.7)) && b16%2===1) {
+    const tones = chordTones(s, chordDeg, 3); const d = tones[(b16>>1)%3] + 7;
+    square(hzOf(s, d, 2), t, .12, .6, ((b16>>1)%2?.4:-.4));
+  }
+  // Melody (motif)
+  const mn = S.motif[step % 32];
+  const play = mn !== null && (full || (drift && Math.random()<.5) || s.lead==='bell');
+  if (play) {
+    let deg = mn; if (b16%4===0) { const ct = chordTones(s, chordDeg, 3).map(x=>x%s.scale.length); const dm=((deg%s.scale.length)+s.scale.length)%s.scale.length; if (!ct.includes(dm)) deg += 1; }
+    const len = s.lead==='bell' ? 1.6 : s.lead==='keys' ? .45 : s.lead==='fuzz' ? .13 : (60/s.bpm/4)*rnd(1.2,2.4);
+    LEADS[s.lead](hzOf(s, deg, s.lead==='bell'?3:2), t+human()+sw, len, vel()*(peak?1:.85), rnd(-.25,.25));
+  }
   S.step++;
 }
 function scheduler(){
-  if (!S.playing || !S.ctx) return;
-  const s = station(); if (!s.bpm) return;
-  while (S.nextTime < S.ctx.currentTime + .12) {
-    const swing = s.swing && S.step%2 ? s.swing*(60/s.bpm/4) : 0;
-    stepAt(S.nextTime + swing);
-    S.nextTime += 60/s.bpm/4;
-  }
+  if (!S.playing || !N.ctx) return;
+  const s = st(); if (!s.bpm) return;
+  while (S.next < N.ctx.currentTime + .15) { stepAt(S.next); S.next += 60/s.bpm/4; }
 }
 
-/* ---------- Playback ---------- */
+/* ================= PLAYBACK ================= */
 async function play(){
-  if (!initAudio()) return;
-  try { await S.ctx.resume(); } catch(e) {}
-  const s = station();
-  S.playing = true;
-  clearInterval(S.timer);
+  if (!init()) return;
+  try { await N.ctx.resume(); } catch(e) {}
+  const s = st(); S.playing = true; clearInterval(S.timer);
   if (s.local) {
-    if (!S.tracks.length) { S.playing=false; paint(); setStatus('ADD MUSIC FIRST'); return; }
-    live.pause(); loadTrack(S.ti); await player.play().catch(()=>setStatus('TAP PLAY AGAIN'));
-    setStatus('PLAYING FROM THIS PHONE');
+    if (!S.tracks.length) { S.playing=false; $('musicBox').open=true; paint(); $('status').textContent='ADD MUSIC'; return; }
+    live.pause(); loadTrack(S.ti); await player.play().catch(()=>{}); $('status').textContent='FROM THIS PHONE';
   } else if (s.stream) {
-    player.pause(); live.src = s.stream; live.volume = S.volume; setStatus('CONNECTING…');
-    await live.play().then(()=>setStatus('LIVE')).catch(()=>{ setStatus('NO SIGNAL FOR LIVE'); });
+    player.pause(); live.src = s.stream; $('status').textContent='TUNING…';
+    await live.play().then(()=>$('status').textContent='ON AIR').catch(()=>$('status').textContent='NO SIGNAL');
   } else {
     player.pause(); live.pause();
-    S.step = 0; S.nextTime = S.ctx.currentTime + .06;
-    S.timer = setInterval(scheduler, 25);
-    setStatus('GENERATING ON YOUR PHONE');
+    S.step = 0; S.lastSection = -1; S.motif = null; S.next = N.ctx.currentTime + .08;
+    S.timer = setInterval(scheduler, 25); $('status').textContent='MADE LIVE';
   }
-  fx(); paint(); wake();
+  apply(); paint(); wake();
 }
-function pause(){
-  S.playing = false; clearInterval(S.timer); player.pause(); live.pause(); fx(); paint();
-}
-function pick(i){
-  const was = S.playing;
-  if (was) pause();
-  S.i = (i+STATIONS.length)%STATIONS.length; S.step = 0; S.lastDeg = 2;
-  paint();
-  if (was) play();
-}
-$('stations').addEventListener('click', e => { const b=e.target.closest('.st'); if (b) { pick(+b.dataset.i); if (!S.playing) play(); } });
-$('play').onclick = () => S.playing ? pause() : play();
-$('next').onclick = () => station().local && S.tracks.length ? nextTrack(1) : pick(S.i+1);
-$('prev').onclick = () => station().local && S.tracks.length ? nextTrack(-1) : pick(S.i-1);
+function pause(){ S.playing=false; clearInterval(S.timer); player.pause(); live.pause(); $('section').textContent='PAUSED'; apply(); paint(); }
+function tune(i){ const was=S.playing; if (was) pause(); S.i=(i+STATIONS.length)%STATIONS.length; paint(); if (was) play(); }
 
-/* ---------- Toggles and sliders ---------- */
-function toggle(key, btn, label){
-  initAudio(); S[key] = !S[key];
-  $(btn).classList.toggle('on', S[key]); $(label).textContent = S[key] ? 'on' : 'off'; fx();
+/* ================= UI ================= */
+$('strip').innerHTML = STATIONS.map((s,i)=>`<button class="st" role="listitem" data-i="${i}"><span class="e">${s.e}</span><span><b>${s.short}</b><br><small>${s.freq}</small></span></button>`).join('');
+function paint(){
+  const s = st();
+  document.documentElement.style.setProperty('--a', s.c); document.documentElement.style.setProperty('--g', s.c+'2e');
+  document.querySelectorAll('.st').forEach((b,i)=>b.classList.toggle('on',i===S.i));
+  const on = document.querySelector('.st.on'); if (on && on.scrollIntoView) on.scrollIntoView({block:'nearest', inline:'nearest', behavior:'smooth'});
+  const tr = s.local && S.tracks[S.ti];
+  $('freq').textContent = s.freq + (s.bpm ? ' FM' : '');
+  $('name').textContent = tr ? tr.name : s.name;
+  $('desc').textContent = s.local && !S.tracks.length ? 'Open MY MUSIC below and tap + ADD to save songs to this phone.' : s.desc;
+  $('bpm').textContent = s.bpm || '--';
+  $('play').textContent = S.playing ? 'Ⅱ PAUSE' : '▶ PLAY';
+  if (!S.playing) { $('status').textContent = s.stream ? 'NEEDS SIGNAL' : 'OFFLINE OK'; $('section').textContent = 'READY'; }
+  renderTracks(); media();
 }
-$('rainBtn').onclick = () => toggle('rain','rainBtn','rainState');
-$('driveBtn').onclick = () => toggle('drive','driveBtn','driveState');
-$('delayBtn').onclick = () => toggle('echo','delayBtn','delayState');
-['energy','variation','space','volume'].forEach(id => {
-  const el=$(id), out=$(id+'Out');
-  const saved = localStorage.getItem('nc.'+id); if (saved!==null) el.value = saved;
-  const set = () => { S[id] = el.value/100; out.textContent = el.value+'%'; try{localStorage.setItem('nc.'+id, el.value);}catch(e){} fx(); };
+$('strip').addEventListener('click', e=>{ const b=e.target.closest('.st'); if (!b) return; tune(+b.dataset.i); if (!S.playing) play(); });
+$('play').onclick = () => S.playing ? pause() : play();
+$('next').onclick = () => st().local && S.tracks.length ? skip(1) : tune(S.i+1);
+$('prev').onclick = () => st().local && S.tracks.length ? skip(-1) : tune(S.i-1);
+function flip(key, id){ init(); S[key]=!S[key]; $(id).classList.toggle('on',S[key]); apply(); }
+$('qRain').onclick = () => flip('rain','qRain');
+$('qEcho').onclick = () => flip('echo','qEcho');
+$('qFuzz').onclick = () => flip('fuzz','qFuzz');
+['energy','variation','space','tape','volume'].forEach(id=>{
+  const el=$(id), o=$(id+'Out'); try { const v=localStorage.getItem('nc2.'+id); if (v!==null) el.value=v; } catch(e){}
+  const set=()=>{ S[id]=el.value/100; o.textContent=el.value+'%'; try{localStorage.setItem('nc2.'+id,el.value);}catch(e){} apply(); };
   el.addEventListener('input', set); set();
 });
+function clock(){ $('clock').textContent = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
+clock(); setInterval(clock, 5000);
 
-/* ---------- My music (shared offline library) ---------- */
-function renderTracks(){
-  const ul=$('tracks');
-  $('libLine').textContent = S.tracks.length ? S.tracks.length+' saved on this phone · plays offline' : 'Saved on this phone, plays offline';
-  ul.innerHTML = S.tracks.map((t,i)=>`<li class="${station().local&&i===S.ti?'on':''}" data-i="${i}"><span>${String(i+1).padStart(2,'0')} ${t.name.replace(/</g,'&lt;')}</span><button data-del="${t.id}" aria-label="Remove">✕</button></li>`).join('');
-}
-async function loadLibrary(){
-  try { S.tracks = await PocketAudio.list(); } catch(e) { S.tracks = []; }
-  renderTracks();
-}
-function loadTrack(i){
-  const t = S.tracks[i]; if (!t) return;
-  if (S.url) URL.revokeObjectURL(S.url);
-  S.url = URL.createObjectURL(t.blob); player.src = S.url;
-}
-function nextTrack(d){
-  S.ti = (S.ti+d+S.tracks.length)%S.tracks.length;
-  if (S.playing) { loadTrack(S.ti); player.play().catch(()=>{}); }
-  paint();
-}
-player.addEventListener('ended', () => { if (station().local && S.tracks.length) nextTrack(1); });
-$('addMusic').onclick = () => $('fileInput').click();
-$('fileInput').addEventListener('change', async e => {
-  const files=e.target.files; if (!files.length) return;
-  setStatus('SAVING TO THIS PHONE…');
-  try { await PocketAudio.add(files); } catch(err) { setStatus('COULD NOT SAVE: '+(err.message||'storage full')); }
-  e.target.value=''; await loadLibrary();
-  const mine = STATIONS.findIndex(s=>s.local);
-  if (S.i !== mine) pick(mine); else paint();
-  setStatus(S.tracks.length+' TRACKS SAVED');
-});
-$('tracks').addEventListener('click', async e => {
-  const del = e.target.closest('[data-del]');
-  if (del) { await PocketAudio.remove(del.dataset.del); await loadLibrary(); S.ti=Math.min(S.ti,Math.max(0,S.tracks.length-1)); paint(); return; }
-  const li = e.target.closest('li'); if (!li) return;
-  S.ti = +li.dataset.i;
-  const mine = STATIONS.findIndex(s=>s.local);
-  if (S.i!==mine) { pick(mine); }
-  if (S.playing) { loadTrack(S.ti); player.play().catch(()=>{}); paint(); } else play();
-});
-
-/* ---------- Visualizer ---------- */
-function viz(){
-  const data = new Uint8Array(S.analyser ? S.analyser.frequencyBinCount : 32);
-  const loop = () => {
-    if (S.analyser) S.analyser.getByteFrequencyData(data);
-    bars.forEach((b,i)=>{ b.style.height = (4 + (data[i]||0)/255*50) + 'px'; });
-    requestAnimationFrame(loop);
+/* Oscilloscope with lo-fi phosphor trails */
+function scope(){
+  const cv=$('scope'), g=cv.getContext('2d'), buf=new Uint8Array(N.an.fftSize);
+  const draw=()=>{
+    const w=cv.width, h=cv.height, a=getComputedStyle(document.documentElement).getPropertyValue('--a').trim()||'#ff3d6e';
+    g.fillStyle='rgba(3,4,9,.32)'; g.fillRect(0,0,w,h);
+    N.an.getByteTimeDomainData(buf);
+    g.strokeStyle=a; g.lineWidth=2; g.shadowColor=a; g.shadowBlur=10; g.beginPath();
+    for (let i=0;i<w;i++){ const v=buf[Math.floor(i/w*buf.length)]/128-1; const y=h/2+v*h*.42; i?g.lineTo(i,y):g.moveTo(i,y); }
+    g.stroke(); g.shadowBlur=0;
+    requestAnimationFrame(draw);
   };
-  loop();
+  draw();
 }
 
-/* ---------- Voice, status, trivia ---------- */
+/* ================= MY MUSIC ================= */
+function renderTracks(){
+  $('trackCount').textContent = S.tracks.length;
+  $('tracks').innerHTML = S.tracks.map((t,i)=>`<li class="${st().local&&i===S.ti?'on':''}" data-i="${i}"><span>${String(i+1).padStart(2,'0')} ${t.name.replace(/</g,'&lt;')}</span><button data-del="${t.id}" aria-label="Remove ${t.name.replace(/"/g,'')}">✕</button></li>`).join('') || '';
+}
+async function loadLib(){ try { S.tracks = await PocketAudio.list(); } catch(e) { S.tracks=[]; } renderTracks(); }
+function loadTrack(i){ const t=S.tracks[i]; if (!t) return; if (S.url) URL.revokeObjectURL(S.url); S.url=URL.createObjectURL(t.blob); player.src=S.url; }
+function skip(d){ S.ti=(S.ti+d+S.tracks.length)%S.tracks.length; if (S.playing){ loadTrack(S.ti); player.play().catch(()=>{}); } paint(); }
+player.addEventListener('ended', ()=>{ if (st().local && S.tracks.length) skip(1); });
+$('addMusic').onclick = () => $('fileInput').click();
+$('fileInput').addEventListener('change', async e=>{
+  const f=e.target.files; if (!f.length) return; $('status').textContent='SAVING…';
+  try { await PocketAudio.add(f); } catch(err) { $('status').textContent='STORAGE FULL?'; }
+  e.target.value=''; await loadLib(); const m=STATIONS.findIndex(s=>s.local); if (S.i!==m) tune(m); else paint();
+});
+$('tracks').addEventListener('click', async e=>{
+  const d=e.target.closest('[data-del]'); if (d) { await PocketAudio.remove(d.dataset.del); await loadLib(); S.ti=Math.min(S.ti,Math.max(0,S.tracks.length-1)); paint(); return; }
+  const li=e.target.closest('li'); if (!li) return; S.ti=+li.dataset.i; const m=STATIONS.findIndex(s=>s.local);
+  if (S.i!==m) tune(m); if (S.playing){ loadTrack(S.ti); player.play().catch(()=>{}); paint(); } else play();
+});
+
+/* ================= CO-PILOT ================= */
 function say(text, done){
   if (!('speechSynthesis' in window)) { done&&done(); return; }
-  speechSynthesis.cancel();
-  if (S.ctx) S.master.gain.setTargetAtTime(S.volume*.35, S.ctx.currentTime, .1);
-  const u = new SpeechSynthesisUtterance(text); u.rate=1; u.pitch=.95;
-  u.onend = u.onerror = () => { fx(); done&&done(); };
-  speechSynthesis.speak(u);
+  speechSynthesis.cancel(); if (N.ctx) N.master.gain.setTargetAtTime(S.volume*.3, N.ctx.currentTime, .1);
+  const u=new SpeechSynthesisUtterance(text); u.rate=1; u.pitch=.95; u.onend=u.onerror=()=>{ apply(); done&&done(); }; speechSynthesis.speak(u);
 }
-function statusLine(){
-  const sp = S.speed==null ? '' : ' You are going about '+Math.round(S.speed)+' miles per hour.';
-  const msg = "It's "+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+'. You are listening to '+$('title').textContent+'.'+sp;
-  $('heard').textContent = msg; say(msg);
-}
-$('statusBtn').onclick = statusLine;
-const QUIZ = [
-  ['Which planet spins clockwise?', ['Mars','Venus','Jupiter','Saturn'], 1],
-  ['What year did the Sony Walkman launch?', ['1975','1979','1985','1990'], 1],
-  ['Which interstate runs from Seattle to Boston?', ['I-80','I-90','I-10','I-95'], 1],
-  ['What is the capital of Australia?', ['Sydney','Melbourne','Canberra','Perth'], 2],
-  ['How many keys does a standard piano have?', ['76','82','88','96'], 2],
-  ['Which state has the most miles of Interstate 10?', ['Texas','Arizona','California','Louisiana'], 0],
-  ['What instrument did Jimi Hendrix play?', ['Drums','Bass','Guitar','Keys'], 2],
-  ['Saguaro cactus grows naturally in which desert?', ['Mojave','Sonoran','Chihuahuan','Great Basin'], 1]
-];
-function ask(){
-  const [q,a] = QUIZ[S.qi%QUIZ.length]; S.trivia = true;
-  const opts = a.map((x,i)=>'ABCD'[i]+', '+x).join('. ');
-  $('heard').textContent = q;
-  say(q+' '+opts+'. Say a letter or an answer.', () => { if (S.rec && !S.voice) voiceOn(true); });
-  if (!S.rec) setTimeout(()=>{ if (S.trivia) reveal(); }, 9000);
-}
-function reveal(){ const [,a,c]=QUIZ[S.qi%QUIZ.length]; S.trivia=false; S.qi++; say('The answer is '+a[c]+'.'); $('heard').textContent='Answer: '+a[c]; }
-function answer(t){
-  const [,a,c] = QUIZ[S.qi%QUIZ.length];
-  const k = a.findIndex((x,i)=>t===('abcd'[i])||t.includes(x.toLowerCase())||t.includes('option '+'abcd'[i])||t==='ay'&&i===0||t==='bee'&&i===1||t==='see'&&i===2||t==='dee'&&i===3);
-  if (k<0) return false;
-  S.trivia=false; S.qi++;
-  if (k===c) { S.score+=100; say('Correct. '+S.score+' points.'); $('heard').textContent='Correct · '+S.score+' pts'; }
-  else { say('Nope. It was '+a[c]+'.'); $('heard').textContent='Answer: '+a[c]; }
-  return true;
-}
+function report(){ const sp=S.speed==null?'':' About '+Math.round(S.speed)+' miles per hour.'; const m="It's "+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+'. '+$('name').textContent+'.'+sp; $('heard').textContent=m; say(m); }
+$('statusBtn').onclick = report;
+const QUIZ=[['Which planet spins clockwise?',['Mars','Venus','Jupiter','Saturn'],1],['What year did the Sony Walkman launch?',['1975','1979','1985','1990'],1],['Which interstate runs from Seattle to Boston?',['I-80','I-90','I-10','I-95'],1],['Capital of Australia?',['Sydney','Melbourne','Canberra','Perth'],2],['Keys on a standard piano?',['76','82','88','96'],2],['Which state has the most miles of I-10?',['Texas','Arizona','California','Louisiana'],0],['The saguaro grows wild in which desert?',['Mojave','Sonoran','Chihuahuan','Great Basin'],1],['A theremin is played by…',['Bowing','Not touching it','Blowing','Plucking'],1]];
+function ask(){ const [q,a]=QUIZ[S.qi%QUIZ.length]; S.trivia=true; $('heard').textContent=q; say(q+' '+a.map((x,i)=>'ABCD'[i]+', '+x).join('. ')+'.', ()=>{ if (!S.voice) setTimeout(()=>{ if (S.trivia) reveal(); }, 8000); }); }
+function reveal(){ const [,a,c]=QUIZ[S.qi%QUIZ.length]; S.trivia=false; S.qi++; $('heard').textContent='Answer: '+a[c]; say('The answer is '+a[c]+'.'); }
+function answer(t){ const [,a,c]=QUIZ[S.qi%QUIZ.length]; const L=['a|ay','b|bee','c|see','d|dee']; const k=a.findIndex((x,i)=>new RegExp('^('+L[i]+')$').test(t)||t.includes(x.toLowerCase())); if (k<0) return false; S.trivia=false; S.qi++; if (k===c){S.score+=100;say('Correct. '+S.score+' points.');} else say('Nope. '+a[c]+'.'); $('heard').textContent=k===c?'Correct · '+S.score:'Answer: '+a[c]; return true; }
 $('triviaBtn').onclick = ask;
-function command(raw){
-  const t = raw.toLowerCase().trim();
-  $('heard').textContent = 'Heard: '+raw;
-  if (S.trivia && answer(t)) return;
-  const find = id => STATIONS.findIndex(s=>s.id===id);
-  if (/trivia|quiz|question/.test(t)) ask();
-  else if (/\bnext|skip\b/.test(t)) $('next').click();
-  else if (/previous|go back/.test(t)) $('prev').click();
-  else if (/punk/.test(t)) pick(find('punk'));
-  else if (/chill|lo.?fi|tape/.test(t)) pick(find('lofi'));
-  else if (/cyber|techno|dark/.test(t)) pick(find('cyber'));
-  else if (/space|ambient|stars?/.test(t)) pick(find('space'));
-  else if (/energy|voltage|upbeat/.test(t)) pick(find('energy'));
-  else if (/synth/.test(t)) pick(find('synth'));
-  else if (/my music|my songs|local/.test(t)) pick(find('mine'));
-  else if (/live|internet/.test(t)) pick(find('live'));
-  else if (/pause|stop/.test(t)) pause();
-  else if (/play|start|resume/.test(t)) play();
-  else if (/rain/.test(t)) $('rainBtn').click();
-  else if (/echo|delay/.test(t)) $('delayBtn').click();
-  else if (/drive|fuzz|distortion/.test(t)) $('driveBtn').click();
-  else if (/louder|volume up/.test(t)) { $('volume').value=Math.min(100,+$('volume').value+10); $('volume').dispatchEvent(new Event('input')); }
-  else if (/quieter|softer|volume down/.test(t)) { $('volume').value=Math.max(0,+$('volume').value-10); $('volume').dispatchEvent(new Event('input')); }
-  else if (/time|status|speed|where/.test(t)) statusLine();
+function cmd(raw){
+  const t=raw.toLowerCase().trim(); $('heard').textContent='Heard: '+raw; if (S.trivia && answer(t)) return;
+  const f=id=>STATIONS.findIndex(s=>s.id===id);
+  const vol=d=>{ $('volume').value=Math.max(0,Math.min(100,+$('volume').value+d)); $('volume').dispatchEvent(new Event('input')); };
+  if (/trivia|quiz/.test(t)) ask(); else if (/\b(next|skip)\b/.test(t)) $('next').click(); else if (/previous|go back/.test(t)) $('prev').click();
+  else if (/punk/.test(t)) tune(f('punk')); else if (/chill|lo.?fi|tape/.test(t)) tune(f('lofi')); else if (/cyber|techno|acid/.test(t)) tune(f('cyber'));
+  else if (/space|ambient|star/.test(t)) tune(f('space')); else if (/energy|voltage|upbeat/.test(t)) tune(f('energy')); else if (/synth/.test(t)) tune(f('synth'));
+  else if (/my music|my songs/.test(t)) tune(f('mine')); else if (/live|internet/.test(t)) tune(f('live'));
+  else if (/pause|stop/.test(t)) pause(); else if (/play|start|resume/.test(t)) play();
+  else if (/rain/.test(t)) $('qRain').click(); else if (/echo|delay/.test(t)) $('qEcho').click(); else if (/fuzz|distort/.test(t)) $('qFuzz').click();
+  else if (/louder|volume up/.test(t)) vol(10); else if (/quieter|softer|volume down/.test(t)) vol(-10);
+  else if (/more energy|harder/.test(t)) { $('energy').value=Math.min(100,+$('energy').value+20); $('energy').dispatchEvent(new Event('input')); }
+  else if (/calm|less energy|mellow/.test(t)) { $('energy').value=Math.max(0,+$('energy').value-20); $('energy').dispatchEvent(new Event('input')); }
+  else if (/time|status|speed/.test(t)) report();
 }
-function voiceOn(on){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { $('heard').textContent = 'Voice commands are not supported in this browser.'; return; }
-  S.voice = on;
-  if (on) {
-    if (!S.rec) {
-      S.rec = new SR(); S.rec.lang='en-US'; S.rec.continuous=true; S.rec.interimResults=false;
-      S.rec.onresult = e => { const r=e.results[e.results.length-1]; if (r.isFinal) command(r[0].transcript); };
-      S.rec.onerror = e => { if (e.error==='not-allowed') { S.voice=false; voiceUI(); } };
-      S.rec.onend = () => { if (S.voice) setTimeout(()=>{ try{S.rec.start();}catch(e){} }, 500); };
-    }
-    try { S.rec.start(); } catch(e) {}
-  } else if (S.rec) { try { S.rec.abort(); } catch(e) {} }
-  voiceUI();
+function voice(on){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if (!SR) { $('heard').textContent='Voice commands are not supported in this browser.'; return; }
+  S.voice=on;
+  if (on) { if (!S.rec) { S.rec=new SR(); S.rec.lang='en-US'; S.rec.continuous=true; S.rec.interimResults=false;
+      S.rec.onresult=e=>{ const r=e.results[e.results.length-1]; if (r.isFinal) cmd(r[0].transcript); };
+      S.rec.onerror=e=>{ if (e.error==='not-allowed'){ S.voice=false; $('qVoice').classList.remove('on'); } };
+      S.rec.onend=()=>{ if (S.voice) setTimeout(()=>{ try{S.rec.start();}catch(e){} },400); }; }
+    try{S.rec.start();}catch(e){} }
+  else if (S.rec) { try{S.rec.abort();}catch(e){} }
+  $('qVoice').classList.toggle('on', S.voice);
 }
-function voiceUI(){ $('voiceBtn').textContent = S.voice ? '🎙 ON' : '🎙 OFF'; $('voiceBtn').classList.toggle('on', S.voice); }
-$('voiceBtn').onclick = () => voiceOn(!S.voice);
+$('qVoice').onclick = () => voice(!S.voice);
 
-/* ---------- GPS speed, sleep, wake lock, lock screen ---------- */
+/* ================= GPS, SLEEP, WAKE, LOCK SCREEN ================= */
 $('gps').onclick = () => {
-  if (S.gps!==null) { navigator.geolocation.clearWatch(S.gps); S.gps=null; S.speed=null; $('speed').textContent='--'; $('gpsState').textContent='GPS OFF'; return; }
-  if (!navigator.geolocation) { $('gpsState').textContent='NO GPS'; return; }
-  $('gpsState').textContent='SEARCHING';
-  S.gps = navigator.geolocation.watchPosition(p => {
-    const v = p.coords.speed;
-    if (v!=null && isFinite(v)) { S.speed=v*2.23694; $('speed').textContent=Math.round(S.speed); $('gpsState').textContent='MPH'; }
-    else $('gpsState').textContent='NO FIX';
-  }, () => { $('gpsState').textContent='GPS ERROR'; S.gps=null; }, {enableHighAccuracy:true, maximumAge:3000, timeout:15000});
+  if (S.gps!==null) { navigator.geolocation.clearWatch(S.gps); S.gps=null; S.speed=null; $('gps').textContent='GPS --'; $('gps').classList.remove('on'); return; }
+  if (!navigator.geolocation) return; $('gps').textContent='GPS …'; $('gps').classList.add('on');
+  S.gps=navigator.geolocation.watchPosition(p=>{ const v=p.coords.speed; if (v!=null&&isFinite(v)){ S.speed=v*2.23694; $('gps').textContent=Math.round(S.speed)+' MPH'; } },
+    ()=>{ $('gps').textContent='GPS --'; $('gps').classList.remove('on'); S.gps=null; }, {enableHighAccuracy:true,maximumAge:3000,timeout:15000});
 };
-$('sleep').onchange = e => {
-  clearTimeout(S.sleep); const m=+e.target.value; if (!m) return;
-  S.sleep = setTimeout(() => { pause(); $('sleep').value='0'; setStatus('SLEEP TIMER · PAUSED'); }, m*60000);
-};
-async function wake(){ try { if ('wakeLock' in navigator && !S.wake) { S.wake = await navigator.wakeLock.request('screen'); S.wake.addEventListener('release', ()=>S.wake=null); } } catch(e) {} }
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState==='visible' && S.playing) { if (S.ctx && S.ctx.state!=='running') S.ctx.resume(); wake(); }
-});
+$('sleep').onchange = e => { clearTimeout(S.sleep); const m=+e.target.value; if (m) S.sleep=setTimeout(()=>{ pause(); $('sleep').value='0'; }, m*60000); };
+async function wake(){ try { if ('wakeLock' in navigator && !S.wake) { S.wake=await navigator.wakeLock.request('screen'); S.wake.addEventListener('release',()=>S.wake=null); } } catch(e){} }
+document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState==='visible' && S.playing) { if (N.ctx && N.ctx.state!=='running') N.ctx.resume(); wake(); } });
 function media(){
   if (!('mediaSession' in navigator)) return;
-  try {
-    navigator.mediaSession.metadata = new MediaMetadata({ title: $('title').textContent, artist: 'Night Cruiser', album: station().name });
-    navigator.mediaSession.setActionHandler('play', play);
-    navigator.mediaSession.setActionHandler('pause', pause);
-    navigator.mediaSession.setActionHandler('nexttrack', () => $('next').click());
-    navigator.mediaSession.setActionHandler('previoustrack', () => $('prev').click());
-  } catch(e) {}
+  try { navigator.mediaSession.metadata=new MediaMetadata({title:$('name').textContent, artist:'Night Cruiser', album:st().name});
+    navigator.mediaSession.setActionHandler('play',play); navigator.mediaSession.setActionHandler('pause',pause);
+    navigator.mediaSession.setActionHandler('nexttrack',()=>$('next').click()); navigator.mediaSession.setActionHandler('previoustrack',()=>$('prev').click()); } catch(e){}
 }
-window.addEventListener('pagehide', () => { clearInterval(S.timer); if (S.gps!==null) navigator.geolocation.clearWatch(S.gps); if (S.rec) { S.voice=false; try{S.rec.abort();}catch(e){} } });
+window.addEventListener('pagehide', ()=>{ clearInterval(S.timer); if (S.gps!==null) navigator.geolocation.clearWatch(S.gps); if (S.rec){ S.voice=false; try{S.rec.abort();}catch(e){} } });
 
-loadLibrary().then(paint);
-paint();
+loadLib().then(paint); paint();
 })();
 </script>
 </body>

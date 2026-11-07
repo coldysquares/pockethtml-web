@@ -18,6 +18,8 @@ Working plan for making Nick's apps one place he can open from his phone, with p
 
 - 2026-11-07: Night Cruiser (merged from Nick's six versions) and Tape Deck added as hosted tools. Both share one offline audio library (IndexedDB `pocket-audio`), so music added in one plays in the other with no signal. Home has an Upload HTML tile that saves .html files to the Library.
 
+- 2026-11-07: Rule from Nick: one best version of every product, never duplicates. Home collapses Library copies into one tile per project and folds drafts of hosted tools into the tool. Night Cruiser 2.0 rebuilt: new synth engine (supersaw, keys, FM bells, acid bass, layered drums, sidechain, tape wobble), song sections, motif-based melodies, drive-first layout.
+
 ## Offline survey (2026-11-07, from the live pages)
 - Have a service worker: PocketPDF, PocketMP3, Aether Alchemist, Systems & Chaos Lab, Rhinoceros. Only PocketPDF and PocketMP3 are marked offline so far; the other three need a check.
 - No service worker (need signal): Pitchback, Tabbycat, Local Songbook, Slopscore Lab, TED LAB, Wollohy Playground, Wollohy archive, Clip Studio, Local Tools, Wiki Constellation, Astrograph, GUVs, Saperli Popette, STATERoom, NickOS, Packet Now, Task Keeper.
