@@ -73,6 +73,7 @@
       <input id="search" class="home-search" type="search" placeholder="Find a tool or file" autocomplete="off" autocapitalize="off" spellcheck="false">
       <button id="viewToggle" class="view-toggle" type="button">List</button>
     </div>
+    <input id="uploadInput" type="file" accept=".html,.htm,text/html" multiple hidden>
     <div class="legend"><span class="l-offline">works offline</span><span class="l-building">in progress</span></div>
 
     <div id="groups"></div>
@@ -180,7 +181,14 @@
       const docItems = mine.map(d => view === 'grid'
         ? tile(d.title || d.name, 'edit/?doc=' + encodeURIComponent(d.id), '', '')
         : docCard(d));
-      if (view === 'grid' && !q) docItems.unshift((() => { const a = tile('New HTML', 'edit/?new=1', '+', ''); a.querySelector('.tile-icon').className = 'tile-icon new'; return a; })());
+      if (view === 'grid' && !q) {
+        const up = tile('Upload HTML', '', '⇪', '');
+        up.querySelector('.tile-icon').className = 'tile-icon new';
+        up.setAttribute('role', 'button'); up.tabIndex = 0;
+        up.addEventListener('click', e => { e.preventDefault(); document.getElementById('uploadInput').click(); });
+        docItems.unshift(up);
+        docItems.unshift((() => { const a = tile('New HTML', 'edit/?new=1', '+', ''); a.querySelector('.tile-icon').className = 'tile-icon new'; return a; })());
+      }
       section('YOUR HTML', docItems);
 
       const groups = registry.groups && registry.groups.length ? registry.groups : [['', 'TOOLS']];
@@ -199,6 +207,27 @@
     }
 
     searchEl.addEventListener('input', render);
+
+    // Upload one or more .html files straight into the Library on this phone.
+    // One file opens right away in the preview; several just appear in YOUR HTML.
+    document.getElementById('uploadInput').addEventListener('change', async e => {
+      const files = Array.from(e.target.files || []);
+      e.target.value = '';
+      if (!files.length || !window.PocketLibrary) return;
+      noteEl.textContent = 'Saving ' + files.length + ' file' + (files.length > 1 ? 's' : '') + ' to this phone…';
+      const saved = [];
+      for (const f of files) {
+        try {
+          const code = await f.text();
+          const same = await window.PocketLibrary.findSame(f.name, code).catch(() => null);
+          saved.push(same || await window.PocketLibrary.put({ name: f.name, code }));
+        } catch (err) { noteEl.textContent = 'Could not save ' + f.name + '.'; }
+      }
+      docs = await window.PocketLibrary.list().catch(() => docs);
+      if (saved.length === 1) { location.href = 'edit/?doc=' + encodeURIComponent(saved[0].id); return; }
+      noteEl.textContent = saved.length + ' saved. They open offline from YOUR HTML.';
+      render();
+    });
     toggleEl.addEventListener('click', () => {
       view = view === 'grid' ? 'list' : 'grid';
       try { localStorage.setItem('pocket.home.view', view); } catch (e) {}

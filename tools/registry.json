@@ -38,6 +38,36 @@
       "icon": "🍺"
     },
     {
+      "id": "night-cruiser",
+      "name": "Night Cruiser",
+      "description": "Generative driving radio: 6 stations made on your phone, rain, echo, drive, your saved music, voice commands and trivia. Works offline.",
+      "kind": "hosted",
+      "path": "night-cruiser/",
+      "version": "1.0.0",
+      "status": "live",
+      "tags": [
+        "audio"
+      ],
+      "added": "2026-11-07",
+      "updated": "2026-11-07",
+      "icon": "🌃"
+    },
+    {
+      "id": "tape-deck",
+      "name": "Tape Deck",
+      "description": "Cassette-style player for your own audio. Tracks save to this phone and play offline, shared with Night Cruiser.",
+      "kind": "hosted",
+      "path": "tape-deck/",
+      "version": "1.0.0",
+      "status": "live",
+      "tags": [
+        "audio"
+      ],
+      "added": "2026-11-07",
+      "updated": "2026-11-07",
+      "icon": "📼"
+    },
+    {
       "id": "pockethtml",
       "name": "PocketHTML",
       "icon": "⌨️",

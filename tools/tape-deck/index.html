@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tape Deck</title>
+<meta name="theme-color" content="#0d0e11">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+ :root {
+   --bg: #0d0e11;
+   --panel: #16181d;
+   --border: #2a2e37;
+   --text: #d8dee9;
+   --muted: #6c7380;
+   --amber: #ff9d00;
+   --amber-glow: rgba(255, 157, 0, 0.25);
+   --green: #4af626;
+   --red: #ff3b30;
+ }
+ * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+ body {
+   background: var(--bg);
+   color: var(--text);
+   font-family: 'SF Mono', 'JetBrains Mono', 'Courier New', monospace;
+   display: flex;
+   justify-content: center;
+   padding: 20px 12px;
+   min-height: 100vh;
+ }
+ .deck-container {
+   width: 100%;
+   max-width: 680px;
+   background: var(--panel);
+   border: 2px solid var(--border);
+   border-radius: 8px;
+   padding: 18px;
+   box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+ }
+ .header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   border-bottom: 1px solid var(--border);
+   padding-bottom: 12px;
+   margin-bottom: 16px;
+   font-size: 11px;
+   letter-spacing: 1px;
+ }
+ .header-title { color: var(--amber); font-weight: bold; }
+ .badge {
+   background: #22252d;
+   padding: 3px 6px;
+   border-radius: 4px;
+   border: 1px solid var(--border);
+   color: var(--muted);
+   font-size: 10px;
+ }
+ .cassette-well {
+   background: #090a0c;
+   border: 2px solid #22252c;
+   border-radius: 6px;
+   padding: 16px;
+   position: relative;
+   margin-bottom: 16px;
+   transition: border-color 0.2s, box-shadow 0.2s;
+ }
+ .cassette-well.dragover {
+   border-color: var(--amber);
+   box-shadow: 0 0 20px var(--amber-glow);
+ }
+ .tape-top-row {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 14px;
+ }
+ .tape-status {
+   font-size: 13px;
+   color: var(--amber);
+   text-shadow: 0 0 8px var(--amber-glow);
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   max-width: 75%;
+ }
+ .side-badge {
+   border: 1px solid var(--amber);
+   color: var(--amber);
+   padding: 2px 6px;
+   font-size: 11px;
+   border-radius: 3px;
+   cursor: pointer;
+ }
+ .reels-window {
+   background: #121418;
+   border: 1px solid #252830;
+   border-radius: 40px;
+   height: 74px;
+   display: flex;
+   justify-content: space-around;
+   align-items: center;
+   padding: 0 30px;
+   margin-bottom: 12px;
+ }
+ .reel {
+   width: 50px;
+   height: 50px;
+   border: 3px solid #3a3f4b;
+   border-radius: 50%;
+   position: relative;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   background: radial-gradient(circle, #1d2026 40%, #0d0e11 100%);
+ }
+ .reel::before, .reel::after {
+   content: '';
+   position: absolute;
+   background: #3a3f4b;
+ }
+ .reel::before { width: 100%; height: 3px; }
+ .reel::after { width: 3px; height: 100%; }
+ .reel-core {
+   width: 16px;
+   height: 16px;
+   background: #090a0c;
+   border: 2px solid var(--amber);
+   border-radius: 50%;
+   z-index: 2;
+ }
+ .spinning { animation: spin 2.2s linear infinite; }
+ .spinning-rev { animation: spinRev 0.5s linear infinite; }
+ .spinning-ff { animation: spin 0.5s linear infinite; }
+ @keyframes spin { 100% { transform: rotate(360deg); } }
+ @keyframes spinRev { 100% { transform: rotate(-360deg); } }
+ .drop-hint {
+   font-size: 10px;
+   color: var(--muted);
+   text-align: center;
+   letter-spacing: 0.5px;
+ }
+ .telemetry-bar {
+   display: grid;
+   grid-template-columns: 82px 1fr 95px;
+   gap: 10px;
+   align-items: center;
+   background: #0b0c0e;
+   border: 1px solid var(--border);
+   padding: 10px;
+   border-radius: 6px;
+   margin-bottom: 14px;
+ }
+ .tape-counter {
+   font-size: 18px;
+   font-weight: bold;
+   color: var(--amber);
+   background: #050507;
+   padding: 4px 6px;
+   border: 1px solid #1f232b;
+   text-align: center;
+   border-radius: 4px;
+   letter-spacing: 2px;
+ }
+ .vu-meters { display: flex; flex-direction: column; gap: 6px; }
+ .vu-row { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--muted); }
+ .vu-track {
+   flex: 1;
+   height: 8px;
+   background: #15181e;
+   border-radius: 2px;
+   overflow: hidden;
+ }
+ .vu-fill {
+   height: 100%;
+   width: 0%;
+   background: linear-gradient(90deg, var(--green) 0%, var(--amber) 75%, var(--red) 95%);
+   transition: width 0.05s ease;
+ }
+ .time-readout { text-align: right; font-size: 12px; color: var(--text); }
+ .time-readout span { color: var(--muted); font-size: 10px; display: block; }
+ .scrub-container { margin-bottom: 16px; display: flex; align-items: center; }
+ .scrub-bar {
+   width: 100%;
+   accent-color: var(--amber);
+   cursor: pointer;
+   height: 4px;
+   background: #252830;
+ }
+ .transport-row {
+   display: grid;
+   grid-template-columns: repeat(5, 1fr);
+   gap: 8px;
+   margin-bottom: 14px;
+ }
+ .btn {
+   background: #1f232b;
+   color: var(--text);
+   border: 1px solid #323846;
+   border-bottom: 3px solid #0b0c0f;
+   padding: 12px 4px;
+   font-family: inherit;
+   font-size: 11px;
+   font-weight: bold;
+   border-radius: 4px;
+   cursor: pointer;
+   text-align: center;
+ }
+ .btn:active, .btn.active {
+   transform: translateY(2px);
+   border-bottom-width: 1px;
+   background: #2b2214;
+   color: var(--amber);
+   border-color: var(--amber);
+ }
+ .utility-row {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: space-between;
+   align-items: center;
+   gap: 10px;
+   background: #121419;
+   padding: 10px 12px;
+   border-radius: 6px;
+   border: 1px solid var(--border);
+   margin-bottom: 18px;
+   font-size: 11px;
+ }
+ .vol-group { display: flex; align-items: center; gap: 8px; }
+ .vol-slider { width: 80px; accent-color: var(--amber); cursor: pointer; }
+ .load-group { display: flex; gap: 6px; flex-wrap: wrap; }
+ .btn-small { padding: 6px 9px; font-size: 10px; border-bottom-width: 2px; }
+ .btn-amber { border-color: rgba(255, 157, 0, 0.5); color: var(--amber); }
+ .tracklist-header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 8px;
+   font-size: 11px;
+   color: var(--muted);
+   border-bottom: 1px solid var(--border);
+   padding-bottom: 6px;
+ }
+ .folder-filter {
+   background: #1b1e26;
+   color: var(--text);
+   border: 1px solid var(--border);
+   font-family: inherit;
+   font-size: 11px;
+   padding: 3px 6px;
+   border-radius: 4px;
+   display: none;
+ }
+ .tracklist {
+   list-style: none;
+   max-height: 220px;
+   overflow-y: auto;
+   background: #0b0c0f;
+   border: 1px solid var(--border);
+   border-radius: 4px;
+   padding: 4px;
+ }
+ .track-item {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 8px 10px;
+   font-size: 12px;
+   border-bottom: 1px solid #16181f;
+   cursor: pointer;
+   border-radius: 3px;
+ }
+ .track-item:hover { background: #161920; }
+ .track-item.playing {
+   background: rgba(255, 157, 0, 0.12);
+   color: var(--amber);
+   border-left: 3px solid var(--amber);
+ }
+ .track-folder-tag {
+   font-size: 10px;
+   color: var(--muted);
+   background: #181a20;
+   padding: 2px 6px;
+   border-radius: 3px;
+   margin-left: 8px;
+ }
+ .empty-msg { padding: 18px; text-align: center; color: var(--muted); font-size: 12px; }
+ .hidden-picker { display: none; }
+ .track-item { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+ .track-del { background:none; border:0; color:var(--muted); font:inherit; font-size:12px; padding:2px 6px; cursor:pointer; }
+ .reel.spinning-rev { animation: spinRev 0.5s linear infinite; }
+ .reel.spinning-ff { animation: spin 0.5s linear infinite; }
+</style>
+</head>
+<body>
+ 
+<div class="deck-container">
+ <div class="header">
+   <div><a href="../../" style="color:inherit;text-decoration:none">← POCKET</a> · <span class="header-title">TAPE DECK</span></div>
+   <div>
+     <span class="badge">POST//MODE</span>
+     <span class="badge">V1.4</span>
+   </div>
+ </div>
+ 
+ <div class="cassette-well" id="dropZone">
+   <div class="tape-top-row">
+     <div class="tape-status" id="tapeStatus">NO TAPE INSERTED</div>
+     <div class="side-badge" id="sideToggle">SIDE A</div>
+   </div>
+   <div class="reels-window">
+     <div class="reel" id="reelL"><div class="reel-core"></div></div>
+     <div class="reel" id="reelR"><div class="reel-core"></div></div>
+   </div>
+   <div class="drop-hint">TAP + FILES BELOW · SAVED OFFLINE</div>
+ </div>
+ 
+ <div class="telemetry-bar">
+   <div class="tape-counter" id="tapeCounter">0000</div>
+   <div class="vu-meters">
+     <div class="vu-row"><span>L</span><div class="vu-track"><div class="vu-fill" id="vuL"></div></div></div>
+     <div class="vu-row"><span>R</span><div class="vu-track"><div class="vu-fill" id="vuR"></div></div></div>
+   </div>
+   <div class="time-readout">
+     <div id="timeCurrent">00:00</div>
+     <span id="timeTotal">/ 00:00</span>
+   </div>
+ </div>
+ 
+ <div class="scrub-container">
+   <input type="range" class="scrub-bar" id="scrubBar" value="0" min="0" max="100" step="0.1">
+ </div>
+ 
+ <div class="transport-row">
+   <button class="btn" id="btnRew">REW</button>
+   <button class="btn" id="btnPlay">PLAY</button>
+   <button class="btn" id="btnFf">FF</button>
+   <button class="btn" id="btnStop">STOP</button>
+   <button class="btn" id="btnEject">EJECT</button>
+ </div>
+ 
+ <div class="utility-row">
+   <div class="vol-group">
+     <span>OUT</span>
+     <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.01" value="0.85">
+     <span id="volVal">0.85</span>
+   </div>
+   <div class="load-group">
+     <button class="btn btn-small" id="btnHiss">HISS: OFF</button>
+     <button class="btn btn-small btn-amber" id="btnAddFiles">+ FILES</button>
+     <button class="btn btn-small btn-amber" id="btnAddFolder">+ FOLDER</button>
+   </div>
+ </div>
+ 
+ <input type="file" id="fileInput" class="hidden-picker" multiple accept=".mp3,.m4a,.wav,.aac,.aif,.aiff,.flac,.ogg,.opus,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/x-wav,audio/aac,audio/flac,audio/ogg">
+ <input type="file" id="folderInput" class="hidden-picker" webkitdirectory directory multiple>
+ 
+ <div class="tracklist-header">
+   <div>CASSETTE TRACKLIST (<span id="trackCount">0</span>)</div>
+   <select id="folderFilter" class="folder-filter"><option value="ALL">All Folders</option></select>
+ </div>
+ <ul class="tracklist" id="tracklist">
+   <li class="empty-msg">No local tracks queued. Tap + FOLDER or + FILES to auto-load audio.</li>
+ </ul>
+</div>
+ 
+<script>
+// Shared offline audio library for Pocket tools (Night Cruiser, Tape Deck).
+// Tracks are stored as blobs in IndexedDB on this origin, so every Pocket tool
+// can play them with no signal. Inlined into each tool so tools stay single-file.
+const PocketAudio = (() => {
+  const DB = 'pocket-audio', STORE = 'tracks';
+  let dbp = null;
+  const EXT = /\.(mp3|wav|wave|flac|ogg|oga|m4a|aac|opus|aif|aiff|caf|webm)$/i;
+  function open() {
+    if (dbp) return dbp;
+    dbp = new Promise((resolve, reject) => {
+      if (!('indexedDB' in window)) return reject(new Error('no indexedDB'));
+      const req = indexedDB.open(DB, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore(STORE, { keyPath: 'id' });
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    return dbp;
+  }
+  function tx(mode, fn) {
+    return open().then(db => new Promise((resolve, reject) => {
+      const t = db.transaction(STORE, mode);
+      const r = fn(t.objectStore(STORE));
+      t.oncomplete = () => resolve(r && 'result' in r ? r.result : r);
+      t.onerror = () => reject(t.error);
+    }));
+  }
+  const isAudio = f => !f.name.startsWith('.') && (/^audio\//.test(f.type) || EXT.test(f.name));
+  return {
+    isAudio,
+    list: () => tx('readonly', s => s.getAll()).then(a => (a || []).sort((x, y) => x.added - y.added)),
+    add(files) {
+      const now = Date.now();
+      const items = Array.from(files).filter(isAudio).map((f, i) => {
+        const parts = (f.webkitRelativePath || '').split('/');
+        return {
+          id: now.toString(36) + i + Math.random().toString(36).slice(2, 6),
+          name: f.name.replace(EXT, ''),
+          folder: parts.length > 1 ? parts[parts.length - 2] : 'Loose',
+          type: f.type || 'audio/mpeg',
+          size: f.size,
+          added: now + i,
+          blob: new Blob([f], { type: f.type || 'audio/mpeg' })
+        };
+      });
+      return tx('readwrite', s => items.forEach(it => s.put(it))).then(() => items);
+    },
+    remove: id => tx('readwrite', s => s.delete(id)),
+    clear: () => tx('readwrite', s => s.clear())
+  };
+})();
+
+</script>
+<script>
+(() => {
+ 'use strict';
+ let tracks = [], filtered = [], current = -1, isPlaying = false, hiss = false, url = null, seekTimer = null;
+ const audio = new Audio(); audio.preload = 'auto'; audio.setAttribute('playsinline', '');
+ let ctx, srcNode, outGain, analyserL, analyserR, hissGain;
+ const $ = id => document.getElementById(id);
+ const tapeStatus = $('tapeStatus'), reelL = $('reelL'), reelR = $('reelR'), counter = $('tapeCounter');
+ const vuL = $('vuL'), vuR = $('vuR'), tCur = $('timeCurrent'), tTot = $('timeTotal'), scrub = $('scrubBar');
+ const vol = $('volSlider'), volVal = $('volVal'), btnPlay = $('btnPlay'), folderFilter = $('folderFilter');
+
+ function initAudio() {
+   if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+   const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+   ctx = new AC();
+   outGain = ctx.createGain(); outGain.gain.value = +vol.value; outGain.connect(ctx.destination);
+   try { srcNode = ctx.createMediaElementSource(audio); } catch (e) { srcNode = null; }
+   const split = ctx.createChannelSplitter(2);
+   analyserL = ctx.createAnalyser(); analyserR = ctx.createAnalyser(); analyserL.fftSize = analyserR.fftSize = 256;
+   if (srcNode) { srcNode.connect(outGain); srcNode.connect(split); split.connect(analyserL, 0); split.connect(analyserR, 1); }
+   const n = ctx.sampleRate * 2, buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+   let b0 = 0, b1 = 0, b2 = 0;
+   for (let i = 0; i < n; i++) { const w = Math.random() * 2 - 1; b0 = .99765 * b0 + w * .099046; b1 = .963 * b1 + w * .2965164; b2 = .57 * b2 + w * 1.0526913; d[i] = (b0 + b1 + b2 + w * .1848) * .04; }
+   const hs = ctx.createBufferSource(); hs.buffer = buf; hs.loop = true;
+   hissGain = ctx.createGain(); hissGain.gain.value = 0; hs.connect(hissGain); hissGain.connect(outGain); hs.start();
+ }
+ function clunk(pitch) {
+   initAudio(); if (!ctx) return;
+   const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime;
+   o.type = 'triangle'; o.frequency.setValueAtTime(pitch, t); o.frequency.exponentialRampToValueAtTime(35, t + .045);
+   g.gain.setValueAtTime(.2, t); g.gain.exponentialRampToValueAtTime(.001, t + .05);
+   o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + .06);
+ }
+ const reels = cls => { reelL.className = 'reel ' + cls; reelR.className = 'reel ' + cls; };
+ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+ async function load() {
+   try { tracks = await PocketAudio.list(); } catch (e) { tracks = []; }
+   folders(); filter(folderFilter.value || 'ALL');
+   if (tracks.length && current < 0) tapeStatus.textContent = tracks.length + ' TRACKS ON TAPE';
+ }
+ function folders() {
+   const fs = [...new Set(tracks.map(t => t.folder))];
+   folderFilter.style.display = fs.length > 1 ? 'block' : 'none';
+   folderFilter.innerHTML = '<option value="ALL">All (' + tracks.length + ')</option>' + fs.map(f => '<option value="' + esc(f) + '">' + esc(f) + '</option>').join('');
+ }
+ function filter(f) { filtered = f === 'ALL' ? tracks : tracks.filter(t => t.folder === f); render(); }
+ folderFilter.addEventListener('change', e => filter(e.target.value));
+ function render() {
+   const list = $('tracklist');
+   $('trackCount').textContent = filtered.length;
+   if (!filtered.length) { list.innerHTML = '<li class="empty-msg">Nothing on the tape yet. Tap + FILES. Tracks save to this phone and play offline, here and in Night Cruiser.</li>'; return; }
+   list.innerHTML = filtered.map((t, i) => {
+     const g = tracks.indexOf(t);
+     return '<li class="track-item' + (g === current ? ' playing' : '') + '" data-index="' + g + '"><span>' + String(i + 1).padStart(2, '0') + '. ' + esc(t.name) + '<span class="track-folder-tag">' + esc(t.folder) + '</span></span><button class="track-del" data-del="' + t.id + '" aria-label="Remove from tape">✕</button></li>';
+   }).join('');
+ }
+ $('tracklist').addEventListener('click', async e => {
+   const del = e.target.closest('[data-del]');
+   if (del) {
+     const id = del.dataset.del, wasCurrent = tracks[current] && tracks[current].id === id;
+     if (wasCurrent) stop(true);
+     await PocketAudio.remove(id); current = -1; await load(); return;
+   }
+   const li = e.target.closest('.track-item'); if (!li) return;
+   clunk(160); playTrack(+li.dataset.index);
+ });
+ function playTrack(i) {
+   if (i < 0 || i >= tracks.length) return;
+   current = i; const t = tracks[i];
+   if (url) URL.revokeObjectURL(url);
+   url = URL.createObjectURL(t.blob); audio.src = url;
+   tapeStatus.textContent = t.name.toUpperCase();
+   play(); updateMedia();
+ }
+ function play() {
+   initAudio(); if (!tracks.length) return;
+   if (current < 0) { playTrack(0); return; }
+   clunk(180);
+   audio.play().then(() => { isPlaying = true; btnPlay.classList.add('active'); btnPlay.textContent = 'PAUSE'; reels('spinning'); render(); })
+     .catch(() => { tapeStatus.textContent = 'TAP PLAY AGAIN'; });
+ }
+ function stop(silent) {
+   if (!silent) clunk(100);
+   audio.pause(); isPlaying = false; btnPlay.classList.remove('active'); btnPlay.textContent = 'PLAY';
+   reels(''); vuL.style.width = vuR.style.width = '0%';
+ }
+ function eject() {
+   clunk(90); stop(true); current = -1; audio.removeAttribute('src'); audio.load();
+   tapeStatus.textContent = tracks.length ? tracks.length + ' TRACKS ON TAPE' : 'NO TAPE INSERTED';
+   counter.textContent = '0000'; tCur.textContent = '00:00'; tTot.textContent = '/ 00:00'; scrub.value = 0; render();
+ }
+ const fmt = s => isNaN(s) || s < 0 ? '00:00' : String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+ const bufL = new Uint8Array(128), bufR = new Uint8Array(128);
+ function tick() {
+   if (isPlaying && analyserL) {
+     analyserL.getByteFrequencyData(bufL); analyserR.getByteFrequencyData(bufR);
+     const avg = b => Math.min(100, b.reduce((a, x) => a + x, 0) / b.length * 1.5);
+     vuL.style.width = avg(bufL) + '%'; vuR.style.width = avg(bufR) + '%';
+   }
+   if (audio.duration > 0 && isFinite(audio.duration)) {
+     tCur.textContent = fmt(audio.currentTime); tTot.textContent = '/ ' + fmt(audio.duration);
+     if (!scrub.matches(':active')) scrub.value = audio.currentTime / audio.duration * 100;
+     counter.textContent = String(Math.floor(audio.currentTime * 2.2) % 9999).padStart(4, '0');
+   }
+   requestAnimationFrame(tick);
+ }
+ requestAnimationFrame(tick);
+ audio.addEventListener('ended', () => { if (current + 1 < tracks.length) playTrack(current + 1); else stop(); });
+ scrub.addEventListener('input', e => { if (audio.duration > 0) audio.currentTime = e.target.value / 100 * audio.duration; });
+ function setVol() { const v = +vol.value; volVal.textContent = v.toFixed(2); if (outGain) outGain.gain.value = v; else audio.volume = v; try { localStorage.setItem('tape.vol', v); } catch (e) {} }
+ try { const sv = localStorage.getItem('tape.vol'); if (sv !== null) vol.value = sv; } catch (e) {}
+ vol.addEventListener('input', setVol); setVol();
+ $('btnHiss').addEventListener('click', () => {
+   initAudio(); hiss = !hiss; if (hissGain) hissGain.gain.value = hiss ? .035 : 0;
+   $('btnHiss').classList.toggle('active', hiss); $('btnHiss').textContent = hiss ? 'HISS: ON' : 'HISS: OFF';
+ });
+ btnPlay.addEventListener('click', () => isPlaying ? stop() : play());
+ $('btnStop').addEventListener('click', () => { stop(); if (audio.duration) audio.currentTime = 0; });
+ $('btnEject').addEventListener('click', eject);
+ // Hold REW to scan back, hold FF to scan forward. A quick tap jumps to the previous or next track.
+ function hold(btn, dir) {
+   let start = 0;
+   btn.addEventListener('pointerdown', e => {
+     e.preventDefault(); if (!tracks.length || current < 0) return;
+     start = Date.now(); btn.setPointerCapture && btn.setPointerCapture(e.pointerId);
+     reels(dir < 0 ? 'spinning-rev' : 'spinning-ff');
+     clearInterval(seekTimer);
+     seekTimer = setInterval(() => { if (audio.duration) audio.currentTime = Math.max(0, Math.min(audio.duration - .2, audio.currentTime + dir * 1.5)); }, 100);
+   });
+   const end = () => {
+     if (!start) return; clearInterval(seekTimer); reels(isPlaying ? 'spinning' : '');
+     if (Date.now() - start < 250) { clunk(150); dir < 0 ? (audio.currentTime > 3 ? audio.currentTime = 0 : playTrack(Math.max(0, current - 1))) : playTrack(Math.min(tracks.length - 1, current + 1)); }
+     start = 0;
+   };
+   btn.addEventListener('pointerup', end); btn.addEventListener('pointercancel', end); btn.addEventListener('pointerleave', end);
+ }
+ hold($('btnRew'), -1); hold($('btnFf'), 1);
+ $('sideToggle').addEventListener('click', () => { clunk(200); $('sideToggle').textContent = $('sideToggle').textContent === 'SIDE A' ? 'SIDE B' : 'SIDE A'; });
+ $('btnAddFiles').addEventListener('click', () => $('fileInput').click());
+ $('btnAddFolder').addEventListener('click', () => $('folderInput').click());
+ async function ingest(files) {
+   const list = Array.from(files).filter(PocketAudio.isAudio);
+   if (!list.length) { tapeStatus.textContent = 'NO AUDIO IN THAT SELECTION'; return; }
+   list.sort((a, b) => (a.webkitRelativePath || a.name).localeCompare(b.webkitRelativePath || b.name, undefined, { numeric: true }));
+   tapeStatus.textContent = 'SAVING ' + list.length + ' TO THIS PHONE…';
+   const before = tracks.length;
+   try { await PocketAudio.add(list); } catch (e) { tapeStatus.textContent = 'COULD NOT SAVE (STORAGE FULL?)'; return; }
+   await load(); playTrack(before);
+ }
+ $('fileInput').addEventListener('change', e => { ingest(e.target.files); e.target.value = ''; });
+ $('folderInput').addEventListener('change', e => { ingest(e.target.files); e.target.value = ''; });
+ const drop = $('dropZone');
+ drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+ drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+ drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('dragover'); if (e.dataTransfer.files.length) ingest(e.dataTransfer.files); });
+ function updateMedia() {
+   if (!('mediaSession' in navigator) || !tracks[current]) return;
+   try {
+     navigator.mediaSession.metadata = new MediaMetadata({ title: tracks[current].name, artist: 'Tape Deck', album: tracks[current].folder });
+     navigator.mediaSession.setActionHandler('play', play);
+     navigator.mediaSession.setActionHandler('pause', () => stop(true));
+     navigator.mediaSession.setActionHandler('nexttrack', () => playTrack(Math.min(tracks.length - 1, current + 1)));
+     navigator.mediaSession.setActionHandler('previoustrack', () => playTrack(Math.max(0, current - 1)));
+   } catch (e) {}
+ }
+ // iPhone Safari cannot pick folders; hide that button there.
+ if (/iP(hone|ad|od)/.test(navigator.userAgent)) $('btnAddFolder').style.display = 'none';
+ load();
+})();
+
+</script>
+</body>
+</html>
