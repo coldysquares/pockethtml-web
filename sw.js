@@ -5,7 +5,7 @@
 // still lands in the cache for next time.
 // Offline: everything precached at install (the app, the tools hub and every
 // hosted tool in tools/registry.json) opens with no connection.
-const CACHE = 'pockethtml-v12';
+const CACHE = 'pockethtml-v13';
 const NETWORK_TIMEOUT_MS = 3000;
 const ASSETS = [
   './',
