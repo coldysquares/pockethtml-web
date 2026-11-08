@@ -298,7 +298,22 @@ const S = {
 const P = () => PROFILES[S.profile] || PROFILES.highway;
 const N = {}; // audio nodes
 const player = $('player'), live = $('live');
-const st = () => STATIONS[S.i];
+// Every few minutes the station rolls a new "song", like dice: key, tempo, verse and chorus chords, kick pattern and song form.
+// The station's sound and mood stay; within a song the chorus melody comes back so it feels like one piece.
+const PROGS7 = [[0,5,3,4],[0,4,5,3],[0,3,4,0],[5,3,0,4],[0,2,3,4],[0,5,1,4],[0,6,5,4],[0,3,5,4],[1,4,0,0],[0,0,3,4],[3,4,0,5],[0,4,3,3]];
+const PROGS5 = [[0,3,4,2],[0,2,3,1],[0,4,3,2],[0,3,1,4],[0,1,3,2]];
+const FORMS = [SECTIONS, ['INTRO','CRUISE','CRUISE','PEAK','DRIFT','PEAK','PEAK','CRUISE'], ['INTRO','CRUISE','PEAK','DRIFT','CRUISE','PEAK','CRUISE','DRIFT']];
+const KICKS = { synth:[[0,8],[0,8,10],[0,6,8],[0,3,8,11]], lofi:[[0,7,10],[0,10],[0,3,10],[0,7,9]], four:[[0,4,8,12],[0,4,8,12,14]], punk:[[0,6,8,14],[0,8,10],[0,4,8,12],[0,3,8,11]], soft:[[0,8],[0,6,8],[0,10]] };
+function rollSong(){
+  const b = STATIONS[S.i]; if (!b.bpm) { S.cur = null; return; }
+  const bank = b.scale.length === 5 ? PROGS5 : PROGS7, roll = () => Math.random() < .25 ? b.prog : pickOne(bank);
+  const prog = roll(), progB = Math.random() < .3 ? prog : roll();
+  const tr = pickOne([-2,-1,0,0,2,3,5].filter(x => { const f = b.root*Math.pow(2,x/12); return f >= 36 && f < 80; }));
+  S.cur = Object.assign({}, b, { root: b.root*Math.pow(2,tr/12), bpm: Math.round(b.bpm*(1+rnd(-.06,.06))), prog, progB, form: pickOne(FORMS), kick: pickOne(KICKS[b.drums] || [[0,8]]) });
+  S.songStart = S.step; S.motifs = {}; S.lastSection = -1;
+  if (typeof N !== 'undefined' && N.ctx) apply();
+}
+const st = () => (S.cur && S.cur.id === STATIONS[S.i].id) ? S.cur : STATIONS[S.i];
 
 /* ================= AUDIO GRAPH ================= */
 function shaper(k){ const n=2048,c=new Float32Array(n); for(let i=0;i<n;i++){const x=i*2/n-1;c[i]=Math.tanh(k*x)/Math.tanh(k);} return c; }
@@ -660,12 +675,14 @@ function mutate(m){
   const v = S.variation * (.6 + .8*P().variation) * (S.longDrive ? .5 : 1); return m.map(n => n===null ? (Math.random()<v*.08 ? pickOne([2,4,7]) : null) : (Math.random()<v*.3 ? Math.max(0,Math.min(11,n+pickOne([-2,-1,1,2]))) : n));
 }
 function stepAt(t){
-  const s = st(), step = S.step, b16 = step % 16, bar = Math.floor(step/16), barInPhrase = bar % 8;
-  const SEQ = S.longDrive ? SECTIONS_LONG : SECTIONS, prof = P();
+  if (!S.cur || S.cur.id !== STATIONS[S.i].id) rollSong();
+  if (S.step % 16 === 0 && Math.floor((S.step - S.songStart)/16) >= 8*(S.longDrive ? SECTIONS_LONG : st().form).length) rollSong();
+  const s = st(), step = S.step, b16 = step % 16, bar = Math.floor((step - S.songStart)/16), barInPhrase = bar % 8;
+  const SEQ = S.longDrive ? SECTIONS_LONG : s.form, prof = P();
   const secIdx = Math.floor(bar/8) % SEQ.length, sec = S.energy < .2 ? 'DRIFT' : SEQ[secIdx];
-  if (secIdx !== S.lastSection || !S.motif) { S.lastSection = secIdx; S.section = sec; S.motif = newMotif(s); $('section').textContent = sec; }
+  if (secIdx !== S.lastSection || !S.motif) { S.lastSection = secIdx; S.section = sec; S.motif = S.motifs[sec] ? mutate(S.motifs[sec]) : (S.motifs[sec] = newMotif(s)); $('section').textContent = sec; }
   if (b16===0 && barInPhrase%2===0 && barInPhrase) S.motif = mutate(S.motif);
-  const chordDeg = s.prog[bar % s.prog.length], barDur = 60/s.bpm*4;
+  const pr = sec==='PEAK' && s.progB ? s.progB : s.prog, chordDeg = pr[bar % pr.length], barDur = 60/s.bpm*4;
   const human = () => rnd(-.004,.004), vel = () => rnd(.82,1), rock = s.id==='punk' && has('guitar') && has('rock');
   const full = sec==='CRUISE' || sec==='PEAK', peak = sec==='PEAK', drift = sec==='DRIFT' || sec==='INTRO';
   // Harmony
@@ -682,7 +699,7 @@ function stepAt(t){
   // Drums
   const sw = s.swing && step%2 ? s.swing*(60/s.bpm/4) : 0, T = t + sw;
   if (s.drums !== 'none' && !(drift && sec==='DRIFT')) {
-    const k = { synth:[0,8], lofi:[0,7,10], four:[0,4,8,12], punk:[0,6,8,14], soft:[0,8] }[s.drums] || [];
+    const k = s.kick || { synth:[0,8], lofi:[0,7,10], four:[0,4,8,12], punk:[0,6,8,14], soft:[0,8] }[s.drums] || [];
     const sn = { synth:[4,12], lofi:[4,12], four:[4,12], punk:[4,12], soft:[4,12] }[s.drums] || [];
     const soft = s.drums==='lofi' || s.drums==='soft';
     if (k.includes(b16) && (full || b16===0)) kick(T, vel()*(s.drums==='soft'?.7:1));
@@ -751,7 +768,7 @@ async function play(){
     await live.play().then(()=>$('status').textContent='ON AIR').catch(()=>$('status').textContent='NO SIGNAL');
   } else {
     player.pause(); live.pause();
-    S.step = 0; S.lastSection = -1; S.motif = null; S.next = N.ctx.currentTime + .08;
+    S.step = 0; S.lastSection = -1; S.motif = null; rollSong(); S.next = N.ctx.currentTime + .08;
     S.timer = setInterval(scheduler, 25); $('status').textContent='MADE LIVE';
   }
   clearInterval(S.evolve); S.evolve = setInterval(evolve, 1500);
