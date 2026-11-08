@@ -200,6 +200,19 @@
       "repo": "https://github.com/coldysquares/wollohy"
     },
     {
+      "id": "clip-studio",
+      "name": "Clipwave Studio",
+      "icon": "✂️",
+      "description": "Clip Studio.",
+      "kind": "app",
+      "url": "https://clipwave-studio.vercel.app/",
+      "status": "live",
+      "tags": [
+        "image"
+      ],
+      "repo": "https://github.com/coldysquares/clip-studio"
+    },
+    {
       "id": "alchemist",
       "name": "Aether Alchemist",
       "icon": "⚗️",
@@ -211,19 +224,6 @@
         "image"
       ],
       "repo": "https://github.com/coldysquares/alchemist-image-studio"
-    },
-    {
-      "id": "local-tools",
-      "name": "Local Tools",
-      "icon": "🧰",
-      "description": "Local image tools.",
-      "kind": "app",
-      "url": "https://local-tools.vercel.app/",
-      "status": "live",
-      "tags": [
-        "image"
-      ],
-      "repo": "https://github.com/coldysquares/local-tools"
     },
     {
       "id": "wiki-constellation",
@@ -301,6 +301,19 @@
         "systems"
       ],
       "repo": "https://github.com/coldysquares/zweff-workspace"
+    },
+    {
+      "id": "nickos",
+      "name": "NickOS",
+      "icon": "📥",
+      "description": "Voice and text capture into tasks, projects, events and ideas.",
+      "kind": "app",
+      "url": "https://nickos.app/",
+      "status": "live",
+      "tags": [
+        "systems"
+      ],
+      "repo": "https://github.com/coldysquares/nickos"
     },
     {
       "id": "rhinoceros",
