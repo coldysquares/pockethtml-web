@@ -22,6 +22,8 @@ Working plan for making Nick's apps one place he can open from his phone, with p
 
 - 2026-11-07: Pitchback now opens offline (pitchback-app PR, live). Astrograph offline code is merged in aster-graf but that Vercel project does not deploy from GitHub, so it is not live yet. Tabbycat's live site is a loader that pulls a pinned commit from jsDelivr, not the repo; making it offline needs a decision (see below).
 
+- 2026-11-07: Removed two wrong home tiles. nickos.vercel.app is someone else's site (Nick's NickOS runs at nickos.app on a different deployment), and clip-studio.vercel.app serves a Next.js app that is not the coldysquares/clip-studio code (static Clipwave Studio). Every other tile is to be checked against Nick's Vercel project list before adding any URL; never infer an address from a project name.
+
 ## Offline survey (2026-11-07, from the live pages)
 - Have a service worker: PocketPDF, PocketMP3, Aether Alchemist, Systems & Chaos Lab, Rhinoceros. Only PocketPDF and PocketMP3 are marked offline so far; the other three need a check.
 - No service worker (need signal): Pitchback, Tabbycat, Local Songbook, Slopscore Lab, TED LAB, Wollohy Playground, Wollohy archive, Clip Studio, Local Tools, Wiki Constellation, Astrograph, GUVs, Saperli Popette, STATERoom, NickOS, Packet Now, Task Keeper.
