@@ -200,19 +200,6 @@
       "repo": "https://github.com/coldysquares/wollohy"
     },
     {
-      "id": "clip-studio",
-      "name": "Clip Studio",
-      "icon": "✂️",
-      "description": "Clip Studio.",
-      "kind": "app",
-      "url": "https://clip-studio.vercel.app/",
-      "status": "live",
-      "tags": [
-        "image"
-      ],
-      "repo": "https://github.com/coldysquares/clip-studio"
-    },
-    {
       "id": "alchemist",
       "name": "Aether Alchemist",
       "icon": "⚗️",
@@ -314,19 +301,6 @@
         "systems"
       ],
       "repo": "https://github.com/coldysquares/zweff-workspace"
-    },
-    {
-      "id": "nickos",
-      "name": "NickOS",
-      "icon": "📥",
-      "description": "Voice and text capture into tasks, projects, events and ideas.",
-      "kind": "app",
-      "url": "https://nickos.vercel.app/",
-      "status": "live",
-      "tags": [
-        "systems"
-      ],
-      "repo": "https://github.com/coldysquares/nickos"
     },
     {
       "id": "rhinoceros",
