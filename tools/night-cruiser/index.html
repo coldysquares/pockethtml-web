@@ -256,25 +256,25 @@ const pickOne = a => a[Math.floor(Math.random() * a.length)];
 const STATIONS = [
   { id:'synth', name:'NIGHTRIDE 84', freq:'88.9', e:'🌆', short:'SYNTH', c:'#ff3d6e', title:'CINEMATIC SYNTHWAVE', mood:'CINEMATIC',
     desc:'Cinematic synthwave, retro drums and melodic hooks.',
-    bpm:100, root:43.65, scale:[0,2,3,5,7,8,10], prog:[0,5,3,6], lead:'supersaw', bassStyle:'pulse', drums:'synth', arp:true, pad:true, duck:.45 },
+    bpm:100, root:43.65, scale:[0,2,3,5,7,8,10], prog:[0,5,3,6], lead:'supersaw', bassStyle:'pulse', drums:'synth', arp:true, pad:true, duck:.45, trim:1.08 },
   { id:'lofi', name:'MIDNIGHT TAPE', freq:'92.3', e:'🌙', short:'LO-FI', c:'#2fd18b', title:'JAZZY LO-FI CHILL', mood:'RELAXED',
     desc:'Dusty drums, warm chords and jazzy late-night melodies.',
-    bpm:78, root:55, scale:[0,2,3,5,7,9,10], prog:[1,4,0,5], lead:'keys', bassStyle:'round', drums:'lofi', swing:.18, crackle:true, wobble:1, seventh:true },
+    bpm:78, root:55, scale:[0,2,3,5,7,9,10], prog:[1,4,0,5], lead:'keys', bassStyle:'round', drums:'lofi', swing:.18, crackle:true, wobble:1, seventh:true, trim:1.1 },
   { id:'cyber', name:'AUTOBAHN', freq:'96.7', e:'⚡', short:'CYBER', c:'#ffb020', title:'DARK CYBER TECHNO', mood:'DARK ENERGY',
     desc:'Industrial percussion, dark bass and aggressive electronic rhythms.',
-    bpm:124, root:41.2, scale:[0,1,3,5,7,8,10], prog:[0,0,5,6], lead:'square', bassStyle:'acid', drums:'four', duck:.5 },
+    bpm:124, root:41.2, scale:[0,1,3,5,7,8,10], prog:[0,0,5,6], lead:'square', bassStyle:'acid', drums:'four', duck:.5, chorus:1.6, trim:.85 },
   { id:'golden', name:'GOLDEN HOUR', freq:'99.5', e:'🌅', short:'DAYDREAM', c:'#ffc857', title:'WARM MELODIC SOUNDSCAPE', mood:'DAYDREAM',
     desc:'Warm analog tones, memorable motifs and relaxed harmonic movement.',
-    bpm:88, root:73.42, scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'warm', bassStyle:'round', drums:'soft', pad:true },
+    bpm:88, root:73.42, scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'warm', bassStyle:'round', drums:'soft', pad:true, dl:1.5, trim:1.04 },
   { id:'space', name:'STARLIGHT', freq:'101.5', e:'🪐', short:'SPACE', c:'#46c3ff', title:'DEEP SPACE AMBIENT', mood:'ATMOSPHERIC',
     desc:'Wide evolving pads, floating melodies and cinematic space.',
-    bpm:60, root:49, scale:[0,2,4,7,9], prog:[0,3,4,2], lead:'bell', bassStyle:'drone', drums:'none', pad:true, bigVerb:true },
+    bpm:60, root:49, scale:[0,2,4,7,9], prog:[0,3,4,2], lead:'bell', bassStyle:'drone', drums:'none', pad:true, bigVerb:true, trim:1.26 },
   { id:'energy', name:'VOLTAGE', freq:'104.2', e:'🔋', short:'ENERGY', c:'#b46bff', title:'ENERGY BEATS', mood:'HIGH ENERGY',
     desc:'Driving electronic drums, uplifting bass and energetic synth hooks.',
-    bpm:126, root:49, scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'supersaw', bassStyle:'offbeat', drums:'four', arp:true, clap:true, duck:.5 },
+    bpm:126, root:49, scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'supersaw', bassStyle:'offbeat', drums:'four', arp:true, clap:true, duck:.5, chorus:1.3, trim:.88 },
   { id:'punk', name:'PUNK AFTER DARK', freq:'107.9', e:'🎸', short:'PUNK', c:'#ff7a2f', title:'PUNK DRIVE', mood:'REBELLIOUS',
     desc:'Distorted guitar-like synths, fast drums and rebellious melodies.',
-    bpm:168, root:41.2, scale:[0,3,5,7,10], prog:[0,3,5,4], lead:'fuzz', bassStyle:'eighths', drums:'punk', power:true },
+    bpm:168, root:41.2, scale:[0,3,5,7,10], prog:[0,3,5,4], lead:'fuzz', bassStyle:'eighths', drums:'punk', power:true, chorus:2, trim:.87 },
   { id:'mine', name:'MY MUSIC', freq:'LOCAL', e:'💾', short:'MINE', c:'#c4f042', title:'YOUR SAVED TRACKS', mood:'LOCAL', desc:'Your saved tracks, played from this phone.', local:true },
   { id:'live', name:'SOMAFM DEF CON', freq:'LIVE', e:'📡', short:'LIVE', c:'#ef6cff', title:'LIVE CLOUD RADIO', mood:'LIVE', desc:'Internet radio. Needs signal.', stream:'https://ice1.somafm.com/defcon-128-mp3' }
 ];
@@ -302,51 +302,116 @@ const st = () => STATIONS[S.i];
 
 /* ================= AUDIO GRAPH ================= */
 function shaper(k){ const n=2048,c=new Float32Array(n); for(let i=0;i<n;i++){const x=i*2/n-1;c[i]=Math.tanh(k*x)/Math.tanh(k);} return c; }
-function impulse(ctx, sec, decay){
-  const len=Math.floor(ctx.sampleRate*sec), b=ctx.createBuffer(2,len,ctx.sampleRate);
-  for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay)*(i<ctx.sampleRate*.01?i/(ctx.sampleRate*.01):1);}
+// Tape drive: same level for quiet notes at any TAPE setting; more TAPE only rounds off the loud parts sooner
+function tapeCurve(k){ const n=2048,c=new Float32Array(n); for(let i=0;i<n;i++){const x=i*2/n-1;c[i]=Math.tanh(k*x)*1.6/k;} return c; }
+// Final safety clipper (fed at half level): untouched below .8, rounds anything louder into a .98 ceiling
+function clipCurve(){ const n=4096,c=new Float32Array(n); for(let i=0;i<n;i++){ const y=(i*2/(n-1)-1)*2, a=Math.abs(y); c[i]=Math.sign(y)*(a<.8?a:.8+.18*Math.tanh((a-.8)/.18)); } return c; }
+// Reverb: short pre-delay, a few early reflections, then a tail that darkens as it fades (like a real room), different on each side
+function impulse(ctx, sec, decay, pre){
+  const sr=ctx.sampleRate, len=Math.floor(sr*sec), p0=Math.floor(sr*(pre||.022)), b=ctx.createBuffer(2,len,sr);
+  for(let ch=0;ch<2;ch++){
+    const d=b.getChannelData(ch); let y=0, e=0;
+    for(let k=0;k<7;k++){ const at=p0+Math.floor(sr*(.003+Math.random()*.06)); if(at<len) d[at]+=(Math.random()<.5?-1:1)*(.55-k*.05); }
+    for(let i=p0;i<len;i++){
+      const x=(i-p0)/(len-p0), cf=.06+.84*Math.pow(1-x,2.2);
+      y += cf*((Math.random()*2-1) - y);
+      d[i] += y*Math.pow((2-cf)/cf,.4)*Math.pow(1-x,decay)*Math.min(1,(i-p0)/(sr*.012));
+    }
+    for(let i=0;i<len;i++) e+=d[i]*d[i];
+    const g=Math.sqrt((len/(3*(2*decay+1)))/e); for(let i=0;i<len;i++) d[i]*=g; // same overall energy as the old reverb, so the sliders keep their feel
+  }
   return b;
+}
+// Small RBJ filter for building drum samples once at start-up
+function biq(type, f, q, sr){
+  const w=2*Math.PI*f/sr, cs=Math.cos(w), al=Math.sin(w)/(2*q); let b0,b1,b2;
+  if(type==='lp'){b0=(1-cs)/2;b1=1-cs;b2=b0;} else if(type==='hp'){b0=(1+cs)/2;b1=-(1+cs);b2=b0;} else {b0=al;b1=0;b2=-al;}
+  const a0=1+al,a1=-2*cs,a2=1-al; let x1=0,x2=0,y1=0,y2=0;
+  return x=>{const y=(b0*x+b1*x1+b2*x2-a1*y1-a2*y2)/a0; x2=x1;x1=x;y2=y1;y1=y;return y;};
+}
+// Drum kit: rendered once into sample buffers (fuller sound, and far lighter on the phone than building every hit from oscillators)
+function drumKit(c){
+  const sr=c.sampleRate, nz=()=>Math.random()*2-1;
+  const mk=(sec,ch,fn)=>{ const b=c.createBuffer(ch,Math.floor(sr*sec),sr), f=Math.floor(sr*.008); for(let k=0;k<ch;k++){ const d=b.getChannelData(k); fn(d,k); for(let i=0;i<f;i++) d[d.length-1-i]*=i/f; } return b; }; // short fade at the end so no hit ever clicks
+  const kickBuf=(f0,f1,drop,decay,click,drive)=>mk(.65,1,d=>{ const hp=biq('hp',1800,.7,sr); let ph=0;
+    for(let i=0;i<d.length;i++){ const t=i/sr, f=f1+(f0-f1)*Math.exp(-t/drop); ph+=2*Math.PI*f/sr;
+      const s=Math.sin(ph)*Math.exp(-t/decay)*Math.min(1,t/.0012) + click*hp(nz())*Math.exp(-t/.0035);
+      d[i]=Math.tanh(s*drive)/Math.tanh(drive); } });
+  const snareBuf=(tone,nDecay,bright,nAmt,bodyDecay)=>mk(.45,1,d=>{ const bp=biq('bp',bright,.6,sr), hp=biq('hp',1000,.7,sr); let p1=0,p2=0;
+    for(let i=0;i<d.length;i++){ const t=i/sr; p1+=2*Math.PI*tone*(1+.6*Math.exp(-t/.008))/sr; p2+=2*Math.PI*tone*1.58/sr;
+      const body=(Math.sin(p1)*.75+Math.sin(p2)*.3)*Math.exp(-t/bodyDecay), n=hp(bp(nz()))*Math.exp(-t/nDecay)*nAmt;
+      d[i]=Math.tanh((body+n)*1.25)*.85; } });
+  const hatBuf=(decay)=>mk(Math.min(.7,decay*6),2,d=>{ const fr=[205.3,304.4,369.6,522.7,540,800], ph=fr.map(()=>Math.random()), hp=biq('hp',7000,.7,sr), hp2=biq('hp',7000,.7,sr);
+    for(let i=0;i<d.length;i++){ const t=i/sr; let m=0; for(let j=0;j<6;j++){ ph[j]+=fr[j]/sr; m+=(ph[j]%1<.5?1:-1); }
+      d[i]=hp2(hp(m*.15+nz()*.3))*Math.exp(-t/decay)*Math.min(1,t/.0006)*1.6; } });
+  return {
+    kick: kickBuf(170,50,.03,.11,.35,1.8),      // synthwave / techno: deep with a clean click
+    kickSoft: kickBuf(115,50,.03,.1,.12,1.15),   // lo-fi and daydream: rounder, no click
+    kickPunk: kickBuf(190,58,.022,.08,.5,2.3),   // punk: short and hard
+    snare: snareBuf(185,.12,4300,2.1,.06),
+    snareSoft: snareBuf(230,.075,2500,1.5,.04),
+    clap: mk(.4,1,d=>{ const bp=biq('bp',1250,1.1,sr), hits=[0,.009,.019,.031];
+      for(let i=0;i<d.length;i++){ const t=i/sr; let e=0; hits.forEach((h,j)=>{ if(t>=h) e=Math.max(e, j<3 ? Math.exp(-(t-h)/.005) : Math.exp(-(t-h)/.1)); }); d[i]=Math.tanh(bp(nz())*e*3); } }),
+    hat: hatBuf(.025), hatOpen: hatBuf(.12)
+  };
 }
 function init(){
   if (N.ctx) { if (N.ctx.state==='suspended') N.ctx.resume(); return true; }
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) { $('status').textContent = 'NO WEB AUDIO'; return false; }
   const c = N.ctx = new AC({ latencyHint:'playback' });
-  // Output: master -> glue compressor -> limiter -> analyser -> speakers
+  // Output: master (volume) -> glue compressor -> limiter -> safety clipper -> analyser -> speakers
   N.master = c.createGain(); N.master.gain.value = 0;
   N.glue = c.createDynamicsCompressor(); N.glue.threshold.value=-16; N.glue.ratio.value=2.5; N.glue.attack.value=.02; N.glue.release.value=.25; N.glue.knee.value=8;
-  N.lim = c.createDynamicsCompressor(); N.lim.threshold.value=-2; N.lim.ratio.value=20; N.lim.attack.value=.002; N.lim.release.value=.08;
+  N.lim = c.createDynamicsCompressor(); N.lim.threshold.value=-4; N.lim.knee.value=0; N.lim.ratio.value=20; N.lim.attack.value=.001; N.lim.release.value=.12;
+  N.pre = c.createGain(); N.pre.gain.value=.5; N.clip = c.createWaveShaper(); N.clip.curve = clipCurve(); N.clip.oversample='4x';
   N.an = c.createAnalyser(); N.an.fftSize = 1024;
-  N.master.connect(N.glue); N.glue.connect(N.lim); N.lim.connect(N.an); N.an.connect(c.destination);
-  // Music bus: duck (sidechain) -> tone -> tape saturation -> master
+  N.master.connect(N.glue); N.glue.connect(N.lim); N.lim.connect(N.pre); N.pre.connect(N.clip); N.clip.connect(N.an); N.an.connect(c.destination);
+  // Generated stations mix here: level match per station -> rumble cut -> STEREO width -> master
+  N.gen = c.createGain(); N.hp = c.createBiquadFilter(); N.hp.type='highpass'; N.hp.frequency.value=30; N.hp.Q.value=.6;
+  N.gen.connect(N.hp);
+  const sp=c.createChannelSplitter(2), mg=c.createChannelMerger(2); N.wLL=c.createGain(); N.wLR=c.createGain(); N.wRL=c.createGain(); N.wRR=c.createGain();
+  N.hp.connect(sp); sp.connect(N.wLL,0); sp.connect(N.wLR,0); sp.connect(N.wRL,1); sp.connect(N.wRR,1);
+  N.wLL.connect(mg,0,0); N.wRL.connect(mg,0,0); N.wLR.connect(mg,0,1); N.wRR.connect(mg,0,1); mg.connect(N.master);
+  // Music bus: duck (sidechain) -> tone -> FILTER -> tape drive -> mix
   N.music = c.createGain(); N.duck = c.createGain(); N.tone = c.createBiquadFilter(); N.tone.type='lowpass'; N.tone.frequency.value=16000; N.tone.Q.value=.3;
-  N.sat = c.createWaveShaper(); N.sat.curve = shaper(1.6); N.sat.oversample='2x';
+  N.sat = c.createWaveShaper(); N.sat.curve = tapeCurve(1.6); N.sat.oversample='2x';
   // FILTER slider: a user lowpass after the arrangement's own tone filter, drifting slowly (evolving sound design)
   N.filter = c.createBiquadFilter(); N.filter.type='lowpass'; N.filter.Q.value=.5; N.filter.frequency.value=8000;
-  N.music.connect(N.duck); N.duck.connect(N.tone); N.tone.connect(N.filter); N.filter.connect(N.sat); N.sat.connect(N.master);
-  // Drum bus: not ducked, light saturation
-  N.drums = c.createGain(); N.drums.gain.value=.9; N.drums.connect(N.master);
+  N.music.connect(N.duck); N.duck.connect(N.tone); N.tone.connect(N.filter); N.filter.connect(N.sat); N.sat.connect(N.gen);
+  // Chorus: two slowly moving short delays, one per side, above 250 Hz so the bass stays centered
+  N.chorus = c.createGain(); const chp=c.createBiquadFilter(); chp.type='highpass'; chp.frequency.value=250; const cm=c.createChannelMerger(2);
+  [[.012,.27],[.019,.21]].forEach(([dt,rate],ch)=>{ const d=c.createDelay(.06); d.delayTime.value=dt; const l=c.createOscillator(); l.frequency.value=rate; const lg=c.createGain(); lg.gain.value=.0018; l.connect(lg); lg.connect(d.delayTime); l.start(); chp.connect(d); d.connect(cm,0,ch); });
+  N.sat.connect(chp); cm.connect(N.chorus); N.chorus.connect(N.gen);
+  // Drum bus: not ducked; a tone control so lo-fi drums sit dusty and the others stay crisp
+  N.kit = drumKit(c);
+  N.drums = c.createGain(); N.drums.gain.value=.5; N.drumTone = c.createBiquadFilter(); N.drumTone.type='lowpass'; N.drumTone.frequency.value=18000; N.drumTone.Q.value=.5;
+  N.drums.connect(N.drumTone); N.drumTone.connect(N.gen);
+  N.hats = c.createStereoPanner ? c.createStereoPanner() : c.createGain(); if (N.hats.pan) N.hats.pan.value=.18; N.hats.connect(N.drums);
   // Sends
   N.verb = c.createConvolver(); N.verb.buffer = impulse(c, 3.2, 2.6); N.verbIn = c.createGain(); N.verbOut = c.createGain();
   const vhp = c.createBiquadFilter(); vhp.type='highpass'; vhp.frequency.value=220;
-  N.verbIn.connect(vhp); vhp.connect(N.verb); N.verb.connect(N.verbOut); N.verbOut.connect(N.master);
-  N.dly = c.createDelay(2); N.dlyIn = c.createGain(); N.dlyFb = c.createGain(); N.dlyOut = c.createGain();
-  const dlp = c.createBiquadFilter(); dlp.type='lowpass'; dlp.frequency.value=2800; const dhp=c.createBiquadFilter(); dhp.type='highpass'; dhp.frequency.value=300;
-  N.dlyIn.connect(N.dly); N.dly.connect(dlp); dlp.connect(dhp); dhp.connect(N.dlyFb); N.dlyFb.connect(N.dly); dhp.connect(N.dlyOut); N.dlyOut.connect(N.master);
+  N.verbIn.connect(vhp); vhp.connect(N.verb); N.verb.connect(N.verbOut); N.verbOut.connect(N.gen);
+  N.snVerb = c.createGain(); N.snVerb.gain.value=.25; N.snVerb.connect(N.verbIn);
+  // Ping-pong delay: first echo left, next right, and so on
+  N.dly = c.createDelay(2); N.dly2 = c.createDelay(2); N.dlyIn = c.createGain(); N.dlyFb = c.createGain(); N.dlyOut = c.createGain();
+  const dlp = c.createBiquadFilter(); dlp.type='lowpass'; dlp.frequency.value=2800; const dhp=c.createBiquadFilter(); dhp.type='highpass'; dhp.frequency.value=300; const dm=c.createChannelMerger(2);
+  N.dlyIn.connect(N.dly); N.dly.connect(dlp); dlp.connect(dhp); dhp.connect(dm,0,0); dhp.connect(N.dly2); N.dly2.connect(dm,0,1); N.dly2.connect(N.dlyFb); N.dlyFb.connect(N.dly);
+  dm.connect(N.dlyOut); N.dlyOut.connect(N.gen);
   // Fuzz send for FUZZ toggle
   N.fz = c.createWaveShaper(); N.fz.curve = shaper(9); N.fz.oversample='4x'; N.fzOut = c.createGain(); N.fzOut.gain.value=0;
   const fzlp = c.createBiquadFilter(); fzlp.type='lowpass'; fzlp.frequency.value=3800;
-  N.tone.connect(N.fz); N.fz.connect(fzlp); fzlp.connect(N.fzOut); N.fzOut.connect(N.master);
+  N.tone.connect(N.fz); N.fz.connect(fzlp); fzlp.connect(N.fzOut); N.fzOut.connect(N.gen);
   // Tape wobble LFO shared by all pitched voices
   N.lfo = c.createOscillator(); N.lfo.frequency.value = .55; N.lfoAmt = c.createGain(); N.lfoAmt.gain.value = 0; N.lfo.connect(N.lfoAmt); N.lfo.start();
-  // Shared noise
-  const nl = c.sampleRate*2; N.noise = c.createBuffer(1, nl, c.sampleRate); const nd = N.noise.getChannelData(0); for(let i=0;i<nl;i++) nd[i]=Math.random()*2-1;
-  // Rain + vinyl bed (always running, faded in/out)
+  // Shared noise, different on each side
+  const nl = c.sampleRate*2; N.noise = c.createBuffer(2, nl, c.sampleRate); for (let ch=0;ch<2;ch++){ const nd = N.noise.getChannelData(ch); for(let i=0;i<nl;i++) nd[i]=Math.random()*2-1; }
+  // Rain bed (always running, faded in/out), straight to master so it sounds the same on every station
   N.rain = c.createGain(); N.rain.gain.value=0;
-  const rs = c.createBufferSource(); rs.buffer=N.noise; rs.loop=true; const rbp=c.createBiquadFilter(); rbp.type='bandpass'; rbp.frequency.value=1700; rbp.Q.value=.35;
-  const rlp=c.createBiquadFilter(); rlp.type='lowpass'; rlp.frequency.value=5200; rs.connect(rbp); rbp.connect(rlp); rlp.connect(N.rain); N.rain.connect(N.master); rs.start();
-  N.vinyl = c.createGain(); N.vinyl.gain.value=0; N.vinyl.connect(N.master);
-  // Local music and live radio through the same master
+  const rs = c.createBufferSource(); rs.buffer=N.noise; rs.loop=true; const rbp=c.createBiquadFilter(); rbp.type='bandpass'; rbp.frequency.value=1500; rbp.Q.value=.35;
+  const rlp=c.createBiquadFilter(); rlp.type='lowpass'; rlp.frequency.value=4800; rs.connect(rbp); rbp.connect(rlp); rlp.connect(N.rain); N.rain.connect(N.master); rs.start();
+  N.vinyl = c.createGain(); N.vinyl.gain.value=0; N.vinyl.connect(N.gen);
+  // Local music and live radio go straight to master, untouched by the station effects
   try { N.media = c.createMediaElementSource(player); N.media.connect(N.master); } catch(e) {}
   apply(); scope();
   return true;
@@ -357,15 +422,23 @@ function apply(){
   const on = S.playing || S.rain;
   const fx = .4 + 1.2*S.effects; // EFFECTS / ATMOSPHERE scales reverb and delay together
   N.master.gain.setTargetAtTime(on ? S.volume*.9 : 0, t, .12);
+  // Each station is level matched, so switching stations doesn't jump in loudness
+  N.gen.gain.setTargetAtTime((s.trim||1) * (S.longDrive ? .7 : 1), t, .2);
+  // STEREO: 0 = mono, middle = natural, top = extra wide
+  const w = S.stereo < .5 ? S.stereo*2 : 1 + (S.stereo-.5);
+  N.wLL.gain.setTargetAtTime((1+w)/2, t, .2); N.wRR.gain.setTargetAtTime((1+w)/2, t, .2); N.wLR.gain.setTargetAtTime((1-w)/2, t, .2); N.wRL.gain.setTargetAtTime((1-w)/2, t, .2);
+  N.chorus.gain.setTargetAtTime(.1 + .3*S.stereo*(s.chorus||1), t, .3);
   N.verbOut.gain.setTargetAtTime((s.bigVerb?.6:.32)*S.reverb*fx + .03, t, .3);
   N.dlyOut.gain.setTargetAtTime(S.echo ? .18 + S.delay*.3 : S.delay*.14*fx, t, .3);
   N.dlyFb.gain.setTargetAtTime(S.echo ? .38 + S.delay*.2 : .12 + S.delay*.22, t, .3);
-  N.dly.delayTime.setTargetAtTime(s.bpm ? (60/s.bpm)*.75 : .33, t, .3);
+  const dt = s.bpm ? (60/s.bpm)*.75 : .33; N.dly.delayTime.setTargetAtTime(dt, t, .3); N.dly2.delayTime.setTargetAtTime(dt, t, .3);
   N.filter.frequency.setTargetAtTime(500 + S.filter*11500, t, .6);
+  N.drums.gain.setTargetAtTime(.5*(s.dl||1), t, .2); // drums sit level with the music instead of on top of it
+  N.drumTone.frequency.setTargetAtTime(s.drums==='lofi' ? 6500 : s.drums==='soft' ? 8000 : 18000, t, .2);
   // Long drive mode: firmer glue compression for consistent loudness
   N.glue.threshold.setTargetAtTime(S.longDrive ? -24 : -16, t, .5); N.glue.ratio.setTargetAtTime(S.longDrive ? 4 : 2.5, t, .5);
-  N.fzOut.gain.setTargetAtTime(S.fuzz ? .35 : 0, t, .1);
-  N.sat.curve = shaper(1.2 + S.tape*3);
+  N.fzOut.gain.setTargetAtTime(S.fuzz ? .3 : 0, t, .1);
+  N.sat.curve = tapeCurve(1.2 + S.tape*3);
   N.lfoAmt.gain.setTargetAtTime((s.wobble ? 9 : 2.5) * S.tape * (S.playing?1:0), t, .5);
   N.rain.gain.setTargetAtTime(S.rain ? S.rainLevel*.35 : 0, t, .3);
   N.vinyl.gain.setTargetAtTime(S.playing && (s.crackle || S.tape>.6) ? .12*S.tape+.03 : 0, t, .3);
@@ -378,6 +451,8 @@ function hzOf(s, deg, oct){ // scale degree (can exceed length) -> Hz
   const L = s.scale.length, o = Math.floor(deg / L), d = ((deg % L) + L) % L;
   return s.root * Math.pow(2, oct + o + s.scale[d]/12);
 }
+// Close voicing: fold every chord tone into one octave so chords move smoothly instead of jumping
+function voicing(freqs, lo){ return freqs.map(f => { while (f >= lo*2) f /= 2; while (f < lo) f *= 2; return f; }).sort((a,b)=>a-b); }
 function out(node, pan, verb, dly){
   const c=N.ctx, p=c.createStereoPanner ? c.createStereoPanner() : null;
   // STEREO slider sets how wide voices sit in the field (0 = mono, 100 = wide)
@@ -391,37 +466,44 @@ function env(g, t, a, peak, d, sus, r, len){
   g.gain.setTargetAtTime(Math.max(.0001,peak*sus), t+a, d/3);
   g.gain.setTargetAtTime(.0001, t+len, r/3);
 }
-function osc(type, f, t, stop, det){
+// ph: start a hair later so stacked voices don't all begin in phase (a softer, wider attack)
+function osc(type, f, t, stop, det, ph){
   const o=N.ctx.createOscillator(); o.type=type; o.frequency.setValueAtTime(f,t); if (det) o.detune.value=det;
-  N.lfoAmt.connect(o.detune); o.onended = () => { try { N.lfoAmt.disconnect(o.detune); } catch(e) {} }; o.start(t); o.stop(stop); return o;
+  N.lfoAmt.connect(o.detune); o.onended = () => { try { N.lfoAmt.disconnect(o.detune); } catch(e) {} }; o.start(t+(ph||0)); o.stop(stop); return o;
 }
-// Supersaw lead: 3 detuned saws through a sweeping lowpass
+// Send one voice to the left (0), right (1) or both (2) inputs of a stereo merger
+function side(o, mg, ch){ if (ch===2) { o.connect(mg,0,0); o.connect(mg,0,1); } else o.connect(mg,0,ch); }
+// Supersaw lead: 5 detuned saws spread across the stereo field through a sweeping lowpass
 function supersaw(f, t, len, vel, pan){
-  const c=N.ctx, lp=c.createBiquadFilter(), g=c.createGain(); lp.type='lowpass'; lp.Q.value=2;
+  const c=N.ctx, lp=c.createBiquadFilter(), g=c.createGain(), mg=c.createChannelMerger(2); lp.type='lowpass'; lp.Q.value=1.4;
   const cut = 900 + 3800*S.energy*vel; lp.frequency.setValueAtTime(cut*1.8,t); lp.frequency.exponentialRampToValueAtTime(Math.max(300,cut*.6), t+len*.9);
-  [-11,0,11].forEach(d=>osc('sawtooth',f,t,t+len+.5,d).connect(lp));
-  lp.connect(g); env(g,t,.01,.07*vel,.25,.6,.25,len); out(g,pan,.35,.25);
+  [[-17,0],[-6,1],[0,2],[7,0],[16,1]].forEach(([d,ch])=>side(osc('sawtooth',f,t,t+len+.5,d,Math.random()/f), mg, ch));
+  mg.connect(lp); lp.connect(g); env(g,t,.01,.05*vel,.25,.6,.25,len); out(g,pan,.35,.25);
 }
-function keys(f, t, len, vel, pan){ // Rhodes-ish: sine + soft triangle bell, fast decay
-  const c=N.ctx, g=c.createGain(), lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2400;
-  osc('sine',f,t,t+len+1).connect(lp); const b=osc('triangle',f*2,t,t+len+1,3); const bg=c.createGain(); bg.gain.setValueAtTime(.35,t); bg.gain.exponentialRampToValueAtTime(.01,t+.4); b.connect(bg); bg.connect(lp);
-  lp.connect(g); env(g,t,.006,.11*vel,.7,.25,.5,len); out(g,pan,.3,.12);
+function keys(f, t, len, vel, pan){ // FM electric piano: a bright tine bark on the attack that mellows as the note rings
+  const c=N.ctx, g=c.createGain(), lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3400;
+  const car=osc('sine',f,t,t+len+1.2), mod=osc('sine',f,t,t+len+1.2), mi=c.createGain();
+  mi.gain.setValueAtTime(f*(1+1.6*vel),t); mi.gain.setTargetAtTime(f*.22,t,.22); mod.connect(mi); mi.connect(car.frequency);
+  const tn=osc('sine',f*7.01,t,t+.4), tg=c.createGain(); tg.gain.setValueAtTime(.18*vel,t); tg.gain.exponentialRampToValueAtTime(.001,t+.3); tn.connect(tg); tg.connect(lp);
+  car.connect(lp); lp.connect(g); env(g,t,.004,.1*vel,.9,.3,.5,len); out(g,pan,.3,.12);
 }
-function bell(f, t, len, vel, pan){ // glassy FM-style bell
-  const c=N.ctx, car=osc('sine',f,t,t+len+3), mod=osc('sine',f*3.5,t,t+len+3), mg=c.createGain(), g=c.createGain();
-  mg.gain.setValueAtTime(f*2.2,t); mg.gain.exponentialRampToValueAtTime(f*.05,t+2); mod.connect(mg); mg.connect(car.frequency);
-  car.connect(g); env(g,t,.004,.06*vel,1.2,.2,2,len); out(g,pan,.7,.3);
+function bell(f, t, len, vel, pan){ // glassy FM bell, slightly detuned on each side, with a soft shimmer partial
+  const c=N.ctx, g=c.createGain(), mg=c.createChannelMerger(2), mod=osc('sine',f*3.5,t,t+len+3), mg2=c.createGain();
+  mg2.gain.setValueAtTime(f*2.2,t); mg2.gain.exponentialRampToValueAtTime(f*.05,t+2); mod.connect(mg2);
+  [-4,4].forEach((d,ch)=>{ const car=osc('sine',f,t,t+len+3,d); mg2.connect(car.frequency); car.connect(mg,0,ch); });
+  const sh=osc('sine',f*12.03,t,t+1.2), sg=c.createGain(); sg.gain.setValueAtTime(.1,t); sg.gain.exponentialRampToValueAtTime(.001,t+1); sh.connect(sg); sg.connect(mg,0,0); sg.connect(mg,0,1);
+  mg.connect(g); env(g,t,.004,.045*vel,1.2,.2,2,len); out(g,pan,.7,.3);
 }
 function square(f, t, len, vel, pan){
   const c=N.ctx, g=c.createGain(), lp=c.createBiquadFilter(); lp.type='lowpass'; lp.Q.value=6;
   lp.frequency.setValueAtTime(600+3000*S.energy,t); lp.frequency.exponentialRampToValueAtTime(400,t+len);
-  osc('square',f,t,t+len+.4,-6).connect(lp); osc('square',f*1.003,t,t+len+.4,6).connect(lp);
-  lp.connect(g); env(g,t,.004,.045*vel,.15,.4,.12,len); out(g,pan,.25,.3);
+  const mg=c.createChannelMerger(2); osc('square',f,t,t+len+.4,-6).connect(mg,0,0); osc('square',f*1.003,t,t+len+.4,6,Math.random()/f).connect(mg,0,1);
+  mg.connect(lp); lp.connect(g); env(g,t,.004,.045*vel,.15,.4,.12,len); out(g,pan,.25,.3);
 }
 function fuzzLead(f, t, len, vel, pan){
-  const c=N.ctx, ws=c.createWaveShaper(), g=c.createGain(), lp=c.createBiquadFilter(); ws.curve=shaper(7); lp.type='lowpass'; lp.frequency.value=3200;
+  const c=N.ctx, ws=c.createWaveShaper(), g=c.createGain(), lp=c.createBiquadFilter(), hp=c.createBiquadFilter(); ws.curve=shaper(7); lp.type='lowpass'; lp.frequency.value=3600; hp.type='highpass'; hp.frequency.value=160;
   osc('sawtooth',f,t,t+len+.3,-8).connect(ws); osc('sawtooth',f*1.5,t,t+len+.3,8).connect(ws);
-  ws.connect(lp); lp.connect(g); env(g,t,.003,.05*vel,.1,.7,.08,len); out(g,pan,.15,0);
+  ws.connect(hp); hp.connect(lp); lp.connect(g); env(g,t,.003,.05*vel,.1,.7,.08,len); out(g,pan,.15,0);
 }
 function warm(f, t, len, vel, pan){ // GOLDEN HOUR: soft triangle lead with an octave sine, warm lowpass
   const c=N.ctx, g=c.createGain(), lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1400+1400*S.energy;
@@ -429,44 +511,41 @@ function warm(f, t, len, vel, pan){ // GOLDEN HOUR: soft triangle lead with an o
   lp.connect(g); env(g,t,.02,.08*vel,.5,.55,.45,len); out(g,pan,.4,.22);
 }
 const LEADS = { supersaw, keys, bell, square, fuzz:fuzzLead, warm };
-function pad(freqs, t, len){
-  const c=N.ctx, lp=c.createBiquadFilter(), g=c.createGain(); lp.type='lowpass'; lp.Q.value=.7;
-  lp.frequency.setValueAtTime(500,t); lp.frequency.linearRampToValueAtTime(900+1600*S.energy, t+len*.5); lp.frequency.linearRampToValueAtTime(600, t+len);
-  freqs.forEach((f,i)=>{ osc('sawtooth',f,t,t+len+2,-7+i*3).connect(lp); osc('sawtooth',f,t,t+len+2,7-i*2).connect(lp); });
-  lp.connect(g); env(g,t,Math.min(1.8,len*.35),.022,1,.85,1.6,len); out(g,0,.8,.1);
+function pad(freqs, t, len){ // two saws per chord tone, one on each side, kept out of the bass range
+  const c=N.ctx, s=st(), lp=c.createBiquadFilter(), hp=c.createBiquadFilter(), g=c.createGain(), mg=c.createChannelMerger(2); lp.type='lowpass'; lp.Q.value=.7; hp.type='highpass'; hp.frequency.value=160;
+  const open = s.bigVerb ? 1400 : 0;
+  lp.frequency.setValueAtTime(500+open*.5,t); lp.frequency.linearRampToValueAtTime(900+1600*S.energy+open, t+len*.5); lp.frequency.linearRampToValueAtTime(600+open*.5, t+len);
+  freqs.forEach((f,i)=>{ osc('sawtooth',f,t,t+len+2,-7+i*3,Math.random()/f).connect(mg,0,0); osc('sawtooth',f,t,t+len+2,7-i*2,Math.random()/f).connect(mg,0,1); });
+  mg.connect(hp); hp.connect(lp); lp.connect(g); env(g,t,Math.min(1.8,len*.35),.022,1,.85,1.6,len); out(g,0,.8,.1);
 }
 function stab(freqs, t, vel){ // short chord hit (keys stations, punk power chords)
   freqs.forEach((f,i)=>{ const s=st(); (s.power?fuzzLead:keys)(f,t,s.power?.22:.9,vel*(i?0.7:1),(i-1)*.25); });
 }
-function bass(f, t, len, vel, style){
+function bass(f, t, len, vel, style, from){
   const c=N.ctx, g=c.createGain(), lp=c.createBiquadFilter(); lp.type='lowpass';
-  if (style==='acid') { lp.Q.value=14; lp.frequency.setValueAtTime(300+2200*S.energy*vel,t); lp.frequency.exponentialRampToValueAtTime(140,t+len*.9); osc('sawtooth',f,t,t+len+.2).connect(lp); }
+  if (style==='acid') {
+    lp.Q.value=13; lp.frequency.setValueAtTime(300+2200*S.energy*vel,t); lp.frequency.exponentialRampToValueAtTime(140,t+len*.9);
+    const o=osc('sawtooth',f,t,t+len+.2); if (from) { o.frequency.setValueAtTime(from,t); o.frequency.exponentialRampToValueAtTime(f,t+.06); } o.connect(lp); // slides between notes
+  }
   else { lp.Q.value=1; lp.frequency.setValueAtTime(style==='round'?420:style==='drone'?260:700,t); osc(style==='round'||style==='drone'?'triangle':'sawtooth',f,t,t+len+.3).connect(lp); }
-  const sub = osc('sine',f,t,t+len+.3); const sg=c.createGain(); sg.gain.value=.9; sub.connect(sg); sg.connect(g);
+  const sub = osc('sine',f,t,t+len+.3); const sg=c.createGain(); sg.gain.value=.4; sub.connect(sg); sg.connect(g);
   lp.connect(g); env(g,t,style==='drone'?.8:.005,(style==='drone'?.12:.2)*vel,.2,.7,.08,len); out(g,0,0,0);
 }
-// Drums
+// Drums (sample buffers from drumKit)
+function hit(buf, t, v, rate, dest){ const c=N.ctx, s=c.createBufferSource(), g=c.createGain(); s.buffer=buf; if (rate) s.playbackRate.value=rate; g.gain.value=v; s.connect(g); g.connect(dest||N.drums); s.start(t); return g; }
 function kick(t, v){
-  const c=N.ctx, o=c.createOscillator(), g=c.createGain();
-  o.frequency.setValueAtTime(155,t); o.frequency.exponentialRampToValueAtTime(46,t+.11);
-  g.gain.setValueAtTime(1.0*v,t); g.gain.exponentialRampToValueAtTime(.001,t+.42);
-  o.connect(g); g.connect(N.drums); o.start(t); o.stop(t+.45);
-  noiseHit(t,.012,.25*v,3000,'highpass');
-  const s = st(); if (s.duck) { N.duck.gain.cancelScheduledValues(t); N.duck.gain.setValueAtTime(1-s.duck*(.6+S.energy*.4),t); N.duck.gain.setTargetAtTime(1,t+.02,.09); }
+  const s = st(), soft = s.drums==='lofi' || s.drums==='soft';
+  hit(s.drums==='punk' ? N.kit.kickPunk : soft ? N.kit.kickSoft : N.kit.kick, t, .9*v);
+  if (s.duck) { N.duck.gain.cancelScheduledValues(t); N.duck.gain.setValueAtTime(1-s.duck*(.6+S.energy*.4),t); N.duck.gain.setTargetAtTime(1,t+.02,.09); }
 }
 function noiseHit(t, len, v, f, type, q, dest){
   const c=N.ctx, s=c.createBufferSource(); s.buffer=N.noise; const fl=c.createBiquadFilter(); fl.type=type||'highpass'; fl.frequency.value=f; if (q) fl.Q.value=q;
   const g=c.createGain(); g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.001,t+len);
   s.connect(fl); fl.connect(g); g.connect(dest || N.drums); s.start(t, Math.random()*1.5, len+.05); return g;
 }
-function snare(t, v, soft){
-  noiseHit(t, soft?.18:.22, (soft?.28:.42)*v, soft?1400:1900, 'bandpass', .8);
-  const c=N.ctx, o=c.createOscillator(), g=c.createGain(); o.frequency.setValueAtTime(210,t); o.frequency.exponentialRampToValueAtTime(150,t+.08);
-  g.gain.setValueAtTime(.32*v,t); g.gain.exponentialRampToValueAtTime(.001,t+.12); o.connect(g); g.connect(N.drums); o.start(t); o.stop(t+.14);
-  if (!soft) { const vg=c.createGain(); vg.gain.value=.25; g.connect(vg); vg.connect(N.verbIn); }
-}
-function clap(t, v){ [0,.012,.024].forEach(d=>noiseHit(t+d,.09,.22*v,1200,'bandpass',1.4)); }
-function hat(t, v, open){ noiseHit(t, open?.22:.035, (open?.12:.13)*v, open?7000:9000, 'highpass'); }
+function snare(t, v, soft){ const g = hit(soft ? N.kit.snareSoft : N.kit.snare, t, (soft?.4:.55)*v, rnd(.98,1.02)); if (!soft) g.connect(N.snVerb); }
+function clap(t, v){ hit(N.kit.clap, t, .45*v).connect(N.snVerb); }
+function hat(t, v, open){ hit(open ? N.kit.hatOpen : N.kit.hat, t, (open?.2:.24)*v, rnd(.985,1.015), N.hats); }
 function crackle(t){ if (Math.random()<.5) noiseHit(t, .006, rnd(.3,1), 2500, 'highpass', 0, N.vinyl); }
 
 /* ================= COMPOSER ================= */
@@ -494,13 +573,13 @@ function stepAt(t){
   const full = sec==='CRUISE' || sec==='PEAK', peak = sec==='PEAK', drift = sec==='DRIFT' || sec==='INTRO';
   // Harmony
   if (b16===0) {
-    const tones = chordTones(s, chordDeg, s.seventh ? 4 : 3).map(d => hzOf(s, d, 2));
+    const raw = chordTones(s, chordDeg, s.seventh ? 4 : 3).map(d => hzOf(s, d, 2)), tones = voicing(raw, 185);
     if (s.pad || drift) pad(tones, t, barDur*(s.pad?1.02:1));
-    if (!s.pad || peak) { if (s.drums==='lofi' || s.power) stab(tones.slice(0, s.power?2:4), t+human(), .8); }
+    if (!s.pad || peak) { if (s.drums==='lofi' || s.power) stab(s.power ? raw.slice(0,2) : tones, t+human(), .8); }
     N.tone.frequency.setTargetAtTime(drift ? 2600 : peak ? 16000 : 9000, t, 1.5);
   }
   if (s.power && full && b16%4===0 && b16) stab(chordTones(s, chordDeg, 2).map(d=>hzOf(s,d,1)), t+human(), .7);
-  if (s.drums==='lofi' && b16===10 && Math.random()<.5) stab(chordTones(s, chordDeg, 3).map(d=>hzOf(s,d,2)), t, .5);
+  if (s.drums==='lofi' && b16===10 && Math.random()<.5) stab(voicing(chordTones(s, chordDeg, 3).map(d=>hzOf(s,d,2)), 220), t, .5);
   // Drums
   const sw = s.swing && step%2 ? s.swing*(60/s.bpm/4) : 0, T = t + sw;
   if (s.drums !== 'none' && !(drift && sec==='DRIFT')) {
@@ -527,7 +606,7 @@ function stepAt(t){
   if (!drift || s.bassStyle==='drone') {
     const st16 = 60/s.bpm/4;
     if (s.bassStyle==='pulse' && b16%2===0) bass(bf*(b16%8===6?1.5:1), t, st16*1.6, b16%4===0?1:.7, 'pulse');
-    else if (s.bassStyle==='acid' && (b16%2===0 || Math.random()<S.energy*.4)) bass(bf*pickOne([1,1,1,2,1.5]), t, st16*1.4, Math.random()<.3?1:.7, 'acid');
+    else if (s.bassStyle==='acid' && (b16%2===0 || Math.random()<S.energy*.4)) { const f = bf*pickOne([1,1,1,2,1.5]); bass(f, t, st16*1.4, Math.random()<.3?1:.7, 'acid', S.acidLast && Math.random()<.3 ? S.acidLast : 0); S.acidLast = f; }
     else if (s.bassStyle==='offbeat' && b16%4===2) bass(bf, t, st16*1.8, 1, 'pulse');
     else if (s.bassStyle==='eighths' && b16%2===0) bass(bf, t, st16*1.5, .9, 'pulse');
     else if (s.bassStyle==='round' && (b16===0 || b16===7 || b16===10)) bass(bf*(b16===10?1.5:1), t+sw, st16*4, .9, 'round');
@@ -584,7 +663,7 @@ function evolve(){
   if (!S.playing || !N.ctx) return;
   const t = N.ctx.currentTime, s = st(), v = P().variation * (S.longDrive ? .3 : 1) * (.4 + S.effects);
   N.filter.frequency.setTargetAtTime(Math.max(250, 500 + S.filter*11500 + Math.sin(Date.now()/12000)*350*v), t, 2);
-  const dt = s.bpm ? (60/s.bpm)*.75 : .33; N.dly.delayTime.setTargetAtTime(dt*(1 + Math.sin(Date.now()/18000)*.06*v), t, 3);
+  const dt = s.bpm ? (60/s.bpm)*.75 : .33, dd = dt*(1 + Math.sin(Date.now()/18000)*.06*v); N.dly.delayTime.setTargetAtTime(dd, t, 3); N.dly2.delayTime.setTargetAtTime(dd, t, 3);
   if (!S.longDrive && Math.random() < .18*v) { const fx=.4+1.2*S.effects; N.verbOut.gain.setTargetAtTime(((s.bigVerb?.6:.32)*S.reverb*fx+.03)*(.9+Math.random()*.15), t, 4); }
 }
 function tune(i){ const was=S.playing; if (was) pause(); S.i=(i+STATIONS.length)%STATIONS.length; paint(); if (was) play(); }
