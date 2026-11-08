@@ -256,7 +256,7 @@ const pickOne = a => a[Math.floor(Math.random() * a.length)];
 const STATIONS = [
   { id:'synth', name:'NIGHTRIDE 84', freq:'88.9', e:'🌆', short:'SYNTH', c:'#ff3d6e', title:'CINEMATIC SYNTHWAVE', mood:'CINEMATIC',
     desc:'Cinematic synthwave, retro drums and melodic hooks.',
-    bpm:100, root:43.65, scale:[0,2,3,5,7,8,10], prog:[0,5,3,6], lead:'supersaw', bassStyle:'pulse', drums:'synth', arp:true, pad:true, duck:.45, trim:1.08 },
+    bpm:100, root:43.65, scale:[0,2,3,5,7,8,10], prog:[0,5,3,6], lead:'supersaw', bassStyle:'pulse', drums:'synth', arp:true, pad:true, duck:.45, trim:1.3 },
   { id:'lofi', name:'MIDNIGHT TAPE', freq:'92.3', e:'🌙', short:'LO-FI', c:'#2fd18b', title:'JAZZY LO-FI CHILL', mood:'RELAXED',
     desc:'Dusty drums, warm chords and jazzy late-night melodies.',
     bpm:78, root:55, scale:[0,2,3,5,7,9,10], prog:[1,4,0,5], lead:'keys', bassStyle:'round', drums:'lofi', swing:.18, crackle:true, wobble:1, seventh:true, trim:1.1 },
@@ -265,7 +265,7 @@ const STATIONS = [
     bpm:124, root:41.2, scale:[0,1,3,5,7,8,10], prog:[0,0,5,6], lead:'square', bassStyle:'acid', drums:'four', duck:.5, chorus:1.6, trim:.85 },
   { id:'golden', name:'GOLDEN HOUR', freq:'99.5', e:'🌅', short:'DAYDREAM', c:'#ffc857', title:'WARM MELODIC SOUNDSCAPE', mood:'DAYDREAM',
     desc:'Warm analog tones, memorable motifs and relaxed harmonic movement.',
-    bpm:88, root:73.42, scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'warm', bassStyle:'round', drums:'soft', pad:true, dl:1.5, trim:1.04 },
+    bpm:88, root:73.42, scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'warm', bassStyle:'round', drums:'soft', pad:true, dl:1.5, trim:1.16 },
   { id:'space', name:'STARLIGHT', freq:'101.5', e:'🪐', short:'SPACE', c:'#46c3ff', title:'DEEP SPACE AMBIENT', mood:'ATMOSPHERIC',
     desc:'Wide evolving pads, floating melodies and cinematic space.',
     bpm:60, root:49, scale:[0,2,4,7,9], prog:[0,3,4,2], lead:'bell', bassStyle:'drone', drums:'none', pad:true, bigVerb:true, trim:1.26 },
@@ -274,7 +274,7 @@ const STATIONS = [
     bpm:126, root:49, scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'supersaw', bassStyle:'offbeat', drums:'four', arp:true, clap:true, duck:.5, chorus:1.3, trim:.88 },
   { id:'punk', name:'PUNK AFTER DARK', freq:'107.9', e:'🎸', short:'PUNK', c:'#ff7a2f', title:'PUNK DRIVE', mood:'REBELLIOUS',
     desc:'Distorted guitar-like synths, fast drums and rebellious melodies.',
-    bpm:168, root:41.2, scale:[0,3,5,7,10], prog:[0,3,5,4], lead:'fuzz', bassStyle:'eighths', drums:'punk', power:true, chorus:2, trim:.87 },
+    bpm:168, root:41.2, scale:[0,2,4,5,7,9,11], prog:[0,4,5,3], lead:'fuzz', bassStyle:'eighths', drums:'punk', power:true, chorus:1.2, trim:1.15 },
   { id:'mine', name:'MY MUSIC', freq:'LOCAL', e:'💾', short:'MINE', c:'#c4f042', title:'YOUR SAVED TRACKS', mood:'LOCAL', desc:'Your saved tracks, played from this phone.', local:true },
   { id:'live', name:'SOMAFM DEF CON', freq:'LIVE', e:'📡', short:'LIVE', c:'#ef6cff', title:'LIVE CLOUD RADIO', mood:'LIVE', desc:'Internet radio. Needs signal.', stream:'https://ice1.somafm.com/defcon-128-mp3' }
 ];
@@ -481,6 +481,7 @@ function supersaw(f, t, len, vel, pan){
   mg.connect(lp); lp.connect(g); env(g,t,.01,.05*vel,.25,.6,.25,len); out(g,pan,.35,.25);
 }
 function keys(f, t, len, vel, pan){ // FM electric piano: a bright tine bark on the attack that mellows as the note rings
+  if (st().id==='lofi' && has('rhodes')) { const g = smpNote('rhodes', Math.round(hz2midi(f)), t, .075*vel, null, '', len+.35, .45); if (g) { const hp=N.ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=240; hp.Q.value=.5; g.connect(hp); out(hp,pan,.3,.12); return; } }
   const c=N.ctx, g=c.createGain(), lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3400;
   const car=osc('sine',f,t,t+len+1.2), mod=osc('sine',f,t,t+len+1.2), mi=c.createGain();
   mi.gain.setValueAtTime(f*(1+1.6*vel),t); mi.gain.setTargetAtTime(f*.22,t,.22); mod.connect(mi); mi.connect(car.frequency);
@@ -522,6 +523,7 @@ function stab(freqs, t, vel){ // short chord hit (keys stations, punk power chor
   freqs.forEach((f,i)=>{ const s=st(); (s.power?fuzzLead:keys)(f,t,s.power?.22:.9,vel*(i?0.7:1),(i-1)*.25); });
 }
 function bass(f, t, len, vel, style, from){
+  if (st().id==='lofi' && has('bass')) { const g = smpNote('bass', Math.round(hz2midi(f)), t, 2*vel, null, 'f1', len, .12); if (g) { out(g,0,0,0); return; } }
   const c=N.ctx, g=c.createGain(), lp=c.createBiquadFilter(); lp.type='lowpass';
   if (style==='acid') {
     lp.Q.value=13; lp.frequency.setValueAtTime(300+2200*S.energy*vel,t); lp.frequency.exponentialRampToValueAtTime(140,t+len*.9);
@@ -535,7 +537,7 @@ function bass(f, t, len, vel, style, from){
 function hit(buf, t, v, rate, dest){ const c=N.ctx, s=c.createBufferSource(), g=c.createGain(); s.buffer=buf; if (rate) s.playbackRate.value=rate; g.gain.value=v; s.connect(g); g.connect(dest||N.drums); s.start(t); return g; }
 function kick(t, v){
   const s = st(), soft = s.drums==='lofi' || s.drums==='soft';
-  hit(s.drums==='punk' ? N.kit.kickPunk : soft ? N.kit.kickSoft : N.kit.kick, t, .9*v);
+  if (!kitHit('kick', t, v)) hit(s.drums==='punk' ? N.kit.kickPunk : soft ? N.kit.kickSoft : N.kit.kick, t, .9*v);
   if (s.duck) { N.duck.gain.cancelScheduledValues(t); N.duck.gain.setValueAtTime(1-s.duck*(.6+S.energy*.4),t); N.duck.gain.setTargetAtTime(1,t+.02,.09); }
 }
 function noiseHit(t, len, v, f, type, q, dest){
@@ -543,10 +545,105 @@ function noiseHit(t, len, v, f, type, q, dest){
   const g=c.createGain(); g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.001,t+len);
   s.connect(fl); fl.connect(g); g.connect(dest || N.drums); s.start(t, Math.random()*1.5, len+.05); return g;
 }
-function snare(t, v, soft){ const g = hit(soft ? N.kit.snareSoft : N.kit.snare, t, (soft?.4:.55)*v, rnd(.98,1.02)); if (!soft) g.connect(N.snVerb); }
-function clap(t, v){ hit(N.kit.clap, t, .45*v).connect(N.snVerb); }
-function hat(t, v, open){ hit(open ? N.kit.hatOpen : N.kit.hat, t, (open?.2:.24)*v, rnd(.985,1.015), N.hats); }
+function snare(t, v, soft){
+  const s = st(), kg = kitHit('snare', t, v*(soft?.75:1));
+  if (kg) { if (s.id==='synth' || s.id==='punk') kg.connect(N.snVerb); return; }
+  if (s.id==='cyber' && has('rock')) smp('rock', pickOne(['rim1','rim2']), t, .32*v, N.drums);
+  const g = hit(soft ? N.kit.snareSoft : N.kit.snare, t, (soft?.4:.55)*v, rnd(.98,1.02)); if (!soft) g.connect(N.snVerb); }
+function clap(t, v){ hit(N.kit.clap, t, (has('linn')?.25:.45)*v).connect(N.snVerb); const g = smp('linn', 'clap1', t, .5*v, N.drums); if (g) g.connect(N.snVerb); }
+function hat(t, v, open){
+  if (st().id==='punk' && S.section==='PEAK' && has('rock')) { smp('rock', pickOne(['ride1','ride2']), t, .3*v, N.hats); return; }
+  if (kitHit(open?'open':'hat', t, v)) return;
+  hit(open ? N.kit.hatOpen : N.kit.hat, t, (open?.2:.24)*v, rnd(.985,1.015), N.hats); }
 function crackle(t){ if (Math.random()<.5) noiseHit(t, .006, rnd(.3,1), 2500, 'highpass', 0, N.vinyl); }
+
+/* ================= REAL SAMPLES ================= */
+// Recorded instruments, all free to use (CC0 / public domain, see samples/CREDITS.txt).
+// Each station loads only its own sets; until they arrive (or offline before first download) the synth versions play.
+const SAMPLE_SETS = { synth:['linn'], lofi:['dusty','rhodes','bass'], cyber:['rock'], golden:['cr78'], energy:['rock','linn'], punk:['rock','guitar','bass'] };
+const SMP = {}, READY = new Set(); let SMP_MAN = null;
+const has = set => READY.has(set);
+async function manifest(){ if (!SMP_MAN) SMP_MAN = await (await fetch('samples/manifest.json')).json(); return SMP_MAN; }
+async function loadSet(set){
+  if (SMP[set] || !N.ctx) return SMP[set]; const c = N.ctx;
+  return SMP[set] = (async () => {
+    try {
+      const m = await manifest(), out = {};
+      await Promise.all(m.sets[set].map(async name => {
+        const ab = await (await fetch('samples/'+set+'/'+name+'.mp3')).arrayBuffer();
+        const buf = await new Promise((ok, no) => { const p = c.decodeAudioData(ab, ok, no); if (p && p.catch) p.catch(no); });
+        out[name] = { buf, off: onset(buf) };
+      }));
+      SMP[set] = out; READY.add(set);
+    } catch(e) { delete SMP[set]; }
+  })();
+}
+// Skip any silence the MP3 decoder adds in front, so hits land exactly on the beat
+function onset(b){ const d=b.getChannelData(0); let pk=0; for (let i=0;i<d.length;i++) if (Math.abs(d[i])>pk) pk=Math.abs(d[i]); for (let i=0;i<d.length;i++) if (Math.abs(d[i])>pk*.01) return Math.max(0,i-b.sampleRate*.001)/b.sampleRate; return 0; }
+// Save every set to the offline cache in the background (download only, nothing decoded)
+let prefetched = false;
+function prefetchAll(){ if (prefetched || !navigator.onLine) return; prefetched = true; manifest().then(m => Object.keys(m.sets).forEach(set => m.sets[set].forEach(n => fetch('samples/'+set+'/'+n+'.mp3').catch(()=>{})))).catch(()=>{}); }
+// Play one sample; returns its gain node (connected to dest when given)
+function smp(set, name, t, v, dest, rate, len, rel){
+  const e = has(set) && SMP[set][name]; if (!e) return null;
+  const c=N.ctx, s=c.createBufferSource(), g=c.createGain(); s.buffer=e.buf; if (rate) s.playbackRate.value=rate;
+  s.connect(g); if (dest) g.connect(dest); s.start(t, e.off);
+  g.gain.setValueAtTime(v, t); if (len) { g.gain.setValueAtTime(v, t+len); g.gain.setTargetAtTime(0, t+len, (rel||.15)/3); s.stop(t+len+(rel||.15)+.05); }
+  return g;
+}
+const hz2midi = f => 69 + 12*Math.log2(f/440);
+// Pitched instruments: nearest recorded note, retuned by playback rate
+function smpNote(set, midi, t, v, dest, suffix, len, rel){
+  const list = SMP_MAN.notes[set]; let best = list[0]; for (const m of list) if (Math.abs(m-midi) < Math.abs(best-midi)) best = m;
+  return smp(set, 'm'+best+(suffix||''), t, v, dest, Math.pow(2,(midi-best)/12), len, rel);
+}
+// Kits per station: [kick, snare, closed hat, open hat, clap]
+const KITS = {
+  synth:  { set:'linn', kick:['kick1'], snare:['snare1','snare2'], hat:['hat1','hat2'], open:['open1'], clap:['clap1'], kv:1, sv:.75, hv:.4 },
+  lofi:   { set:'dusty', kick:['kick1','kick2'], snare:['snare1','snare2'], hat:['hat1','hat2'], open:['open1'], kv:1.1, sv:.8, hv:.45 },
+  golden: { set:'cr78', kick:['kick1','kick2'], snare:['snare1','snare2'], hat:['hat1','hat2'], open:['hat2'], kv:1.1, sv:.7, hv:.45 },
+  punk:   { set:'rock', kick:['kick2','kick3'], snare:['snare2','snare3'], hat:['hat2','hat3'], open:['open1'], kv:1, sv:.8, hv:.4 },
+  cyber:  { set:'rock', hat:['hat1','hat2','hat3'], open:['open1'], hv:.3 },
+  energy: { set:'rock', hat:['hat1','hat2','hat3'], open:['open1'], hv:.32 }
+};
+function kitHit(part, t, v){
+  const s=st(), k=KITS[s.id]; if (!k || !k[part] || !has(k.set)) return null;
+  const vol = part==='kick' ? k.kv : part==='snare' ? k.sv : part==='clap' ? .6 : k.hv;
+  return smp(k.set, pickOne(k[part]), t, v*vol*.9, part==='hat'||part==='open' ? N.hats : N.drums);
+}
+function cymbal(t, v){ if (has('rock')) smp('rock', pickOne(['crash1','crash2']), t, .38*v, N.drums); }
+// Guitar amps: two rigs, hard left and right, like a double-tracked rhythm guitar, plus a centered lead rig
+function ampCurve(){ const n=4096,c=new Float32Array(n); for(let i=0;i<n;i++){ const x=i*2/n-1; c[i]=Math.tanh(x*1.4+.12)-Math.tanh(.12); } return c; }
+function amp(pan, drive, level){
+  const c=N.ctx, f=(type,fr,q,g)=>{ const b=c.createBiquadFilter(); b.type=type; b.frequency.value=fr; if (q) b.Q.value=q; if (g!==undefined) b.gain.value=g; return b; };
+  const inp=c.createGain(), dr=c.createGain(), ws=c.createWaveShaper(), out=c.createGain(), p=c.createStereoPanner ? c.createStereoPanner() : c.createGain();
+  dr.gain.value=drive; ws.curve=ampCurve(); ws.oversample='4x'; out.gain.value=level; if (p.pan) p.pan.value=pan;
+  const chain=[inp, f('highpass',120,.7), f('peaking',750,.8,5), dr, ws, f('peaking',420,1,-4), f('peaking',3200,1.2,-3), f('lowpass',4800,.8), f('lowpass',7500,.6), out, p];
+  for (let i=0;i<chain.length-1;i++) chain[i].connect(chain[i+1]); p.connect(N.music); return { inp, last:[] };
+}
+function rigs(){ if (!N.amps) N.amps = { L:amp(-.85,10,.07), R:amp(.85,10,.07), C:amp(0,6,.08) }; return N.amps; }
+// One strum on one rig: earlier notes on that rig are cut short, the way a player's hand stops the strings
+function strum(rig, midis, t, len, vel, mute, rr){
+  rig.last.forEach(g => { g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0, t, .006); }); rig.last = [];
+  midis.forEach((m,i) => {
+    const g = smpNote('guitar', m, t+i*.004, vel*(i?.8:1), null, 'r'+rr, len, mute?.03:.12); if (!g) return;
+    if (mute) { const lp=N.ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=900; g.connect(lp); lp.connect(rig.inp); } else g.connect(rig.inp);
+    rig.last.push(g);
+  });
+}
+// Pop punk: power chords (root, fifth, octave), palm-muted eighths on verses, open eighths on choruses
+function rockStep(t, s, step, b16, bar, sec, chordDeg){
+  const R = rigs(), peak = sec==='PEAK', full = sec==='CRUISE' || peak, e8 = 60/s.bpm/2;
+  let root = Math.round(hz2midi(hzOf(s, chordDeg, 1))); while (root > 51) root -= 12; while (root < 40) root += 12;
+  const chord = [root, root+7, root+12];
+  const hitAt = (len, vel, mute) => { strum(R.L, chord, t+rnd(0,.006), len, vel, mute, 1); strum(R.R, chord, t+rnd(.003,.011), len, vel*.97, mute, 2); };
+  if (full && b16%2===0) hitAt(peak ? e8*.95 : e8*.8, (b16%8===0 ? 1 : .82)*(peak?1:.9), !peak && b16%8!==0);
+  else if (!full && b16===0) hitAt(60/s.bpm*4*.95, .7, false);   // intro and breakdown: let the chord ring for the bar
+  // Bass guitar follows the root in eighths
+  if (has('bass') && (full ? b16%2===0 : b16===0)) { let bm = root-12; while (bm > 39) bm -= 12; const g = smpNote('bass', bm, t, (b16%8===0?.95:.8), null, 'f'+(1+(b16>>1)%2), full ? e8*.9 : 60/s.bpm*4, .08); if (g) out(g,0,0,0); }
+  // Lead guitar sings the melody on choruses
+  if (peak) { const mn = S.motif[step % 32]; if (mn !== null && b16%2===0) smpNote('guitar', Math.round(hz2midi(hzOf(s, mn, 2))), t, .55, R.C.inp, 'r1', e8*1.8, .1); }
+}
 
 /* ================= COMPOSER ================= */
 function chordTones(s, deg, n){ const out=[]; for (let k=0;k<n;k++) out.push(deg + k*2); return out; }
@@ -569,16 +666,18 @@ function stepAt(t){
   if (secIdx !== S.lastSection || !S.motif) { S.lastSection = secIdx; S.section = sec; S.motif = newMotif(s); $('section').textContent = sec; }
   if (b16===0 && barInPhrase%2===0 && barInPhrase) S.motif = mutate(S.motif);
   const chordDeg = s.prog[bar % s.prog.length], barDur = 60/s.bpm*4;
-  const human = () => rnd(-.004,.004), vel = () => rnd(.82,1);
+  const human = () => rnd(-.004,.004), vel = () => rnd(.82,1), rock = s.id==='punk' && has('guitar') && has('rock');
   const full = sec==='CRUISE' || sec==='PEAK', peak = sec==='PEAK', drift = sec==='DRIFT' || sec==='INTRO';
   // Harmony
   if (b16===0) {
     const raw = chordTones(s, chordDeg, s.seventh ? 4 : 3).map(d => hzOf(s, d, 2)), tones = voicing(raw, 185);
     if (s.pad || drift) pad(tones, t, barDur*(s.pad?1.02:1));
-    if (!s.pad || peak) { if (s.drums==='lofi' || s.power) stab(s.power ? raw.slice(0,2) : tones, t+human(), .8); }
+    if (!rock && (!s.pad || peak)) { if (s.drums==='lofi' || s.power) stab(s.power ? raw.slice(0,2) : tones, t+human(), .8); }
     N.tone.frequency.setTargetAtTime(drift ? 2600 : peak ? 16000 : 9000, t, 1.5);
   }
-  if (s.power && full && b16%4===0 && b16) stab(chordTones(s, chordDeg, 2).map(d=>hzOf(s,d,1)), t+human(), .7);
+  if (rock) rockStep(t, s, step, b16, bar, sec, chordDeg);
+  if (full && b16===0 && barInPhrase===0) { if (s.id==='punk' || s.id==='energy') cymbal(t, 1); else if (s.id==='synth') smp('linn', 'crash1', t, .3, N.drums); }
+  if (!rock && s.power && full && b16%4===0 && b16) stab(chordTones(s, chordDeg, 2).map(d=>hzOf(s,d,1)), t+human(), .7);
   if (s.drums==='lofi' && b16===10 && Math.random()<.5) stab(voicing(chordTones(s, chordDeg, 3).map(d=>hzOf(s,d,2)), 220), t, .5);
   // Drums
   const sw = s.swing && step%2 ? s.swing*(60/s.bpm/4) : 0, T = t + sw;
@@ -603,7 +702,7 @@ function stepAt(t){
   if (s.crackle) crackle(t);
   // Bass
   const bDeg = chordDeg, bf = hzOf(s, bDeg, 0);
-  if (!drift || s.bassStyle==='drone') {
+  if (!rock && (!drift || s.bassStyle==='drone')) {
     const st16 = 60/s.bpm/4;
     if (s.bassStyle==='pulse' && b16%2===0) bass(bf*(b16%8===6?1.5:1), t, st16*1.6, b16%4===0?1:.7, 'pulse');
     else if (s.bassStyle==='acid' && (b16%2===0 || Math.random()<S.energy*.4)) { const f = bf*pickOne([1,1,1,2,1.5]); bass(f, t, st16*1.4, Math.random()<.3?1:.7, 'acid', S.acidLast && Math.random()<.3 ? S.acidLast : 0); S.acidLast = f; }
@@ -624,7 +723,7 @@ function stepAt(t){
   }
   // Melody (motif)
   const mn = S.motif[step % 32];
-  const play = mn !== null && (full || (drift && Math.random()<.5) || s.lead==='bell');
+  const play = !rock && mn !== null && (full || (drift && Math.random()<.5) || s.lead==='bell');
   if (play) {
     let deg = mn; if (b16%4===0) { const ct = chordTones(s, chordDeg, 3).map(x=>x%s.scale.length); const dm=((deg%s.scale.length)+s.scale.length)%s.scale.length; if (!ct.includes(dm)) deg += 1; }
     const len = s.lead==='bell' ? 1.6 : s.lead==='keys' ? .45 : s.lead==='warm' ? .55 : s.lead==='fuzz' ? .13 : (60/s.bpm/4)*rnd(1.2,2.4);
@@ -643,6 +742,7 @@ async function play(){
   if (!init()) return;
   try { await N.ctx.resume(); } catch(e) {}
   const s = st(); S.playing = true; clearInterval(S.timer);
+  (SAMPLE_SETS[s.id]||[]).forEach(loadSet); setTimeout(prefetchAll, 20000);
   if (s.local) {
     if (!S.tracks.length) { S.playing=false; $('musicBox').open=true; paint(); $('status').textContent='ADD MUSIC'; return; }
     live.pause(); loadTrack(S.ti); await player.play().catch(()=>{}); $('status').textContent='FROM THIS PHONE';

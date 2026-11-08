@@ -1,0 +1,10 @@
+Night Cruiser sample credits. Every sample here is free to use, share and change.
+Samples were trimmed, mixed from their microphones, level matched and encoded to MP3.
+
+rock/    Big Rusty Drums by Karoryfer Samples. CC0 1.0. https://github.com/sfzinstruments/karoryfer.big-rusty-drums
+dusty/   Gogodze Phu Vol II by Karoryfer Samples (retro mic). CC0 1.0. https://github.com/sfzinstruments/karoryfer.gogodze-phu-vol-ii
+guitar/  Emilyguitar by Karoryfer Samples. CC0 1.0. https://github.com/sfzinstruments/karoryfer.emilyguitar
+bass/    Growlybass by Karoryfer Samples. CC0 1.0. https://github.com/sfzinstruments/karoryfer.growlybass
+rhodes/  jRhodes (GM version) by Jeff Learman. CC0 1.0. https://github.com/sfzinstruments/Discord-SFZ-GM-Bank
+linn/    LinnDrum LM-2 samples. Public domain. https://github.com/danigb/sampled (DM/LM-2)
+cr78/    Roland CR-78 samples. Public domain. https://github.com/danigb/sampled (DM/CR-78)
