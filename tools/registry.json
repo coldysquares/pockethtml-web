@@ -43,7 +43,7 @@
       "description": "Generative driving radio: 7 made-on-phone stations plus your music and live radio, listening profiles, long drive mode, rain, delay, drive, voice co-pilot with trivia, sleep timer, driving lock. Works offline.",
       "kind": "hosted",
       "path": "night-cruiser/",
-      "version": "2.4.0",
+      "version": "2.5.0",
       "status": "live",
       "tags": [
         "audio"
