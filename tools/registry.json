@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-11-07",
+  "updated": "2026-11-19",
   "statuses": [
     "live",
     "building",
@@ -66,6 +66,21 @@
       "added": "2026-11-07",
       "updated": "2026-11-07",
       "icon": "📼"
+    },
+    {
+      "id": "pocketcolor",
+      "name": "PocketColor",
+      "description": "Palette maker: color-wheel harmonies or five colors pulled from a photo. Save palettes, export CSS, Tailwind, JSON, an SVG card or an Adobe .ase swatch file. Works offline.",
+      "kind": "hosted",
+      "path": "pocketcolor/",
+      "version": "1.0.0",
+      "status": "live",
+      "tags": [
+        "image"
+      ],
+      "added": "2026-11-19",
+      "updated": "2026-11-19",
+      "icon": "🎨"
     },
     {
       "id": "pockethtml",
